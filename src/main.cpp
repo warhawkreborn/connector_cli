@@ -90,6 +90,7 @@ std::vector<server_entry> download_server_list() {
     for(auto& e: val.get<picojson::array>()) {
         try {
             auto ip = warhawk::net::udp_server::get_ip(e.get("hostname").get<std::string>());
+            if(e.get("state").get<std::string>() != "online") continue;
             server_entry entry;
             entry.name = e.get("name").get<std::string>();
             entry.ping = e.get("ping").get<int64_t>();
