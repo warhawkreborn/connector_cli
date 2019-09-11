@@ -1,6 +1,3 @@
-# Platform Detection
-SYSTEM := $(shell uname)
-
 SRC = $(shell find ./src -name '*.cpp') $(shell find ./src -name '*.c')
 EXCLUDE_SRC =
 FSRC = $(filter-out $(EXCLUDE_SRC), $(SRC))
