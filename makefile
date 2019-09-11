@@ -1,3 +1,6 @@
+# Platform Detection
+SYSTEM := $(shell uname)
+
 SRC = $(shell find ./src -name '*.cpp') $(shell find ./src -name '*.c')
 EXCLUDE_SRC =
 FSRC = $(filter-out $(EXCLUDE_SRC), $(SRC))
@@ -19,7 +22,11 @@ OUTFILE = bridge
 release: FLAGS += -O2
 release: LINKFLAGS := $(LIBS) $(LINKFLAGS)
 release: $(OUTFILE)
+ifeq ($(shell uname), Darwin)
+	@strip -x $(OUTFILE)
+else
 	@strip --strip-unneeded $(OUTFILE)
+endif
 
 debug: FLAGS += -g -O0
 debug: LINKFLAGS := $(LIBS) $(LINKFLAGS)
@@ -28,7 +35,11 @@ debug: $(OUTFILE)
 release_static: FLAGS += -O2
 release_static: LINKFLAGS := -Wl,-Bstatic $(LIBS) -Wl,-Bdynamic  $(LINKFLAGS)
 release_static: $(OUTFILE)
+ifeq ($(shell uname), Darwin)
+	@strip -x $(OUTFILE)
+else
 	@strip --strip-unneeded $(OUTFILE)
+endif
 
 debug_static: FLAGS += -g -O0
 debug_static: LINKFLAGS := -Wl,-Bstatic $(LIBS) -Wl,-Bdynamic  $(LINKFLAGS)
