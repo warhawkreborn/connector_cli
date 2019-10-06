@@ -1,5 +1,5 @@
-# connector_linux
-Connector to allow discovery of servers (Linux version)
+# connector_unix
+Connector to allow discovery of servers (Linux & Mac version)
 
 ### Compiling
 You need to install a couple of dependencies:
