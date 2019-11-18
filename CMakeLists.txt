@@ -13,13 +13,13 @@ message( "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}" )
 if ( APPLE )
 
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.10" )
-  set( CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -pthread -lc++" )
+  set( CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -lc++" )
 
   # Standard library.
   add_definitions( -stdlib=libc++ )
 
   # C++14
-  add_definitions( -std=c++17 )
+  add_definitions( -std=c++14 )
 
   # Warnings as errors.
   # add_definitions( -Werror )
@@ -27,6 +27,8 @@ if ( APPLE )
 endif( )
 
 add_definitions( -DPICOJSON_USE_INT64 )
+
+find_package( Threads )
 
 set( SOURCE_FILES
      src/main.cpp
@@ -52,4 +54,5 @@ target_link_libraries( bridge
                        curl
                        dl
                        z
+                       ${CMAKE_THREAD_LIBS_INIT}
                      )
