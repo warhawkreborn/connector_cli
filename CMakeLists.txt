@@ -28,7 +28,11 @@ endif( )
 
 add_definitions( -DPICOJSON_USE_INT64 )
 
+find_package( CURL REQUIRED )
+
 find_package( Threads )
+
+include_directories( ${CURL_INCLUDE_DIR} )
 
 set( SOURCE_FILES
      src/main.cpp
