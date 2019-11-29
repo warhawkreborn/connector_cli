@@ -10,6 +10,7 @@
 
 #ifndef WIN32
 #include <netinet/in.h>
+#define SOCKET int
 #endif
 
 
@@ -35,7 +36,7 @@ class udp_server
 
   private:
 
-    int m_fd;
+    SOCKET m_fd;
 };
 
 } // End namespace net

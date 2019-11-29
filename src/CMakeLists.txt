@@ -24,6 +24,8 @@ if ( APPLE OR UNIX )
 
 else( )
 
+  add_definitions( -D_WINSOCK_DEPRECATED_NO_WARNINGS )
+
   set( PLATFORM_LIBS
        libcurl
      )
