@@ -26,9 +26,15 @@ if ( APPLE )
   # Warnings as errors.
   # add_definitions( -Werror )
 
+  set( USE_SYSTEM_CURL ON )
+
 elseif ( MSVC )
 
   set( USE_SYSTEM_CURL OFF )
+
+else( )
+
+  set( USE_SYSTEM_CURL ON )
 
 endif( )
 

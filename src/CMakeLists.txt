@@ -17,8 +17,15 @@ include_directories( ${CURL_INCLUDE_DIR} )
 if ( APPLE OR UNIX )
 
   set( UNIX_LIBS 
+       curl
        dl
        z
+     )
+
+else( )
+
+  set( WIN_LIBS
+       libcurl
      )
 
 endif( )
@@ -44,7 +51,7 @@ add_executable( warhawk-reborn
 
 
 target_link_libraries( warhawk-reborn
-                       libcurl
                        ${UNIX_LIBS}
+                       ${WIN_LIBS}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
