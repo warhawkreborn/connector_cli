@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn )
 
+option( USE_SYSTEM_CURL "Use the system CURL (not the built-in one)." OFF )
+
 if ( NOT CMAKE_BUILD_TYPE )
 
   set( CMAKE_BUILD_TYPE Debug )
@@ -27,4 +29,9 @@ if ( APPLE )
 endif( )
 
 add_subdirectory( src )
-#add_subdirectory( libs/curl )
+
+if ( USE_SYSTEM_CURL )
+
+  add_subdirectory( libs/curl )
+
+endif( )

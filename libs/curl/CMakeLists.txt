@@ -1,0 +1,4 @@
+# CURL configuration
+
+project( CURL )
+
