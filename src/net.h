@@ -13,21 +13,31 @@
 #endif
 
 
-namespace warhawk {
-    namespace net {
-        class udp_server {
-            int fd;
-        public:
-            udp_server(uint16_t port);
-            ~udp_server();
+namespace warhawk
+{
 
-            udp_server(const udp_server&) = delete;
-            udp_server& operator=(const udp_server&) = delete;
+namespace net
+{
+class udp_server
+{
+  public:
 
-            void send(struct sockaddr_in& clientaddr, const std::vector<uint8_t>& data);
-            bool receive(struct sockaddr_in& clientaddr, std::vector<uint8_t>& data);
+    udp_server( uint16_t port );
+    ~udp_server( );
 
-            static std::array<uint8_t, 4> get_ip(const std::string& host);
-        };
-    }
-}
+    udp_server( const udp_server & ) = delete;
+    udp_server &operator=( const udp_server & ) = delete;
+
+    void send(    struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data );
+    bool receive( struct sockaddr_in &clientaddr, std::vector<uint8_t> &data );
+
+    static std::array<uint8_t, 4> get_ip( const std::string &host );
+
+  private:
+
+    int m_fd;
+};
+
+} // End namespace net
+
+} // End namespace warhawk
