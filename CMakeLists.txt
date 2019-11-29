@@ -26,37 +26,5 @@ if ( APPLE )
 
 endif( )
 
-add_definitions( -DPICOJSON_USE_INT64 )
-
-find_package( CURL REQUIRED )
-
-find_package( Threads )
-
-include_directories( ${CURL_INCLUDE_DIR} )
-
-set( SOURCE_FILES
-     src/main.cpp
-     src/net.cpp
-     src/webclient.cpp
-   )
-
-set( INCLUDE_FILES
-     src/cookie.h
-     src/net.h
-     src/picojson.h
-     src/warhawk.h
-     src/webclient.h
-   )
-
-add_executable( bridge
-                ${SOURCE_FILES}
-                ${INCLUDE_FILES}
-              )
-
-
-target_link_libraries( bridge
-                       curl
-                       dl
-                       z
-                       ${CMAKE_THREAD_LIBS_INIT}
-                     )
+add_subdirectory( src )
+#add_subdirectory( libs/curl )
