@@ -43,14 +43,14 @@ namespace warhawk {
         }
 
         void udp_server::send(struct sockaddr_in& clientaddr, const std::vector<uint8_t>& data) {
-            int n = sendto( fd, (const char*) data.data( ), data.size(), 0, (struct sockaddr *) &clientaddr, sizeof( clientaddr ) );
+            int n = sendto( fd, (const char*) data.data( ), (int) data.size( ), 0, (struct sockaddr *) &clientaddr, sizeof( clientaddr ) );
             if(n != data.size()) throw std::runtime_error("failed to send data");
         }
 
         bool udp_server::receive(struct sockaddr_in& clientaddr, std::vector<uint8_t>& data) {
             data.resize(16*1024); // TODO: Detect MTU
             socklen_t clientlen = sizeof(clientaddr);
-            int n = recvfrom( fd, (char *) data.data( ), data.size( ), 0, (struct sockaddr *) &clientaddr, &clientlen );
+            int n = recvfrom( fd, (char *) data.data( ), (int) data.size( ), 0, (struct sockaddr *) &clientaddr, &clientlen );
             if (n < 0) return false;
             data.resize(n);
             return true;

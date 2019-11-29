@@ -16,7 +16,7 @@
 namespace warhawk {
     namespace net {
         class udp_server {
-            int fd;
+            SOCKET fd;
         public:
             udp_server(uint16_t port);
             ~udp_server();
