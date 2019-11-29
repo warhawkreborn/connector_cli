@@ -24,13 +24,13 @@ set( INCLUDE_FILES
      webclient.h
    )
 
-add_executable( bridge
+add_executable( warhawk-reborn
                 ${SOURCE_FILES}
                 ${INCLUDE_FILES}
               )
 
 
-target_link_libraries( bridge
+target_link_libraries( warhawk-reborn
                        curl
                        dl
                        z
