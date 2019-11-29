@@ -10,6 +10,7 @@
 
 #ifndef WIN32
 #include <netinet/in.h>
+#define SOCKET int
 #endif
 
 
