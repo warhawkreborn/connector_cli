@@ -1,13 +1,23 @@
-#include "net.h"
+#ifdef WIN32
+#include <WS2tcpip.h>
+#include <winsock2.h>
+#include <Windows.h>
+#endif
+
+#include <cstdio>
 #include <string.h>
 #include <string>
-#include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <stdexcept>
-#include <cstdio>
+#include <sys/types.h>
+
+#ifndef WIN32
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
+
+#include "net.h"
 
 namespace warhawk {
     namespace net {
@@ -17,10 +27,10 @@ namespace warhawk {
                 throw std::runtime_error("ERROR opening socket");
 
             int optval = 1;
-            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(optval));
+            setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (const char *) &optval, sizeof( optval ) );
 
             struct sockaddr_in serveraddr;
-            bzero((char *)&serveraddr, sizeof(serveraddr));
+            memset( (char *) &serveraddr, 0, sizeof( serveraddr ) );
             serveraddr.sin_family = AF_INET;
             serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
             serveraddr.sin_port = htons((unsigned short)10029);
@@ -33,14 +43,14 @@ namespace warhawk {
         }
 
         void udp_server::send(struct sockaddr_in& clientaddr, const std::vector<uint8_t>& data) {
-            int n = sendto(fd, data.data(), data.size(), 0, (struct sockaddr *)&clientaddr, sizeof(clientaddr));
+            int n = sendto( fd, (const char*) data.data( ), data.size(), 0, (struct sockaddr *) &clientaddr, sizeof( clientaddr ) );
             if(n != data.size()) throw std::runtime_error("failed to send data");
         }
 
         bool udp_server::receive(struct sockaddr_in& clientaddr, std::vector<uint8_t>& data) {
             data.resize(16*1024); // TODO: Detect MTU
             socklen_t clientlen = sizeof(clientaddr);
-            int n = recvfrom(fd, data.data(), data.size(), 0, (struct sockaddr *)&clientaddr, &clientlen);
+            int n = recvfrom( fd, (char *) data.data( ), data.size( ), 0, (struct sockaddr *) &clientaddr, &clientlen );
             if (n < 0) return false;
             data.resize(n);
             return true;

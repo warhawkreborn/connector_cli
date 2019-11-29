@@ -26,12 +26,17 @@ if ( APPLE )
   # Warnings as errors.
   # add_definitions( -Werror )
 
+elseif ( MSVC )
+
+  set( USE_SYSTEM_CURL OFF )
+
 endif( )
 
-add_subdirectory( src )
 
-if ( USE_SYSTEM_CURL )
+if ( NOT USE_SYSTEM_CURL )
 
   add_subdirectory( libs/curl )
 
 endif( )
+
+add_subdirectory( src )

@@ -1,8 +1,17 @@
 #pragma once
+
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
+#include <array>
 #include <cstdint>
 #include <vector>
+
+#ifndef WIN32
 #include <netinet/in.h>
-#include <array>
+#endif
+
 
 namespace warhawk {
     namespace net {

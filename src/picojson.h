@@ -42,6 +42,9 @@
 #include <vector>
 #include <utility>
 
+#undef max
+#undef min
+
 // for isnan/isinf
 #if __cplusplus >= 201103L
 #include <cmath>
