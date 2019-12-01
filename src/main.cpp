@@ -93,7 +93,7 @@ std::vector<server_entry> download_server_list() {
             if(e.get("state").get<std::string>() != "online") continue;
             server_entry entry;
             entry.name = e.get("name").get<std::string>();
-            entry.ping = e.get("ping").get<int64_t>();
+            entry.ping = static_cast< int >( e.get( "ping" ).get<int64_t>( ) );
             entry.frame = hex2bin(e.get("response").get<std::string>());
             auto frame = (warhawk::net::server_info_response*)(entry.frame.data() + 4);
             memcpy(frame->ip1, ip.data(), ip.size());

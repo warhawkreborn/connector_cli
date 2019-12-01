@@ -1,13 +1,23 @@
 #pragma once
+
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
+#include <array>
 #include <cstdint>
 #include <vector>
+
+#ifndef WIN32
 #include <netinet/in.h>
-#include <array>
+#define SOCKET int
+#endif
+
 
 namespace warhawk {
     namespace net {
         class udp_server {
-            int fd;
+            SOCKET fd;
         public:
             udp_server(uint16_t port);
             ~udp_server();
