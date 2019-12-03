@@ -85,8 +85,8 @@ class ForwardServer
     // Data
     //
 
-    std::mutex                  m_mtx;
-    warhawk::net::udp_server    m_server;
+    std::mutex                 m_mtx;
+    warhawk::net::udp_server   m_server;
     std::vector< ServerEntry > m_entries;
 };
 
@@ -104,6 +104,7 @@ std::vector< uint8_t > hex2bin( const std::string &str_ )
   for ( size_t i = 0; i < res.size(); i++ )
   {
     auto c = str_[ i * 2 ];
+
     if ( c >= 'A' && c <= 'F' )
     {
       res[ i ] = ( c - 'A' + 10 ) << 4;
@@ -198,7 +199,9 @@ std::vector< ServerEntry > download_server_list( )
 int main( int argc_, const char **argv_ )
 {
   std::cout << "Warhawk bridge booting..." << std::endl;
+
   ForwardServer server;
+
   std::thread server_thread( [&]()
   {
     server.run();
@@ -207,6 +210,7 @@ int main( int argc_, const char **argv_ )
 
   auto list = download_server_list();
   server.set_entries( list );
+
   std::cout << list.size() << " servers found" << std::endl;
 
   for ( auto &e : list )
