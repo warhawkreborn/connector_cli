@@ -33,6 +33,7 @@ class ForwardServer
     {
       struct sockaddr_in client;
       std::vector< uint8_t > data;
+
       while ( m_server.receive( client, data ) )
       {
         if ( !valid_packet( data ) )
@@ -45,6 +46,7 @@ class ForwardServer
         {
           std::cout << "Sending server list" << std::endl;
           std::unique_lock< std::mutex > lck( m_mtx );
+
           for ( auto &e : m_entries )
           {
             m_server.send( client, e.m_frame );
@@ -182,9 +184,12 @@ std::vector< ServerEntry > download_server_list( )
       entry.m_name = e.get( "name" ).get< std::string >();
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
       entry.m_frame = hex2bin( e.get( "response" ).get< std::string >() );
+
       auto frame = (warhawk::net::server_info_response *) ( entry.m_frame.data() + 4 );
+
       memcpy( frame->m_ip1, ip.data(), ip.size() );
       memcpy( frame->m_ip2, ip.data(), ip.size() );
+
       res.push_back( entry );
     }
     catch ( const std::exception &e_ )
