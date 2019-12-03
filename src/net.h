@@ -19,6 +19,7 @@ namespace warhawk
 
 namespace net
 {
+
 class udp_server
 {
   public:

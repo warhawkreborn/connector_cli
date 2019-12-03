@@ -108,12 +108,12 @@ struct cookie_list
         continue;
       }
 
-      if( !domain_.empty( ) && c.m_domain != domain_ )
+      if ( !domain_.empty( ) && c.m_domain != domain_ )
       {
         continue;
       }
 
-      if( !path_.empty( ) && c.m_path != path_ )
+      if ( !path_.empty( ) && c.m_path != path_ )
       {
         continue;
       }

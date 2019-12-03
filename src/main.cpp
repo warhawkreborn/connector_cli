@@ -182,8 +182,8 @@ std::vector< ServerEntry > download_server_list( )
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
       entry.m_frame = hex2bin( e.get( "response" ).get< std::string >() );
       auto frame = (warhawk::net::server_info_response *) ( entry.m_frame.data() + 4 );
-      memcpy( frame->ip1, ip.data(), ip.size() );
-      memcpy( frame->ip2, ip.data(), ip.size() );
+      memcpy( frame->m_ip1, ip.data(), ip.size() );
+      memcpy( frame->m_ip2, ip.data(), ip.size() );
       res.push_back( entry );
     }
     catch ( const std::exception &e_ )
