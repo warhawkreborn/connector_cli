@@ -151,13 +151,13 @@ std::vector< ServerEntry > download_server_list( )
   client.set_verbose( false );
   auto resp = client.execute( req );
 
-  if ( resp.status_code != 200 )
+  if ( resp.m_status_code != 200 )
   {
     throw std::runtime_error( "http request failed" );
   }
 
   picojson::value val;
-  auto err = picojson::parse( val, resp.data );
+  auto err = picojson::parse( val, resp.m_data );
 
   if ( !err.empty() )
   {

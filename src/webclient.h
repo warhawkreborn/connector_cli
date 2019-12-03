@@ -1,40 +1,56 @@
 #pragma once
-#include "cookie.h"
+
 #include <map>
 
-namespace warhawk {
-    namespace common {
-        struct response {
-		std::string data;
-		cookie_list cookies;
-		std::multimap<std::string, std::string> headers;
-		long status_code;
-	};
+#include "cookie.h"
 
-	struct request {
-		std::string url;
-		std::string method;
-		std::string data;
-		cookie_list cookies;
-		std::multimap<std::string, std::string> headers;
-		bool follow_redirect;
+namespace warhawk
+{
 
-		static request default_get(std::string url);
-		static request default_post(std::string url, std::string data);
-	};
+namespace common
+{
 
-	class webclient {
-		void* curl;
-	public:
-		webclient();
-		~webclient();
+struct response
+{
+  std::string                               m_data;
+  cookie_list                               m_cookies;
+  std::multimap< std::string, std::string > m_headers;
+  long                                      m_status_code;
+};
 
-		webclient(const webclient&) = delete;
-		webclient& operator=(const webclient&) = delete;
+struct request
+{
+	std::string                               m_url;
+	std::string                               m_method;
+	std::string                               m_data;
+	cookie_list                               m_cookies;
+	std::multimap< std::string, std::string > m_headers;
+	bool                                      m_follow_redirect;
 
-		void set_verbose(bool v);
+	static request default_get(  std::string url );
+	static request default_post( std::string url, std::string data );
+};
 
-		response execute(const request& req);
-	};
-    }
-}
+
+class webclient
+{
+  public:
+
+    webclient( );
+    ~webclient( );
+
+    webclient( const webclient & ) = delete;
+    webclient &operator =( const webclient & ) = delete;
+
+    void set_verbose( bool );
+
+    response execute( const request & );
+
+  private:
+
+    void *m_curl;
+};
+
+} // End common namespace
+
+} // End warhawk namespace
