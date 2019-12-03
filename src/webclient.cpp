@@ -81,7 +81,7 @@ namespace warhawk {
                 headers = curl_slist_append(headers, str.c_str());
             }
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            for(auto& c : req.cookies.cookies) {
+            for(auto& c : req.cookies.m_cookies) {
                 curl_easy_setopt(curl, CURLOPT_COOKIELIST, c.to_string().c_str());
             }
             if(!req.method.empty())
@@ -110,7 +110,7 @@ namespace warhawk {
                 while(info!=nullptr)
                 {
                     if(info->data != nullptr)
-                        resp.cookies.cookies.insert(cookie::parse(info->data));
+                        resp.cookies.m_cookies.insert(cookie::parse(info->data));
                     info = info->next;
                 }
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp.status_code);
