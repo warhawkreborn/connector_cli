@@ -38,13 +38,13 @@ class ForwardServer
       {
         if ( !valid_packet( data ) )
         {
-          std::cout << "Received invalid frame, skipping" << std::endl;
+          std::cout << "ForwardServer: Received invalid frame, skipping" << std::endl;
           continue;
         }
 
         if ( data[ 0 ] == 0xc3 && data[ 1 ] == 0x81 )
         {
-          std::cout << "Sending server list" << std::endl;
+          std::cout << "ForwardServer: Sending server list" << std::endl;
           std::unique_lock< std::mutex > lck( m_mtx );
 
           for ( auto &e : m_entries )
@@ -54,7 +54,7 @@ class ForwardServer
         }
         else
         {
-          std::cout << "Unknown frame type, ignoring" << std::endl;
+          std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
         }
       }
     }
@@ -90,6 +90,30 @@ class ForwardServer
     std::mutex                 m_mtx;
     warhawk::net::udp_server   m_server;
     std::vector< ServerEntry > m_entries;
+};
+
+
+class SearchServer
+{
+  public:
+
+    SearchServer( )
+    {
+
+    }
+
+    void run( )
+    {
+      while ( true )
+      {
+        std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
+        std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
+      }
+    }
+
+  protected:
+
+  private:
 };
 
 
@@ -194,7 +218,7 @@ std::vector< ServerEntry > download_server_list( )
     }
     catch ( const std::exception &e_ )
     {
-      std::cout << "failed to parse server entry:" << e_.what() << std::endl;
+      std::cout << "DownloadServerList: failed to parse server entry:" << e_.what() << std::endl;
     }
   }
 
@@ -205,37 +229,45 @@ int main( int argc_, const char **argv_ )
 {
   std::cout << "Warhawk bridge booting..." << std::endl;
 
-  ForwardServer server;
+  ForwardServer forwardServer;
 
-  std::thread server_thread( [&]()
+  std::thread forwardServerThread( [&]()
   {
-    server.run();
-    std::cout << "thread ended" << std::endl;
+    forwardServer.run();
+    std::cout << "ForwardServer thread ended." << std::endl;
+  } );
+
+  SearchServer searchServer;
+
+  std::thread searchServerThread( [&] ( )
+  {
+    searchServer.run( );
+    std::cout << "SearchServer thread ended." << std::endl;
   } );
 
   auto list = download_server_list();
-  server.set_entries( list );
+  forwardServer.set_entries( list );
 
-  std::cout << list.size() << " servers found" << std::endl;
+  std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
 
   for ( auto &e : list )
   {
-    std::cout << e.m_name << " " << e.m_ping << "ms" << std::endl;
+    std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
   }
 
-  std::cout << "Init done" << std::endl;
+  std::cout << "MainLoop: Init done" << std::endl;
   std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
 
   while ( true )
   {
-    std::cout << "Updating server list" << std::endl;
+    std::cout << "MainLoop: Updating server list" << std::endl;
     auto list = download_server_list();
-    server.set_entries( list );
-    std::cout << list.size() << " servers found" << std::endl;
+    forwardServer.set_entries( list );
+    std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
 
     for ( auto &e : list )
     {
-      std::cout << e.m_name << " " << e.m_ping << "ms" << std::endl;
+      std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
     }
 
     std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
