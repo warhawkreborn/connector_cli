@@ -1,25 +1,20 @@
-#include "net.h"
-#include "picojson.h"
-#include "warhawk.h"
-#include "webclient.h"
 #include <iostream>
 #include <mutex>
 #include <thread>
 
+#include "net.h"
+#include "picojson.h"
+#include "server_entry.h"
+#include "warhawk.h"
+#include "webclient.h"
 
-struct ServerEntry
-{
-  std::string            m_name;
-  int                    m_ping;
-  std::vector< uint8_t > m_frame;
-};
 
 class ForwardServer
 {
   public:
 
-    ForwardServer( )
-      : m_server( 10029 )
+    ForwardServer( warhawk::net::udp_server &udpServer_ )
+      : m_server( udpServer_ )
     {
     }
 
@@ -59,6 +54,8 @@ class ForwardServer
       }
     }
 
+  protected:
+
   private:
 
     //
@@ -87,9 +84,9 @@ class ForwardServer
     // Data
     //
 
-    std::mutex                 m_mtx;
-    warhawk::net::udp_server   m_server;
-    std::vector< ServerEntry > m_entries;
+    std::mutex                  m_mtx;
+    warhawk::net::udp_server   &m_server;
+    std::vector< ServerEntry >  m_entries;
 };
 
 
@@ -97,7 +94,8 @@ class SearchServer
 {
   public:
 
-    SearchServer( )
+    SearchServer( warhawk::net::udp_server &udpServer_ )
+      : m_server( udpServer_ )
     {
 
     }
@@ -107,6 +105,7 @@ class SearchServer
       while ( true )
       {
         std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
+
         std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
       }
     }
@@ -114,6 +113,13 @@ class SearchServer
   protected:
 
   private:
+
+    const std::string m_DiscoveryPacket =
+      "c381b800001900b6018094004654000005000000010000000000020307000000c0a814ac000000002d27000000000000010000005761726861776b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002801800ffffffff00000000000000004503d7e0000000000000005a";
+
+    std::mutex                  m_mtx;
+    warhawk::net::udp_server   &m_server;
+    std::vector< ServerEntry >  m_entries;
 };
 
 
@@ -229,7 +235,9 @@ int main( int argc_, const char **argv_ )
 {
   std::cout << "Warhawk bridge booting..." << std::endl;
 
-  ForwardServer forwardServer;
+  warhawk::net::udp_server udpServer( 10029 );
+
+  ForwardServer forwardServer( udpServer );
 
   std::thread forwardServerThread( [&]()
   {
@@ -237,7 +245,7 @@ int main( int argc_, const char **argv_ )
     std::cout << "ForwardServer thread ended." << std::endl;
   } );
 
-  SearchServer searchServer;
+  SearchServer searchServer( udpServer );
 
   std::thread searchServerThread( [&] ( )
   {

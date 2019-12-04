@@ -42,6 +42,7 @@ set( INCLUDE_FILES
      cookie.h
      net.h
      picojson.h
+     server_entry.h
      warhawk.h
      webclient.h
    )

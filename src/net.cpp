@@ -57,6 +57,8 @@ udp_server::~udp_server( )
 
 void udp_server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_ )
 {
+  std::unique_lock< std::mutex > lck( m_mtx );
+
   int n =
     sendto( m_fd, (const char *) data_.data( ), (int) data_.size( ), 0, (struct sockaddr *) &clientaddr_, sizeof( clientaddr_ ) );
 
@@ -69,6 +71,8 @@ void udp_server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8
 
 bool udp_server::receive( struct sockaddr_in &clientaddr_, std::vector< uint8_t > &data_ )
 {
+  std::unique_lock< std::mutex > lck( m_mtx );
+
   data_.resize( 16 * 1024 ); // TODO: Detect MTU
   socklen_t clientlen = sizeof( clientaddr_ );
 

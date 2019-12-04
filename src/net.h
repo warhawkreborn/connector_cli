@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cstdint>
+#include <mutex>
 #include <vector>
 
 #ifndef WIN32
@@ -38,6 +39,7 @@ class udp_server
   private:
 
     SOCKET m_fd;
+    std::mutex m_mtx;
 };
 
 } // End namespace net
