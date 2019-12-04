@@ -1,3 +1,6 @@
+#ifndef SERVER_ENTRY_H
+#define SERVER_ENTRY_H
+
 #include <string>
 #include <vector>
 
@@ -8,3 +11,5 @@ struct ServerEntry
   int m_ping;
   std::vector< uint8_t > m_frame;
 };
+
+#endif // SERVER_ENTRY_H

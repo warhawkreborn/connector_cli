@@ -1,3 +1,6 @@
+#ifndef NET_H
+#define NET_H_
+
 #pragma once
 
 #ifdef WIN32
@@ -45,3 +48,5 @@ class udp_server
 } // End namespace net
 
 } // End namespace warhawk
+
+#endif // NET_H

@@ -1,3 +1,6 @@
+#ifndef WEBCLIENT_H
+#define WEBCLIENT_H
+
 #pragma once
 
 #include <map>
@@ -54,3 +57,5 @@ class webclient
 } // End common namespace
 
 } // End warhawk namespace
+
+#endif // WEBCLIENT_H

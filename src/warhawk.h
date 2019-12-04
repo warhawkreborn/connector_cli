@@ -1,3 +1,6 @@
+#ifndef WARHAWK_H
+#define WARHAWK_H
+
 #pragma once
 
 #include <cstdint>
@@ -61,3 +64,5 @@ inline std::vector< uint8_t > build_packet( uint8_t t1_, uint8_t t2_, const T& d
 } // End namespace net
 
 } // End namespace warhawk
+
+#endif // WARHAWK_H

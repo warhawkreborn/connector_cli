@@ -33,6 +33,7 @@ else( )
 endif( )
 
 set( SOURCE_FILES
+     forward_server.cpp
      main.cpp
      net.cpp
      webclient.cpp
@@ -40,6 +41,7 @@ set( SOURCE_FILES
 
 set( INCLUDE_FILES
      cookie.h
+     forward_server.h
      net.h
      picojson.h
      server_entry.h
