@@ -5,42 +5,10 @@
 #include "forward_server.h"
 #include "net.h"
 #include "picojson.h"
+#include "search_server.h"
 #include "server_entry.h"
 #include "warhawk.h"
 #include "webclient.h"
-
-
-class SearchServer
-{
-  public:
-
-    SearchServer( warhawk::net::udp_server &udpServer_ )
-      : m_server( udpServer_ )
-    {
-
-    }
-
-    void run( )
-    {
-      while ( true )
-      {
-        std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
-
-        std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
-      }
-    }
-
-  protected:
-
-  private:
-
-    const std::string m_DiscoveryPacket =
-      "c381b800001900b6018094004654000005000000010000000000020307000000c0a814ac000000002d27000000000000010000005761726861776b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002801800ffffffff00000000000000004503d7e0000000000000005a";
-
-    std::mutex                  m_mtx;
-    warhawk::net::udp_server   &m_server;
-    std::vector< ServerEntry >  m_entries;
-};
 
 
 std::vector< uint8_t > hex2bin( const std::string &str_ )
