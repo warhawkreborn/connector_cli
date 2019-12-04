@@ -141,19 +141,6 @@ int main( int argc_, const char **argv_ )
     std::cout << "SearchServer thread ended." << std::endl;
   } );
 
-  auto list = download_server_list();
-  forwardServer.set_entries( list );
-
-  std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
-
-  for ( auto &e : list )
-  {
-    std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
-  }
-
-  std::cout << "MainLoop: Init done" << std::endl;
-  std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
-
   while ( true )
   {
     std::cout << "MainLoop: Updating server list" << std::endl;
