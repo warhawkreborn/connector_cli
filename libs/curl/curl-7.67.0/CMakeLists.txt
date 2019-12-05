@@ -1113,7 +1113,8 @@ endif()
 
 if(MSVC)
   # Disable default manifest added by CMake
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+  # This is not needed now for Visual Studio 2019???
+  #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
 
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
   if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
