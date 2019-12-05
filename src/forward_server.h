@@ -4,9 +4,11 @@
 #include <iostream>
 
 #include "net.h"
+#include "server.h"
 #include "server_entry.h"
 
-class ForwardServer
+
+class ForwardServer : public Server
 {
   public:
 
@@ -14,7 +16,7 @@ class ForwardServer
  
     void set_entries( std::vector< ServerEntry > e_ );
 
-    void run( );
+    void run( ) override;
 
   protected:
 
@@ -30,7 +32,6 @@ class ForwardServer
     //
 
     std::mutex m_mtx;
-    warhawk::net::udp_server &m_server;
     std::vector< ServerEntry > m_entries;
 };
 

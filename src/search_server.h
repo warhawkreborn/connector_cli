@@ -4,15 +4,16 @@
 #include <iostream>
 
 #include "net.h"
+#include "server.h"
 #include "server_entry.h"
 
-class SearchServer
+class SearchServer : public Server
 {
   public:
 
     SearchServer( warhawk::net::udp_server &udpServer_ );
 
-    void run( );
+    void run( ) override;
 
   protected:
 
@@ -25,7 +26,6 @@ class SearchServer
       "00000000004503d7e0000000000000005a";
 
     std::mutex m_mtx;
-    warhawk::net::udp_server &m_server;
     std::vector< ServerEntry > m_entries;
 };
 

@@ -37,6 +37,7 @@ set( SOURCE_FILES
      main.cpp
      net.cpp
      search_server.cpp
+     server.cpp
      webclient.cpp
    )
 
@@ -46,6 +47,7 @@ set( INCLUDE_FILES
      net.h
      picojson.h
      search_server.h
+     server.h
      server_entry.h
      warhawk.h
      webclient.h

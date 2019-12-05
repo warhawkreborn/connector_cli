@@ -1,10 +1,9 @@
 #include "forward_server.h"
 
-
-ForwardServer::ForwardServer( warhawk::net::udp_server &udpServer_ ) : m_server( udpServer_ )
+ForwardServer::ForwardServer( warhawk::net::udp_server &udpServer_ )
+  : Server( udpServer_ )
 {
 }
-
 
 void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
 {
@@ -12,13 +11,14 @@ void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
   m_entries = std::move( e_ );
 }
 
-
-void ForwardServer::run( )
+void ForwardServer::run()
 {
   struct sockaddr_in client;
   std::vector< uint8_t > data;
 
-  while ( m_server.receive( client, data ) )
+  warhawk::net::udp_server &server = GetServer();
+
+  while ( server.receive( client, data ) )
   {
     if ( !valid_packet( data ) )
     {
@@ -33,7 +33,7 @@ void ForwardServer::run( )
 
       for ( auto &e : m_entries )
       {
-        m_server.send( client, e.m_frame );
+        server.send( client, e.m_frame );
       }
     }
     else
@@ -42,7 +42,6 @@ void ForwardServer::run( )
     }
   }
 }
-
 
 bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 {
