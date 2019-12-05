@@ -2,9 +2,15 @@
 #define SERVER_H
 
 #include <iostream>
+#include <map>
 
+#include "message_handler.h"
 #include "net.h"
 #include "server_entry.h"
+
+
+class MessageHandler;
+
 
 class Server
 {
@@ -13,7 +19,10 @@ class Server
     Server( warhawk::net::udp_server &udpServer_ );
     virtual ~Server();
 
-    virtual void run() = 0;
+    void run( );
+
+    void send( struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data );
+    bool receive( struct sockaddr_in &clientaddr, std::vector< uint8_t > &data );
 
     std::mutex &GetMutex();
 
@@ -21,9 +30,12 @@ class Server
 
     warhawk::net::udp_server &GetServer( );
 
- protected :
+    void Register(   MessageHandler * );
+    void Unregister( MessageHandler * );
 
-    private :
+  protected:
+
+  private:
     //
     // Methods
     //
@@ -32,8 +44,11 @@ class Server
     // Data
     //
 
-    static std::mutex s_mtx;
+    static std::mutex s_mutex;
     warhawk::net::udp_server &m_server;
+ 
+    using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
+    MessageHandlers m_MessageHandlers;
 };
 
 #endif // SERVER_H

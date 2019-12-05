@@ -3,20 +3,22 @@
 
 #include <iostream>
 
+#include "message_handler.h"
 #include "net.h"
 #include "server.h"
 #include "server_entry.h"
 
 
-class ForwardServer : public Server
+class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( warhawk::net::udp_server &udpServer_ );
+    ForwardServer( Server * );
+    ~ForwardServer( );
  
     void set_entries( std::vector< ServerEntry > e_ );
 
-    void run( ) override;
+    void OnReceivePacket( struct sockaddr_in client, std::vector< uint8_t > data ) override;
 
   protected:
 
@@ -31,8 +33,9 @@ class ForwardServer : public Server
     // Data
     //
 
-    std::mutex m_mtx;
-    std::vector< ServerEntry > m_entries;
+    std::mutex                  m_mutex;
+    std::vector< ServerEntry >  m_entries;
+    Server                     *m_server;
 };
 
 #endif // FORWARD_SERVER_H

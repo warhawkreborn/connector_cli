@@ -1,47 +1,53 @@
 #include "forward_server.h"
 
-ForwardServer::ForwardServer( warhawk::net::udp_server &udpServer_ )
-  : Server( udpServer_ )
+ForwardServer::ForwardServer( Server *server_ )
+  : m_mutex( )
+  , m_entries( )
+  , m_server( server_ )
 {
+  m_server->Register( this );
 }
+
+
+ForwardServer::~ForwardServer( )
+{
+  m_server->Unregister( this );
+}
+
 
 void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
 {
-  std::unique_lock< std::mutex > lck( m_mtx );
+  std::unique_lock< std::mutex > lck( m_mutex );
   m_entries = std::move( e_ );
 }
 
-void ForwardServer::run()
+
+void ForwardServer::OnReceivePacket( struct sockaddr_in client_, std::vector< uint8_t > data_ )
 {
-  struct sockaddr_in client;
-  std::vector< uint8_t > data;
+  std::cout << "ForwardServer: Received packet." << std::endl;
 
-  warhawk::net::udp_server &server = GetServer();
-
-  while ( server.receive( client, data ) )
+  if ( !valid_packet( data_ ) )
   {
-    if ( !valid_packet( data ) )
-    {
-      std::cout << "ForwardServer: Received invalid frame, skipping" << std::endl;
-      continue;
-    }
+    std::cout << "ForwardServer: Received invalid frame, skipping" << std::endl;
+    return;
+  }
 
-    if ( data[ 0 ] == 0xc3 && data[ 1 ] == 0x81 )
-    {
-      std::cout << "ForwardServer: Sending server list" << std::endl;
-      std::unique_lock< std::mutex > lck( m_mtx );
+  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
+  {
+    std::cout << "ForwardServer: Sending server list" << std::endl;
+    std::unique_lock< std::mutex > lck( m_mutex );
 
-      for ( auto &e : m_entries )
-      {
-        server.send( client, e.m_frame );
-      }
-    }
-    else
+    for ( auto &e : m_entries )
     {
-      std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
+      m_server->send( client_, e.m_frame );
     }
   }
+  else
+  {
+    std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
+  }
 }
+
 
 bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 {

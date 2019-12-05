@@ -2,18 +2,24 @@
 #define SEARCH_SERVER_H
 
 #include <iostream>
+#include <vector>
 
+#include "message_handler.h"
 #include "net.h"
 #include "server.h"
 #include "server_entry.h"
 
-class SearchServer : public Server
+
+class SearchServer : public MessageHandler
 {
   public:
 
-    SearchServer( warhawk::net::udp_server &udpServer_ );
+    SearchServer( Server * );
+    ~SearchServer( );
 
-    void run( ) override;
+    void run( );
+
+    void OnReceivePacket( struct sockaddr_in client, std::vector< uint8_t > data ) override;
 
   protected:
 
@@ -25,8 +31,9 @@ class SearchServer : public Server
       "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002801800ffffffff000000"
       "00000000004503d7e0000000000000005a";
 
-    std::mutex m_mtx;
-    std::vector< ServerEntry > m_entries;
+    std::mutex                  m_mutex;
+    std::vector< ServerEntry >  m_entries;
+    Server                     *m_server;
 };
 
 #endif // SEARCH_SERVER_H

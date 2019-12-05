@@ -6,6 +6,7 @@
 #include "net.h"
 #include "picojson.h"
 #include "search_server.h"
+#include "server.h"
 #include "server_entry.h"
 #include "warhawk.h"
 #include "webclient.h"
@@ -125,18 +126,22 @@ int main( int argc_, const char **argv_ )
 
   warhawk::net::udp_server udpServer( 10029 );
 
-  ForwardServer forwardServer( udpServer );
+  Server packetServer( udpServer );
 
-  std::thread forwardServerThread( [&]()
+  std::thread packetServerThread( [&]( )
   {
-    forwardServer.run();
-    std::cout << "ForwardServer thread ended." << std::endl;
+    std::cout << "Starting Packet Server..." << std::endl;
+    packetServer.run( );
+    std::cout << "Stopping Packet Server." << std::endl;
   } );
 
-  SearchServer searchServer( udpServer );
+  ForwardServer forwardServer( &packetServer );
+
+  SearchServer searchServer( &packetServer );
 
   std::thread searchServerThread( [&] ( )
   {
+    std::cout << "Starting Search Server..." << std::endl;
     searchServer.run( );
     std::cout << "SearchServer thread ended." << std::endl;
   } );

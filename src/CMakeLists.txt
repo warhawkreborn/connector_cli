@@ -44,6 +44,7 @@ set( SOURCE_FILES
 set( INCLUDE_FILES
      cookie.h
      forward_server.h
+     message_handler.h
      net.h
      picojson.h
      search_server.h
