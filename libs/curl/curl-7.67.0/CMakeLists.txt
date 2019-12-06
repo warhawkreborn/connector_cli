@@ -1168,6 +1168,7 @@ if(BUILD_CURL_EXE)
 endif()
 
 include(CTest)
+message( "*** BUILD_TESTING: ${BUILD_TESTING}" )
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
