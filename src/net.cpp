@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <string>
+#include <sstream>
 #include <sys/types.h>
 
 #ifndef WIN32
@@ -41,7 +42,7 @@ udp_server::udp_server( uint16_t port_ )
   memset( (char *) &serveraddr, 0, sizeof( serveraddr ) );
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_addr.s_addr = htonl( INADDR_ANY );
-  serveraddr.sin_port = htons( (unsigned short) 10029 );
+  serveraddr.sin_port = htons( (unsigned short) WARHAWK_UDP_PORT );
 
   if ( bind( m_fd, (struct sockaddr *) &serveraddr, sizeof( serveraddr ) ) < 0 )
   {
@@ -55,24 +56,34 @@ udp_server::~udp_server( )
 }
 
 
-void udp_server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_ )
+void udp_server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
-  std::unique_lock< std::mutex > lck( m_mtx );
+  int optval = broadcast_ ? 1 : 0;
+  setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
 
-  int n =
-    sendto( m_fd, (const char *) data_.data( ), (int) data_.size( ), 0, (struct sockaddr *) &clientaddr_, sizeof( clientaddr_ ) );
+  int n = sendto(
+    m_fd, (const char *) data_.data(), (int) data_.size(), 0, (struct sockaddr *) &clientaddr_, sizeof( clientaddr_ ) );
 
   if ( n != data_.size() )
   {
-    throw std::runtime_error( "failed to send data" );
+#ifdef WIN32
+    int err = 0;
+
+    if ( n == SOCKET_ERROR )
+    {
+      err = WSAGetLastError( );
+    }
+#endif
+
+      std::stringstream ss;
+      ss << "Failed to send data, n = " << n << ", error = " << err; 
+      throw std::runtime_error( ss.str( ).c_str( ) );
   }
 }
 
 
 bool udp_server::receive( struct sockaddr_in &clientaddr_, std::vector< uint8_t > &data_ )
 {
-  std::unique_lock< std::mutex > lck( m_mtx );
-
   data_.resize( 16 * 1024 ); // TODO: Detect MTU
   socklen_t clientlen = sizeof( clientaddr_ );
 

@@ -18,6 +18,8 @@
 #endif
 
 
+const int WARHAWK_UDP_PORT = 10029;
+
 namespace warhawk
 {
 
@@ -34,7 +36,7 @@ class udp_server
     udp_server( const udp_server & ) = delete;
     udp_server &operator=( const udp_server & ) = delete;
 
-    void send(    struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data );
+    void send(    struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data, bool broadcast = false );
     bool receive( struct sockaddr_in &clientaddr, std::vector< uint8_t > &data );
 
     static std::array< uint8_t, 4 > get_ip( const std::string &host );
@@ -42,7 +44,6 @@ class udp_server
   private:
 
     SOCKET m_fd;
-    std::mutex m_mtx;
 };
 
 } // End namespace net

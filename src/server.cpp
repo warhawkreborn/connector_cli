@@ -29,9 +29,9 @@ void Server::run( )
   }
 }
 
-void Server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_ )
+void Server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
-  m_server.send( clientaddr_, data_ );
+  m_server.send( clientaddr_, data_, broadcast_ );
 }
 
 

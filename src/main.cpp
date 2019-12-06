@@ -70,7 +70,7 @@ int main( int argc_, const char **argv_ )
 {
   std::cout << "Warhawk bridge booting..." << std::endl;
 
-  warhawk::net::udp_server udpServer( 10029 );
+  warhawk::net::udp_server udpServer( WARHAWK_UDP_PORT );
 
   Server packetServer( udpServer );
 
