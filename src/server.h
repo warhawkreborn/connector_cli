@@ -31,7 +31,7 @@ class Server
     void Register(   MessageHandler * );
     void Unregister( MessageHandler * );
 
-    std::vector< uint8_t > Server::hex2bin( const std::string & );
+    std::vector< uint8_t > hex2bin( const std::string & );
 
   protected:
 

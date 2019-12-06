@@ -75,8 +75,8 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
 
   if ( n != data_.size() )
   {
-#ifdef WIN32
     int err = 0;
+#ifdef WIN32
 
     if ( n == SOCKET_ERROR )
     {
