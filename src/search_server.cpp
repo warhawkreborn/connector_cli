@@ -38,4 +38,5 @@ void SearchServer::run( )
 
 void SearchServer::OnReceivePacket( struct sockaddr_in client_, std::vector< uint8_t > data_ )
 {
+  std::cout << "SearchServer: Received packet." << std::endl;
 }

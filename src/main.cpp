@@ -12,61 +12,7 @@
 #include "webclient.h"
 
 
-std::vector< uint8_t > hex2bin( const std::string &str_ )
-{
-  if ( str_.size() % 2 )
-  {
-    throw std::runtime_error( "invalid hex string" );
-  }
-
-  std::vector< uint8_t > res;
-  res.resize( str_.size() / 2 );
-
-  for ( size_t i = 0; i < res.size(); i++ )
-  {
-    auto c = str_[ i * 2 ];
-
-    if ( c >= 'A' && c <= 'F' )
-    {
-      res[ i ] = ( c - 'A' + 10 ) << 4;
-    }
-    else if ( c >= 'a' && c <= 'f' )
-    {
-      res[ i ] = ( c - 'a' + 10 ) << 4;
-    }
-    else if ( c >= '0' && c <= '9' )
-    {
-      res[ i ] = ( c - '0' ) << 4;
-    }
-    else
-    {
-      throw std::runtime_error( "invalid hex" );
-    }
-
-    c = str_[ i * 2 + 1 ];
-
-    if ( c >= 'A' && c <= 'F' )
-    {
-      res[ i ] |= ( c - 'A' + 10 );
-    }
-    else if ( c >= 'a' && c <= 'f' )
-    {
-      res[ i ] |= ( c - 'a' + 10 );
-    }
-    else if ( c >= '0' && c <= '9' )
-    {
-      res[ i ] |= ( c - '0' );
-    }
-    else
-    {
-      throw std::runtime_error( "invalid hex" );
-    }
-  }
-
-  return res;
-}
-
-std::vector< ServerEntry > download_server_list( )
+std::vector< ServerEntry > download_server_list( Server *server_ )
 {
   auto req = warhawk::common::request::default_get( "https://warhawk.thalhammer.it/api/server/" );
   warhawk::common::webclient client;
@@ -102,7 +48,7 @@ std::vector< ServerEntry > download_server_list( )
       ServerEntry entry;
       entry.m_name = e.get( "name" ).get< std::string >();
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
-      entry.m_frame = hex2bin( e.get( "response" ).get< std::string >() );
+      entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >() );
 
       auto frame = (warhawk::net::server_info_response *) ( entry.m_frame.data() + 4 );
 
@@ -149,7 +95,7 @@ int main( int argc_, const char **argv_ )
   while ( true )
   {
     std::cout << "MainLoop: Updating server list" << std::endl;
-    auto list = download_server_list();
+    auto list = download_server_list( &packetServer );
     forwardServer.set_entries( list );
     std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
 

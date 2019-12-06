@@ -89,3 +89,57 @@ void Server::Unregister( MessageHandler *handler_ )
     m_MessageHandlers.erase( itr );
   }
 }
+
+std::vector< uint8_t > Server::hex2bin( const std::string &str_ )
+{
+  if ( str_.size() % 2 )
+  {
+    throw std::runtime_error( "invalid hex string" );
+  }
+
+  std::vector< uint8_t > res;
+  res.resize( str_.size() / 2 );
+
+  for ( size_t i = 0; i < res.size(); i++ )
+  {
+    auto c = str_[ i * 2 ];
+
+    if ( c >= 'A' && c <= 'F' )
+    {
+      res[ i ] = ( c - 'A' + 10 ) << 4;
+    }
+    else if ( c >= 'a' && c <= 'f' )
+    {
+      res[ i ] = ( c - 'a' + 10 ) << 4;
+    }
+    else if ( c >= '0' && c <= '9' )
+    {
+      res[ i ] = ( c - '0' ) << 4;
+    }
+    else
+    {
+      throw std::runtime_error( "invalid hex" );
+    }
+
+    c = str_[ i * 2 + 1 ];
+
+    if ( c >= 'A' && c <= 'F' )
+    {
+      res[ i ] |= ( c - 'A' + 10 );
+    }
+    else if ( c >= 'a' && c <= 'f' )
+    {
+      res[ i ] |= ( c - 'a' + 10 );
+    }
+    else if ( c >= '0' && c <= '9' )
+    {
+      res[ i ] |= ( c - '0' );
+    }
+    else
+    {
+      throw std::runtime_error( "invalid hex" );
+    }
+  }
+
+  return res;
+}
