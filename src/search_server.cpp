@@ -1,5 +1,6 @@
 #include <thread>
 
+#include "addr_info.h"
 #include "net.h"
 #include "search_server.h"
 
@@ -20,11 +21,9 @@ SearchServer::~SearchServer( )
 
 void SearchServer::run( )
 {
-  struct sockaddr_in clientAddr;
-  memset( (char *) &clientAddr, 0, sizeof( clientAddr ) );
-  clientAddr.sin_family = AF_INET;
-  clientAddr.sin_addr.s_addr = htonl( 0xffffffff ); // 255.255.255.255 broadcast address.
-  clientAddr.sin_port = htons( (unsigned short) WARHAWK_UDP_PORT );
+  AddrInfo clientAddr;
+  clientAddr.SetAddr( "255.255.255.255" );
+  clientAddr.PortToSockAddr( m_server->GetServer( ).GetPort( ), (sockaddr *) clientAddr.GetAiAddr( ) );
 
   const std::vector< uint8_t > discoveryPacketData = m_server->hex2bin( m_DiscoveryPacket );
 
@@ -32,21 +31,16 @@ void SearchServer::run( )
   {
     std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
 
-    {
-      // TODO: Do anything that needs to be done here for receiving packets while the mutex is locked.
-    }
-
-#ifdef FUTURE // - We need to be able to tell whether the packet came from us or not to prevent recursion
+    // Broadcast Server Discovery Packet
     const bool broadcast = true;
-    m_server->send( clientAddr, discoveryPacketData, broadcast ); 
-#endif
+    m_server->send( *clientAddr.GetAiAddr( ), discoveryPacketData, broadcast ); 
 
     std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
   }
 }
 
 
-void SearchServer::OnReceivePacket( struct sockaddr_in client_, std::vector< uint8_t > data_ )
+void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
   std::cout << "SearchServer: Received packet." << std::endl;
 }

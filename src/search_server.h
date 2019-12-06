@@ -19,7 +19,7 @@ class SearchServer : public MessageHandler
 
     void run( );
 
-    void OnReceivePacket( struct sockaddr_in client, std::vector< uint8_t > data ) override;
+    void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 
   protected:
 

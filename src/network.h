@@ -19,7 +19,11 @@
 
 #else
 
+#pragma warning( disable : 4786 )
+#include <iphlpapi.h>
+#include <windows.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 
 #endif
 

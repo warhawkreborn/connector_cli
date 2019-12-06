@@ -13,7 +13,7 @@ class MessageHandler
     {
     }
 
-    virtual void OnReceivePacket( struct sockaddr_in client, std::vector< uint8_t > data ) = 0;
+    virtual void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) = 0;
 
   protected:
 

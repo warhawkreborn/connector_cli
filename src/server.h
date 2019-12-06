@@ -21,8 +21,8 @@ class Server
 
     void run( );
 
-    void send( struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data, bool broadcast = false );
-    bool receive( struct sockaddr_in &clientaddr, std::vector< uint8_t > &data );
+    void send(    const sockaddr_storage &clientaddr, const std::vector< uint8_t > &data, const bool broadcast = false );
+    bool receive(       sockaddr_storage &clientaddr, std::vector< uint8_t > &data );
 
     bool valid_packet( const std::vector< uint8_t > &data_ );
 

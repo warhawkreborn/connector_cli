@@ -22,7 +22,7 @@ void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
 }
 
 
-void ForwardServer::OnReceivePacket( struct sockaddr_in client_, std::vector< uint8_t > data_ )
+void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
   std::cout << "ForwardServer: Received packet." << std::endl;
 
@@ -35,6 +35,7 @@ void ForwardServer::OnReceivePacket( struct sockaddr_in client_, std::vector< ui
   if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
   {
     std::cout << "ForwardServer: Sending server list" << std::endl;
+
     std::unique_lock< std::mutex > lck( m_mutex );
 
     for ( auto &e : m_entries )

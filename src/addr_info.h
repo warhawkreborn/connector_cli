@@ -43,10 +43,13 @@ class AddrInfo
     std::string GetAiCanonName( );
     const sockaddr_storage *GetAiAddr( ) const;
 
-    const char *GetAddr( ) const;
+    std::string GetAddr( ) const;
+    bool SetAddr( const std::string & );
 
     static std::string SockAddrToAddress( const struct sockaddr * );
-    static uint16_t SockAddrToPort( const struct sockaddr * );
+
+    static uint16_t SockAddrToPort(             const struct sockaddr * );
+    static void PortToSockAddr( const uint16_t,       struct sockaddr * );
 
   protected:
 

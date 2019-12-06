@@ -15,27 +15,30 @@ Server::~Server( )
 
 void Server::run( )
 {
-  struct sockaddr_in client;
+  struct sockaddr_storage client;
   std::vector< uint8_t > data;
 
   while ( m_server.receive( client, data ) )
   {
-    for ( auto itr : m_MessageHandlers )
+    if ( data.size( ) > 0 )
     {
-      MessageHandler *messageHandler = itr.second;
+      for ( auto itr : m_MessageHandlers )
+      {
+        MessageHandler *messageHandler = itr.second;
 
-      messageHandler->OnReceivePacket( client, data );
+        messageHandler->OnReceivePacket( client, data );
+      }
     }
   }
 }
 
-void Server::send( struct sockaddr_in &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
+void Server::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
   m_server.send( clientaddr_, data_, broadcast_ );
 }
 
 
-bool Server::receive( struct sockaddr_in &clientaddr_, std::vector< uint8_t > &data_ )
+bool Server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
   return m_server.receive( clientaddr_, data_ );
 }

@@ -1,8 +1,8 @@
 #ifdef WIN32
 #pragma warning ( disable : 4786 )
+#include <WS2tcpip.h>
+#include <Windows.h>
 #include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
 #include <iphlpapi.h>
 #endif // WIN32
 
@@ -18,8 +18,6 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <ifaddrs.h>
-#else
-#include <winsock2.h>
 #endif
 
 #include "network.h"
@@ -44,7 +42,7 @@ static MIB_IFTABLE *mib_table = NULL;
 //  CONSTRUCTOR
 //////////////////////////////////////////////////////////////////////
 Network::Network( )
-  :m_MyIpAddresses()
+  : m_MyIpAddresses()
 {
 #ifdef OLD
   if ( StartWinsock( ) )
@@ -266,17 +264,13 @@ void Network::_Init( )
 
 #endif // WIN32
 
-#if 0
+#if 1
   // Test - Convert back and make sure we got what we thought we got.
   for ( IpAddresses_t::iterator itr = m_MyIpAddresses.begin();
         itr != m_MyIpAddresses.end(); ++itr )
   {
     AddrInfo *ptr = &(*itr);
-    const char *paddr = ptr->GetAddr( );
-    if ( paddr != NULL )
-    {
-      fprintf( stderr, "Address: %s\n", paddr );
-    }
+    std::cout << "My Address: " << ptr->GetAddr( ) << std::endl;;
   }
 #endif
 }
@@ -290,18 +284,19 @@ void Network::_Init( )
 bool Network::OnAddressList( const IpAddresses_t &addrList_,
                              const sockaddr_storage &address_ ) const
 {
+  std::string incomingAddr = AddrInfo::SockAddrToAddress( (const sockaddr *) &address_ ); 
   for ( IpAddresses_t::const_iterator itr = addrList_.begin( );
         itr != addrList_.end( ); ++itr )
   {
     const AddrInfo *ptr = &( *itr );
-    if ( ptr->GetAiFamily( ) == address_.ss_family &&
-         memcmp( ptr->GetAiAddr( ), &address_, sizeof(address_) ) == 0 )
-    { 
-      return( true ); // Yes, this is one of my addresses.
+    std::string address = ptr->GetAddr( );
+    if ( incomingAddr == address )
+    {
+      return true; // Yes, this is one of my addresses.
     }
   }
   
-  return( false ); // Nope, not one of my addresses.
+  return false; // Nope, not one of my addresses.
 }
 
 

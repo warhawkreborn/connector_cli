@@ -56,19 +56,19 @@ void AddrInfo::Get( addrinfo &info_ ) const
 
 const sockaddr_storage *AddrInfo::GetAiAddr( ) const
 {
-  return( &m_ai_addr );
+  return &m_ai_addr;
 }
 
 
 size_t AddrInfo::GetAiAddrLen( ) const
 {
-  return( m_ai_addrlen );
+  return m_ai_addrlen;
 }
 
 
 int AddrInfo::GetAiFamily( ) const
 {
-  return( m_ai_family );
+  return m_ai_family;
 }
 
 
@@ -122,7 +122,22 @@ uint16_t AddrInfo::SockAddrToPort( const struct sockaddr *sa_ )
 }
 
 
-const char *AddrInfo::GetAddr( ) const
+void AddrInfo::PortToSockAddr( const uint16_t port_, struct sockaddr *sa_ )
+{
+  uint16_t port = htons( port_ );
+
+  if ( sa_->sa_family == AF_INET )
+  {
+    ( ( ( struct sockaddr_in * ) sa_ )->sin_port ) = port;
+  }
+  else if ( sa_->sa_family == AF_INET6 )
+  {
+    ( ( ( struct sockaddr_in6 * ) sa_ )->sin6_port ) = port;
+  }
+}
+
+
+std::string AddrInfo::GetAddr( ) const
 {
   static char buf[ 256 ];
   memset( &buf[0], 0, sizeof(buf) );
@@ -145,4 +160,46 @@ const char *AddrInfo::GetAddr( ) const
   }
 
   return &buf[0];
+}
+
+bool AddrInfo::SetAddr( const std::string &address_ )
+{
+  addrinfo *result = NULL;
+  addrinfo hints;
+  memset( &hints, 0, sizeof(hints) );
+
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  hints.ai_family = AF_INET;
+
+  hints.ai_flags =
+#ifdef AI_ADDRCONFIG
+    AI_ADDRCONFIG |
+#endif
+    0;
+
+  int e = getaddrinfo( address_.c_str( ), "0", &hints, &result );
+
+  if ( e != 0 )
+  {
+    if ( result != NULL )
+    {
+      freeaddrinfo( result );
+    }
+
+    return false; // Error.
+  }
+
+  for ( addrinfo *itr = result; itr != NULL; itr = itr->ai_next )
+  {
+    Set( *itr );
+  }
+
+  if ( result != NULL )
+  {
+    freeaddrinfo( result );
+  }
+
+  return true; // OK.
 }
