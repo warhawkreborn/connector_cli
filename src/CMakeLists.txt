@@ -28,24 +28,30 @@ else( )
 
   set( PLATFORM_LIBS
        libcurl
+       ws2_32
+       iphlpapi
      )
 
 endif( )
 
 set( SOURCE_FILES
+     addr_info.cpp
      forward_server.cpp
      main.cpp
      net.cpp
+     network.cpp
      search_server.cpp
      server.cpp
      webclient.cpp
    )
 
 set( INCLUDE_FILES
+     addr_info.h
      cookie.h
      forward_server.h
      message_handler.h
      net.h
+	 network.h
      picojson.h
      search_server.h
      server.h
