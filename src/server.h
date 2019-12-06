@@ -24,8 +24,6 @@ class Server
     void send( struct sockaddr_in &clientaddr, const std::vector< uint8_t > &data );
     bool receive( struct sockaddr_in &clientaddr, std::vector< uint8_t > &data );
 
-    std::mutex &GetMutex();
-
     bool valid_packet( const std::vector< uint8_t > &data_ );
 
     warhawk::net::udp_server &GetServer( );
@@ -46,9 +44,9 @@ class Server
     // Data
     //
 
-    static std::mutex s_mutex;
     warhawk::net::udp_server &m_server;
  
+    std::mutex      m_mutex; // Protect m_MessageHandlers.
     using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
     MessageHandlers m_MessageHandlers;
 };

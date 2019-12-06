@@ -1,11 +1,9 @@
 #include "server.h"
 
 
-std::mutex Server::s_mutex;
-
-
 Server::Server( warhawk::net::udp_server &udpServer_ )
   : m_server( udpServer_ )
+  , m_mutex( )
   , m_MessageHandlers( )
 {
 }
@@ -68,20 +66,16 @@ warhawk::net::udp_server &Server::GetServer( )
 }
 
 
-std::mutex &Server::GetMutex( )
-{
-  return s_mutex;
-}
-
-
 void Server::Register( MessageHandler *handler_ )
 {
+  std::unique_lock< std::mutex > lck( m_mutex );
   m_MessageHandlers[ handler_ ] = handler_;
 }
 
 
 void Server::Unregister( MessageHandler *handler_ )
 {
+  std::unique_lock< std::mutex > lck( m_mutex );
   MessageHandlers::iterator itr = m_MessageHandlers.find( handler_ );
 
   if ( itr != m_MessageHandlers.end( ) )

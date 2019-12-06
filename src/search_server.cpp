@@ -25,9 +25,6 @@ void SearchServer::run( )
     std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
 
     {
-      std::mutex &mutex = m_server->GetMutex();
-      std::unique_lock< std::mutex > lck( mutex );
-
       // TODO: Do anything that needs to be done here for receiving packets while the mutex is locked.
     }
 
