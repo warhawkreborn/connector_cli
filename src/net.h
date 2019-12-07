@@ -1,5 +1,5 @@
 #ifndef NET_H
-#define NET_H_
+#define NET_H
 
 #pragma once
 

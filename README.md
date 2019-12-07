@@ -6,9 +6,9 @@ You need to install a couple of dependencies:
 
 ```sudo apt install make build-essential libcurl4-openssl-dev libboost-system-dev libssl-dev```
 
-Then move into the root directory and execute ```make```.
+Build using cmake.
 
-It should compile fine and generate a file called bridge.
+It should compile fine and generate a file called warhawk-reborn.
 
 Execute it using ```./warhawk-reborn```.
 
