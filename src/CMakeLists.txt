@@ -43,6 +43,7 @@ set( SOURCE_FILES
      network.cpp
      search_server.cpp
      server.cpp
+     warhawk_api.cpp
      webclient.cpp
    )
 
@@ -59,6 +60,7 @@ set( INCLUDE_FILES
      server.h
      server_entry.h
      warhawk.h
+     warhawk_api.h
      webclient.h
    )
 
