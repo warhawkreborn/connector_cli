@@ -47,7 +47,7 @@ class SearchServer : public MessageHandler
 
     struct PacketData
     {
-      sockaddr_storage       m_client;
+      std::string            m_address;
       std::vector< uint8_t > m_data;
     };
 

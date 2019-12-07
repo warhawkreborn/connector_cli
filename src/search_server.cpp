@@ -68,9 +68,10 @@ void SearchServer::run( )
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
+              PacketData &data = *itr;
+              std::cout << "SearchServer: Local server found at IP " << data.m_address << std::endl; 
               itr = m_PacketList.erase( itr );
             }
-
           }
         }
 
@@ -88,7 +89,8 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
   {
     std::cout << "SearchServer: Collecting - Received packet." << std::endl;
 
-    PacketData data { client_, data_ };
+    std::string addr = AddrInfo::SockAddrToAddress( (sockaddr *) &client_ );
+    PacketData data { addr, data_ };
 
     std::unique_lock< std::mutex > lck( m_mutex );
     m_PacketList.push_back( data );
