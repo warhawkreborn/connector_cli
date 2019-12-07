@@ -40,6 +40,7 @@ class SearchServer : public MessageHandler
     enum class STATE
     {
       STATE_WAITING,
+      STATE_BROADCASTING,
       STATE_COLLECTING,
       STATE_PROCESSING,
     };

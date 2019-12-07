@@ -8,7 +8,7 @@ SearchServer::SearchServer( Server *server_ )
   : m_mutex( )
   , m_entries( )
   , m_server( server_ )
-  , m_CurrentState( STATE::STATE_WAITING )
+  , m_CurrentState( STATE::STATE_BROADCASTING )
 {
   m_server->Register( this );
 }
@@ -36,6 +36,13 @@ void SearchServer::run( )
       {
         std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
 
+        m_CurrentState = STATE::STATE_BROADCASTING;
+
+        break;
+      }
+
+      case STATE::STATE_BROADCASTING:
+      {
         std::cout << "SearchServer: Broadcasting - Searching for new servers to publish." << std::endl;
 
         // Broadcast Server Discovery Packet
@@ -69,10 +76,12 @@ void SearchServer::run( )
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
-              std::cout << "SearchServer: Local server found at IP " << data.m_address                << std::endl;
-              std::cout << "SearchServer: Name = '"                  << data.m_data.GetName( ) << "'" << std::endl;
-              std::cout << "SearchServer: MapName = "                << data.m_data.GetMapName( )     << std::endl;
-              std::cout << "SearchServer: GameMode = "               << data.m_data.GetGameMode( )    << std::endl;
+              std::cout << "SearchServer: " << 
+                "Local server IP = '" << data.m_address             << "', " <<
+                "Name = '"            << data.m_data.GetName( )     << "', " <<
+                "MapName = '"         << data.m_data.GetMapName( )  << "', " <<
+                "GameMode = '"        << data.m_data.GetGameMode( ) << "'"   <<std::endl;
+
               itr = m_PacketList.erase( itr );
             }
           }
