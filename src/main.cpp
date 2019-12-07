@@ -1,17 +1,7 @@
-#include <iostream>
-#include <mutex>
-#include <thread>
-
 #include "forward_server.h"
-#include "net.h"
-#include "picojson.h"
 #include "search_server.h"
-#include "server.h"
-#include "server_entry.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
-#include "webclient.h"
-
 
 
 int main( int argc_, const char **argv_ )

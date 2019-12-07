@@ -20,9 +20,6 @@
 #endif
 
 
-const int WARHAWK_UDP_PORT = 10029;
-
-
 class Network;
 
 

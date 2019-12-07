@@ -12,7 +12,7 @@ namespace warhawk
 
 std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
 {
-  auto req = warhawk::common::request::default_get( "https://warhawk.thalhammer.it/api/server/" );
+  auto req = warhawk::common::request::default_get( WARHAWK_API_BASE + "server/" );
   warhawk::common::webclient client;
   client.set_verbose( false );
   auto resp = client.execute( req );

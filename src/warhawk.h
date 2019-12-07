@@ -6,6 +6,10 @@
 #include <cstdint>
 #include <vector>
 
+const int         WARHAWK_UDP_PORT = 10029;
+const std::string WARHAWK_API_BASE = "https://warhawk.thalhammer.it/api/";
+
+
 namespace warhawk
 {
 
