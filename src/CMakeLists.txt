@@ -36,6 +36,7 @@ endif( )
 
 set( SOURCE_FILES
      addr_info.cpp
+     discovery_packet.cpp
      forward_server.cpp
      main.cpp
      net.cpp
@@ -48,10 +49,11 @@ set( SOURCE_FILES
 set( INCLUDE_FILES
      addr_info.h
      cookie.h
+     discovery_packet.h
      forward_server.h
      message_handler.h
      net.h
-	 network.h
+     network.h
      picojson.h
      search_server.h
      server.h

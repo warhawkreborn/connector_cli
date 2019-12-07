@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 
+#include "discovery_packet.h"
 #include "message_handler.h"
 #include "net.h"
 #include "server.h"
@@ -47,8 +48,8 @@ class SearchServer : public MessageHandler
 
     struct PacketData
     {
-      std::string            m_address;
-      std::vector< uint8_t > m_data;
+      std::string              m_address;
+      warhawk::DiscoveryPacket m_data;
     };
 
     using PacketList = std::list< PacketData >;

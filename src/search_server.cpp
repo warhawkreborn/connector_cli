@@ -69,7 +69,10 @@ void SearchServer::run( )
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
-              std::cout << "SearchServer: Local server found at IP " << data.m_address << std::endl; 
+              std::cout << "SearchServer: Local server found at IP " << data.m_address                << std::endl;
+              std::cout << "SearchServer: Name = '"                  << data.m_data.GetName( ) << "'" << std::endl;
+              std::cout << "SearchServer: MapName = "                << data.m_data.GetMapName( )     << std::endl;
+              std::cout << "SearchServer: GameMode = "               << data.m_data.GetGameMode( )    << std::endl;
               itr = m_PacketList.erase( itr );
             }
           }
