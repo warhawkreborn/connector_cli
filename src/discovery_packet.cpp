@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "discovery_packet.h"
 
 
@@ -252,7 +254,7 @@ void DiscoveryPacket::SetIP( std::vector< uint8_t > addrBytes_ )
 {
   if ( addrBytes_.size( ) == 0 || addrBytes_.size( ) != 4 )
   {
-    throw new std::runtime_error( "Invalid address bytes" );
+    throw std::runtime_error( "Invalid address bytes" );
   }
 
   m_data[ 112] = addrBytes_[ 0 ];
