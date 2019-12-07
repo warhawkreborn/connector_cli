@@ -2,6 +2,7 @@
 #define DISCOVERY_PACKET_H
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 

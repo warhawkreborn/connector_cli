@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "forward_server.h"
 #include "search_server.h"
 #include "warhawk.h"
