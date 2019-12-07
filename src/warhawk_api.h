@@ -17,6 +17,8 @@ class API
 
     static std::vector< ServerEntry > DownloadServerList( Server * );
 
+    static std::string CheckForwarding( );
+
   private:
 
 };

@@ -64,4 +64,43 @@ std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
   return res;
 }
 
+
+std::string API::CheckForwarding( )
+{
+  auto req = warhawk::common::request::default_get( WARHAWK_API_BASE + "server/checkForwarding" );
+  warhawk::common::webclient client;
+  client.set_verbose( false );
+  auto resp = client.execute( req );
+
+  if ( resp.m_status_code != 200 )
+  {
+    throw std::runtime_error( "http request failed" );
+  }
+
+  picojson::value val;
+  auto err = picojson::parse( val, resp.m_data );
+
+  if ( !err.empty() )
+  {
+    throw std::runtime_error( "invalid json:" + err );
+  }
+
+  std::string ip;
+  std::string state;
+
+  try
+  {
+    ip    = val.get( "ip"   ).get< std::string >( );
+    state = val.get( "info" ).get( "state" ).get< std::string >( );
+  }
+  catch ( const std::exception &e_ )
+  {
+    std::cout << "DownloadServerList: failed to parse server entry:" << e_.what() << std::endl;
+    ip = "";
+    state = "";
+  }
+
+  return ip;
+}
+
 } // namespace warhawk

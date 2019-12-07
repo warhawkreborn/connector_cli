@@ -3,6 +3,8 @@
 #include "addr_info.h"
 #include "net.h"
 #include "search_server.h"
+#include "warhawk_api.h"
+
 
 SearchServer::SearchServer( Server *server_ )
   : m_mutex( )
@@ -73,14 +75,18 @@ void SearchServer::run( )
           if ( m_PacketList.size( ) != 0 )
           {
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
+
+            auto ip = warhawk::API::CheckForwarding( );
+
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
-              std::cout << "SearchServer: " << 
-                "Local server IP = '" << data.m_address             << "', " <<
-                "Name = '"            << data.m_data.GetName( )     << "', " <<
-                "MapName = '"         << data.m_data.GetMapName( )  << "', " <<
-                "GameMode = '"        << data.m_data.GetGameMode( ) << "'"   <<std::endl;
+              std::cout << "SearchServer: " <<
+                "Public server IP = '" << ip                         << "', " <<
+                "Local  server IP = '" << data.m_address             << "', " <<
+                "Name = '"             << data.m_data.GetName( )     << "', " <<
+                "MapName = '"          << data.m_data.GetMapName( )  << "', " <<
+                "GameMode = '"         << data.m_data.GetGameMode( ) << "'"   <<std::endl;
 
               itr = m_PacketList.erase( itr );
             }
