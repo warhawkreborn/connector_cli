@@ -63,12 +63,12 @@ void SearchServer::run( )
         {
           std::unique_lock< std::mutex > lck( m_mutex );
 
-          if ( m_PacketList.size ( ) != 0 )
+          if ( m_PacketList.size( ) != 0 )
           {
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
-            for ( auto entry : m_PacketList )
+            for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
-              m_PacketList.pop_front( );
+              itr = m_PacketList.erase( itr );
             }
 
           }
