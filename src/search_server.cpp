@@ -89,9 +89,8 @@ void SearchServer::run( )
                 "MapName = '"          << data.m_data.GetMapName( )  << "', " <<
                 "GameMode = '"         << data.m_data.GetGameMode( ) << "'"   <<std::endl;
 
-#if 0 // Currently testing both with and without this line to see if I can get "online" response from remote server.
               auto response = warhawk::API::AddHost( data.m_data.GetName( ), "1234", false );
-#endif
+
               itr = m_PacketList.erase( itr );
             }
           }

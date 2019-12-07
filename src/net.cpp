@@ -68,7 +68,7 @@ udp_server::~udp_server( )
 void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, const bool broadcast_ )
 {
   int optval = broadcast_ ? 1 : 0;
-  setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
+  int err = setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
 
   int n = sendto(
     m_fd, (const char *) data_.data(), (int) data_.size(), 0, (sockaddr *) &clientaddr_, sizeof( clientaddr_ ) );
