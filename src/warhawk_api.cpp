@@ -65,7 +65,7 @@ std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
 }
 
 
-std::string API::CheckForwarding( )
+API::ForwardingResponse API::CheckForwarding( )
 {
   auto req = warhawk::common::request::default_get( WARHAWK_API_BASE + "server/checkForwarding" );
   warhawk::common::webclient client;
@@ -95,12 +95,40 @@ std::string API::CheckForwarding( )
   }
   catch ( const std::exception &e_ )
   {
-    std::cout << "DownloadServerList: failed to parse server entry:" << e_.what() << std::endl;
+    std::cout << "DownloadServerList: failed to parse server entry:" << e_.what( ) << std::endl;
     ip = "";
     state = "";
   }
 
-  return ip;
+  ForwardingResponse response;
+  response.m_ip    = ip;
+  response.m_state = state;
+
+  return response;
+}
+
+
+std::string API::AddHost( std::string hostname_, std::string uniqueId_, bool persistent_ )
+{
+  std::cout << "AddHost: Name = " << hostname_ << ", uniqueId = " << uniqueId_ << ", persistent = " << persistent_ << std::endl;
+
+  picojson::object jsonObject;
+  jsonObject[ "hostname"   ] = picojson::value( std::string( hostname_ ) );
+  jsonObject[ "fcm_id"     ] = picojson::value( std::string( uniqueId_ ) );
+  jsonObject[ "persistent" ] = picojson::value( persistent_ );
+  std::string jsonString = picojson::value( jsonObject ).serialize( );
+
+  auto req = warhawk::common::request::default_post( WARHAWK_API_BASE + "server/", jsonString );
+  warhawk::common::webclient client;
+  client.set_verbose( false );
+  auto resp = client.execute( req );
+
+  if ( resp.m_status_code != 200 )
+  {
+    throw std::runtime_error( "http request failed" );
+  }
+
+  return "ok";
 }
 
 } // namespace warhawk

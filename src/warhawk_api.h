@@ -17,7 +17,15 @@ class API
 
     static std::vector< ServerEntry > DownloadServerList( Server * );
 
-    static std::string CheckForwarding( );
+    struct ForwardingResponse
+    {
+      std::string m_ip;
+      std::string m_state;
+    };
+
+    static ForwardingResponse CheckForwarding( );
+
+    static std::string AddHost( std::string hostname, std::string uniqueId, bool persistent );
 
   private:
 

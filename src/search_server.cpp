@@ -76,18 +76,22 @@ void SearchServer::run( )
           {
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
 
-            auto ip = warhawk::API::CheckForwarding( );
+            warhawk::API::ForwardingResponse response = warhawk::API::CheckForwarding( );
 
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
               std::cout << "SearchServer: " <<
-                "Public server IP = '" << ip                         << "', " <<
+                "State = '"            << response.m_state           << "', " <<
+                "Public server IP = '" << response.m_ip              << "', " <<
                 "Local  server IP = '" << data.m_address             << "', " <<
                 "Name = '"             << data.m_data.GetName( )     << "', " <<
                 "MapName = '"          << data.m_data.GetMapName( )  << "', " <<
                 "GameMode = '"         << data.m_data.GetGameMode( ) << "'"   <<std::endl;
 
+#if 0 // Currently testing both with and without this line to see if I can get "online" response from remote server.
+              auto response = warhawk::API::AddHost( data.m_data.GetName( ), "1234", false );
+#endif
               itr = m_PacketList.erase( itr );
             }
           }
