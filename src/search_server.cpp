@@ -8,6 +8,7 @@ SearchServer::SearchServer( Server *server_ )
   : m_mutex( )
   , m_entries( )
   , m_server( server_ )
+  , m_CurrentState( STATE::STATE_WAITING )
 {
   m_server->Register( this );
 }
@@ -29,18 +30,67 @@ void SearchServer::run( )
 
   while ( true )
   {
-    std::cout << "SearchServer: Searching for new servers to publish." << std::endl;
+    switch ( m_CurrentState )
+    {
+      case STATE::STATE_WAITING:
+      {
+        std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
 
-    // Broadcast Server Discovery Packet
-    const bool broadcast = true;
-    m_server->send( *clientAddr.GetAiAddr( ), discoveryPacketData, broadcast ); 
+        std::cout << "SearchServer: Broadcasting - Searching for new servers to publish." << std::endl;
 
-    std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
+        // Broadcast Server Discovery Packet
+        const bool broadcast = true;
+        m_server->send( *clientAddr.GetAiAddr( ), discoveryPacketData, broadcast ); 
+
+        m_CurrentState = STATE::STATE_COLLECTING;
+
+        break;
+      }
+
+      case STATE::STATE_COLLECTING:
+
+        std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+
+        m_CurrentState = STATE::STATE_PROCESSING;
+
+        break;
+
+      case STATE::STATE_PROCESSING:
+
+        std::cout << "SearchServer: Processing any collected packets." << std::endl;
+
+        // Now do something with any packets collected.
+        {
+          std::unique_lock< std::mutex > lck( m_mutex );
+
+          if ( m_PacketList.size ( ) != 0 )
+          {
+            std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
+            for ( auto entry : m_PacketList )
+            {
+              m_PacketList.pop_front( );
+            }
+
+          }
+        }
+
+        m_CurrentState = STATE::STATE_WAITING;
+
+        break;
+    }
   }
 }
 
 
 void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
-  std::cout << "SearchServer: Received packet." << std::endl;
+  if ( m_CurrentState == STATE::STATE_COLLECTING )
+  {
+    std::cout << "SearchServer: Collecting - Received packet." << std::endl;
+
+    PacketData data { client_, data_ };
+
+    std::unique_lock< std::mutex > lck( m_mutex );
+    m_PacketList.push_back( data );
+  }
 }

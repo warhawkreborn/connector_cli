@@ -2,6 +2,7 @@
 #define SEARCH_SERVER_H
 
 #include <iostream>
+#include <list>
 #include <vector>
 
 #include "message_handler.h"
@@ -34,6 +35,25 @@ class SearchServer : public MessageHandler
     std::mutex                  m_mutex;
     std::vector< ServerEntry >  m_entries;
     Server                     *m_server;
+
+    enum class STATE
+    {
+      STATE_WAITING,
+      STATE_COLLECTING,
+      STATE_PROCESSING,
+    };
+
+    STATE m_CurrentState;
+
+    struct PacketData
+    {
+      sockaddr_storage       m_client;
+      std::vector< uint8_t > m_data;
+    };
+
+    using PacketList = std::list< PacketData >;
+
+    PacketList m_PacketList;
 };
 
 #endif // SEARCH_SERVER_H
