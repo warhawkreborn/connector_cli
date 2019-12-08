@@ -13,15 +13,16 @@ BuildRequires: devtoolset-8
 ExcludeArch: noarch
 
 %description
-Play Internet WarHawk again on the Sony PlayStation 3.
+Play Sony PlayStation3 WarHawk on the Internet again.
 
 This acts as a simple bridge between the PlayStation 3 and a host that contains a list of servers.
 
-If you set your router port forwarding to forward port 10029 to you PlayStation 3 then you can also host WarHawk games.
+If you set your router port forwarding to forward port 10029 to your PlayStation 3 then you can also *HOST* WarHawk games for others to join.
 
 %changelog
-* Sat Dec 07 2019 David Summers <david@summersoft.fay-ar.us> @VERSION@-@RELEASE@-@BUILD@
-- First version that can host WarHawk servers.
+* Sat Dec 07 2019 David Summers <david@summersoft.fay-ar.us> @VERSION@-@RELEASE@
+- First version that can host a local WarHawk server so that other Internet
+  players can join.
 
 %prep
 %setup -q
@@ -39,12 +40,15 @@ EOF
 make
 
 %install
-cd build
 /bin/rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 
 # Install executable
-cp src/warhawk-reborn $RPM_BUILD_ROOT/usr/bin
+cp build/src/warhawk-reborn $RPM_BUILD_ROOT/usr/bin
+
+# Install systemd service
+mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system
+cp packages/centos-7/warhawk.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -53,3 +57,4 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc README.md
 /usr/bin/warhawk-reborn
+/usr/lib/systemd/system/warhawk.service

@@ -1,0 +1,18 @@
+# This is /usr/lib/systemd/system/warhawk.service
+# (or /lib/systemd/system/warhawk.service dependent on 
+#  your linux distribution flavor )
+[Unit]
+Description=WarHawk Reborn
+Documentation=https://warhawk.thalhammer.it
+After=network.target syslog.target
+
+[Service]
+# see man systemd.service 
+Type=simple
+ExecStart=/usr/bin/warhawk-reborn
+RemainAfterExit=true
+ExecStop=/usr/bin/pkill warhawk-reborn
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target 
