@@ -1,0 +1,39 @@
+#! /bin/bash
+# Start up warhawk-reborn once when this script is called.
+
+COMMAND="$1"
+
+
+RUNNING_PID=`ps axu | grep -i warhawk-reborn | grep -v grep | awk '{ print $2 }'`
+
+if [ "$COMMAND" = "start" ]; then
+
+  if [ "$RUNNING_PID"x = "x" ]; then
+
+    echo "Starting WARHAWK-REBORN"
+
+    nohup ./warhawk-reborn > warhawk-reborn.log 2>&1 &
+
+  else
+
+    echo "WARHAWK-REBORN already running...."
+
+  fi
+
+elif [ "$COMMAND" = "stop" ]; then
+
+
+  if [ "$RUNNING_PID"x != "x" ]; then
+
+    echo "Stopping WARHAWK-REBORN on $RUNNING_PID"
+
+    kill $RUNNING_PID
+
+  else
+
+    echo "WARHAWK-REBORN already stopped."
+
+
+  fi
+
+fi
