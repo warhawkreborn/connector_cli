@@ -15,7 +15,7 @@ ForwardServer::~ForwardServer( )
 }
 
 
-void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
+void ForwardServer::SetEntries( std::vector< ServerEntry > e_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   m_entries = std::move( e_ );
@@ -24,6 +24,11 @@ void ForwardServer::set_entries( std::vector< ServerEntry > e_ )
 
 void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
+  if ( data_.size() > 300)
+  {
+    // This is not a request, but a response, so we exit early.
+    return;
+  }
   std::cout << "ForwardServer: Received packet." << std::endl;
 
   if ( !valid_packet( data_ ) )

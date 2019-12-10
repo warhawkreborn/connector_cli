@@ -43,6 +43,7 @@ class udp_server
     bool receive(       sockaddr_storage &clientaddr, std::vector< uint8_t > &data );
 
     static std::array< uint8_t, 4 > get_ip( const std::string &host );
+    static std::string ip_to_string(const std::array<uint8_t, 4>& ip);
 
     uint16_t GetPort( ) const;
 

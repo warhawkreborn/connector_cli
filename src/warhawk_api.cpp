@@ -47,6 +47,9 @@ std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
       entry.m_name = e.get( "name" ).get< std::string >();
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
       entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >() );
+      // NOTE: Converting hostname to array and back might seems redundant, but its not,
+      // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
+      entry.m_ip = warhawk::net::udp_server::ip_to_string(ip);
 
       auto frame = (warhawk::net::server_info_response *) ( entry.m_frame.data() + 4 );
 
@@ -114,7 +117,10 @@ std::string API::AddHost( std::string hostname_, std::string uniqueId_, bool per
 
   picojson::object jsonObject;
   jsonObject[ "hostname"   ] = picojson::value( std::string( hostname_ ) );
-  jsonObject[ "fcm_id"     ] = picojson::value( std::string( uniqueId_ ) );
+  if( !uniqueId_.empty() )
+  {
+    jsonObject[ "fcm_id"     ] = picojson::value( std::string( uniqueId_ ) );
+  }
   jsonObject[ "persistent" ] = picojson::value( persistent_ );
   std::string jsonString = picojson::value( jsonObject ).serialize( );
 

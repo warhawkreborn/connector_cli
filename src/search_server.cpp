@@ -94,6 +94,16 @@ void SearchServer::run( )
               std::cout << "SearchServer: Couldn't perform CheckForwarding: " << e_.what( ) << std::endl;
             }
 
+            for(auto & entry : m_entries)
+            {
+              if(entry.m_ip == response.m_ip)
+              {
+                // Skipping AddHost as it already exists
+                m_PacketList.clear();
+                break;
+              }
+            }
+            
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
@@ -105,7 +115,7 @@ void SearchServer::run( )
                 "MapName = '"          << data.m_data.GetMapName( )  << "', " <<
                 "GameMode = '"         << data.m_data.GetGameMode( ) << "'"   <<std::endl;
 
-              auto response = warhawk::API::AddHost( data.m_data.GetName( ), "1234", false );
+              auto response = warhawk::API::AddHost( data.m_data.GetName( ), "", false );
 
               itr = m_PacketList.erase( itr );
             }
@@ -132,4 +142,10 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
     std::unique_lock< std::mutex > lck( m_mutex );
     m_PacketList.push_back( data );
   }
+}
+
+void SearchServer::SetEntries( std::vector< ServerEntry > e_ )
+{
+  std::unique_lock< std::mutex > lck( m_mutex );
+  m_entries = std::move( e_ );
 }

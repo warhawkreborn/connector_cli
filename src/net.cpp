@@ -143,14 +143,9 @@ uint16_t udp_server::GetPort( ) const
 }
 
 
-/*std::string udp_server::ip_to_string(uint32_t ip, uint16_t port) {
-    char *hostaddrp = inet_ntoa(clientaddr.sin_addr);
-    if (hostaddrp == NULL)
-        throw std::runtime_error("ERROR on inet_ntoa");
-    struct hostent *hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_addr.s_addr),
-AF_INET); const char *hname = hostp ? hostp->h_name : ""; std::cout << "server received " << n << " bytes from " <<
-hname << " (" << hostaddrp << ")" << std::endl;
-}*/
+std::string udp_server::ip_to_string(const std::array<uint8_t, 4>& ip) {
+    return std::to_string(ip[0]) + "." + std::to_string(ip[1]) + "." + std::to_string(ip[2]) + "." + std::to_string(ip[3]);
+}
 
 } // namespace net
 

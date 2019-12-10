@@ -16,7 +16,7 @@ class ForwardServer : public MessageHandler
     ForwardServer( Server * );
     ~ForwardServer( );
  
-    void set_entries( std::vector< ServerEntry > e_ );
+    void SetEntries( std::vector< ServerEntry > e_ );
 
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 

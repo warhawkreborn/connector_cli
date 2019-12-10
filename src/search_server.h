@@ -23,6 +23,8 @@ class SearchServer : public MessageHandler
 
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 
+    void SetEntries( std::vector< ServerEntry > e_ );
+
   protected:
 
   private:

@@ -48,7 +48,8 @@ int main( int argc_, const char **argv_ )
 
     if ( list.size( ) > 0 )
     {
-      forwardServer.set_entries( list );
+      forwardServer.SetEntries( list );
+      searchServer.SetEntries(list);
 
       std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
 
