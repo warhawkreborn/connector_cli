@@ -47,9 +47,16 @@ void SearchServer::run( )
       {
         std::cout << "SearchServer: Broadcasting - Searching for new servers to publish." << std::endl;
 
-        // Broadcast Server Discovery Packet
-        const bool broadcast = true;
-        m_server->send( *clientAddr.GetAiAddr( ), discoveryPacketData, broadcast ); 
+        try
+        {
+          // Broadcast Server Discovery Packet
+          const bool broadcast = true;
+          m_server->send( *clientAddr.GetAiAddr( ), discoveryPacketData, broadcast );
+        }
+        catch ( const std::exception &e_ )
+        {
+          std::cout << "SearchServer: Error trying to broadcast packet: " << e_.what( ) << std::endl;
+        }
 
         m_CurrentState = STATE::STATE_COLLECTING;
 

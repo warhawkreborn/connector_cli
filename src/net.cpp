@@ -5,6 +5,7 @@
 #endif
 
 #include <cstdio>
+#include <iostream>
 #include <stdexcept>
 #include <string.h>
 #include <string>
@@ -71,9 +72,9 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
   int err = setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
 
   int n = sendto(
-    m_fd, (const char *) data_.data(), (int) data_.size(), 0, (sockaddr *) &clientaddr_, sizeof( clientaddr_ ) );
+    m_fd, (const char *) data_.data(), (size_t) data_.size(), 0, (sockaddr *) &clientaddr_, sizeof( sockaddr ) );
 
-  if ( n != data_.size() )
+  if ( n != (int) data_.size() )
   {
     int err = 0;
 #ifdef WIN32
@@ -81,6 +82,11 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
     if ( n == SOCKET_ERROR )
     {
       err = WSAGetLastError( );
+    }
+#else
+    if ( n == SOCKET_ERROR )
+    {
+      err = errno;
     }
 #endif
 
