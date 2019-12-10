@@ -84,9 +84,9 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
     }
 #endif
 
-      std::stringstream ss;
-      ss << "Failed to send data, n = " << n << ", error = " << err; 
-      throw std::runtime_error( ss.str( ).c_str( ) );
+    std::stringstream ss;
+    ss << "Failed to send data, n = " << n << ", error = " << err; 
+    throw std::runtime_error( ss.str( ).c_str( ) );
   }
 }
 
