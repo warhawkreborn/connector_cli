@@ -1,5 +1,7 @@
 # connector_unix
-Connector to allow discovery of servers (Linux, Mac, and Windows version)
+Connector to allow discovery of servers and hosting local servers
+
+Works on Linux( CentOS 7, Debian, Raspberry Pi), MacOS, and Windows
 
 ### Compiling
 You need to install a couple of dependencies:
