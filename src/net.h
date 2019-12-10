@@ -40,10 +40,10 @@ class udp_server
     udp_server &operator=( const udp_server & ) = delete;
 
     void send(    const sockaddr_storage &clientaddr, const std::vector< uint8_t > &data, const bool broadcast = false );
-    bool receive(       sockaddr_storage &clientaddr, std::vector< uint8_t > &data );
+    bool receive(       sockaddr_storage &clientaddr,       std::vector< uint8_t > &data );
 
-    static std::array< uint8_t, 4 > get_ip( const std::string &host );
-    static std::string ip_to_string(const std::array<uint8_t, 4>& ip);
+    static std::array< uint8_t, 4 > StringToIp( const std::string &host );
+    static std::string              IpToString( const std::array< uint8_t, 4 > & ip );
 
     uint16_t GetPort( ) const;
 

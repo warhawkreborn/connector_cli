@@ -122,7 +122,7 @@ response webclient::execute( const request &req_ )
 {
   struct curl_slist* headers = nullptr;
 
-  for( auto &e : req_.m_headers )
+  for ( auto &e : req_.m_headers )
   {
     auto str = e.first + ":" + e.second;
     headers = curl_slist_append( headers, str.c_str( ) );

@@ -24,7 +24,7 @@ void ForwardServer::SetEntries( std::vector< ServerEntry > e_ )
 
 void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
-  if ( data_.size() > 300)
+  if ( data_.size( ) > 300)
   {
     // This is not a request, but a response, so we exit early.
     return;
@@ -57,7 +57,7 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
 
 bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 {
-  if ( data_.size() < 4 )
+  if ( data_.size( ) < 4 )
   {
     return false;
   }
@@ -65,7 +65,7 @@ bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
   uint16_t len = data_[ 3 ];
   len = ( len << 8 ) | data_[ 2 ];
 
-  if ( data_.size() - 4 != len )
+  if ( data_.size( ) - 4 != len )
   {
     return false;
   }
