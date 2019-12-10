@@ -83,7 +83,16 @@ void SearchServer::run( )
           {
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
 
-            warhawk::API::ForwardingResponse response = warhawk::API::CheckForwarding( );
+            warhawk::API::ForwardingResponse response;
+
+            try
+            {
+              response = warhawk::API::CheckForwarding( );
+            }
+            catch ( const std::exception &e_ )
+            {
+              std::cout << "SearchServer: Couldn't perform CheckForwarding: " << e_.what( ) << std::endl;
+            }
 
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {

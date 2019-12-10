@@ -35,13 +35,27 @@ int main( int argc_, const char **argv_ )
   while ( true )
   {
     std::cout << "MainLoop: Updating server list" << std::endl;
-    auto list = warhawk::API::DownloadServerList( &packetServer );
-    forwardServer.set_entries( list );
-    std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
-
-    for ( auto &e : list )
+    std::vector< ServerEntry > list;
+    try
     {
-      std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
+      list = warhawk::API::DownloadServerList( &packetServer );
+    }
+    catch ( const std::exception &e_ )
+    {
+      std::cout << "MainLoop: Error = " << e_.what( ) << std::endl;
+      std::cout << "MainLoop: Check network connection." << std::endl;
+    }
+
+    if ( list.size( ) > 0 )
+    {
+      forwardServer.set_entries( list );
+
+      std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
+
+      for ( auto &e : list )
+      {
+        std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
+      }
     }
 
     std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
