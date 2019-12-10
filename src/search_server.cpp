@@ -94,6 +94,12 @@ void SearchServer::run( )
               std::cout << "SearchServer: Couldn't perform CheckForwarding: " << e_.what( ) << std::endl;
             }
 
+            if ( response.m_state != "online")
+            {
+              std::cout << "SearchServer: Server not online, check your port forwarding!" << std::endl;
+              m_PacketList.clear();
+            }
+
             for(auto & entry : m_entries)
             {
               if(entry.m_ip == response.m_ip)

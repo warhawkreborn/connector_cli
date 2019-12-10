@@ -51,7 +51,13 @@ std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
       // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
       entry.m_ip = warhawk::net::udp_server::ip_to_string(ip);
 
-      auto frame = (warhawk::net::server_info_response *) ( entry.m_frame.data() + 4 );
+      if ( entry.m_frame.size() < 4 || (entry.m_frame.size() - 4) < sizeof(warhawk::net::server_info_response) )
+      {
+        // Just to be safe....
+        continue;
+      }
+
+      auto frame = reinterpret_cast<warhawk::net::server_info_response *>( entry.m_frame.data() + 4 );
 
       memcpy( frame->m_ip1, ip.data(), ip.size() );
       memcpy( frame->m_ip2, ip.data(), ip.size() );
