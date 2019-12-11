@@ -38,7 +38,9 @@ udp_server::udp_server( uint16_t port_ )
 
   if ( m_fd < 0 )
   {
-    throw std::runtime_error( "ERROR opening socket" );
+    std::stringstream ss;
+    ss << "ERROR opening socket: " << errno << ".  Check to see if port " << m_port << " is already in use.";
+    throw std::runtime_error( ss.str( ).c_str( ) );
   }
 
   int optval = 1;
