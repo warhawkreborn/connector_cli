@@ -8,6 +8,16 @@
 
 const std::string Version = "1.1";
 
+
+void PrintVersion( )
+{
+  std::cout << "WarHawk Reborn Version " << Version << "-" <<
+    warhawk::Version::GIT_HASH <<
+    " (" << warhawk::Version::GIT_DATE << ")" <<
+    std::endl;
+}
+
+
 int main( int argc_, const char **argv_ )
 {
   if ( argc_ > 1 )
@@ -16,10 +26,7 @@ int main( int argc_, const char **argv_ )
 
     if ( option == "-v" || option == "--version" )
     {
-      std::cout << "WarHawk Reborn Version " << Version << "-" <<
-        warhawk::Version::GIT_HASH <<
-        " (" << warhawk::Version::GIT_DATE << ")" <<
-        std::endl;
+      PrintVersion( );
 
       return 0;
     }
@@ -27,6 +34,8 @@ int main( int argc_, const char **argv_ )
     std::cerr << "Unknown option." << std::endl;
     return 1;
   }
+
+  PrintVersion( );
 
   std::cout << "Warhawk bridge booting..." << std::endl;
 
