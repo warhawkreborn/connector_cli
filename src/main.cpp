@@ -4,12 +4,9 @@
 #include "search_server.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
+#include "version.h"
 
 const std::string Version = "1.1";
-
-// Default to "devel" but CMAKE or packaging should replace with GIT HASH.
-const std::string GitHash = "devel";
-
 
 int main( int argc_, const char **argv_ )
 {
@@ -19,10 +16,11 @@ int main( int argc_, const char **argv_ )
 
     if ( option == "-v" || option == "--version" )
     {
-#ifdef GITHASH
-      GitHash = GITHASH;
-#else
-      std::cout << "WarHawk Reborn Version " << Version << "-" << GitHash << std::endl;
+      std::cout << "WarHawk Reborn Version " << Version << "-" <<
+        warhawk::Version::GIT_HASH <<
+        " (" << warhawk::Version::GIT_DATE << ")" <<
+        std::endl;
+
       return 0;
     }
 

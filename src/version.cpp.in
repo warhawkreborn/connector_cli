@@ -1,0 +1,7 @@
+#include "version.h"
+
+using namespace warhawk;
+
+const std::string Version::GIT_HASH = "@GIT_HASH@";
+const std::string Version::GIT_DATE = "@GIT_DATE@";
+

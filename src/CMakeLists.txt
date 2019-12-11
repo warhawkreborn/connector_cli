@@ -2,16 +2,32 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn )
 
+find_package( Git )
+
+# The commit's hash.
 execute_process( COMMAND
-                 "git" rev-parse --short HEAD
+                 "${GIT_EXECUTABLE}" rev-parse --short HEAD
                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                 OUTPUT_VARIABLE GITHASH
+                 OUTPUT_VARIABLE GIT_HASH
                  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
                )
 
-message( "GITHASH = ${GITHASH}" )
+# The date of the commit.
+execute_process( COMMAND
+                 "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
+                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                 OUTPUT_VARIABLE GIT_DATE
+                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
 
-add_definitions( -DGITHASH=[=["${GITHASH}"]=] )
+# generate version.cpp
+message( "GIT_HASH=${GIT_HASH}" )
+configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
+                @ONLY
+              )
+
+
 add_definitions( -DPICOJSON_USE_INT64 )
 
 if ( USE_SYSTEM_CURL )
@@ -23,6 +39,7 @@ endif( )
 find_package( Threads )
 
 include_directories( ${CURL_INCLUDE_DIR} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 if ( APPLE OR UNIX )
 
@@ -77,6 +94,8 @@ set( INCLUDE_FILES
      warhawk_api.h
      webclient.h
    )
+
+list( APPEND SOURCE_FILES "${CMAKE_CURRENT_BINARY_DIR}/version.cpp" version.h )
 
 add_executable( warhawk-reborn
                 ${SOURCE_FILES}
