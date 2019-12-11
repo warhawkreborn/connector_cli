@@ -9,8 +9,8 @@ namespace warhawk
 {
   struct Version
   {
-    static const std::string GIT_HASH;
-    static const std::string GIT_DATE;
+    static inline const std::string GIT_HASH = "@GIT_HASH@";
+    static inline const std::string GIT_DATE = "@GIT_DATE@";
   };
 }
 

@@ -2,32 +2,6 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn )
 
-find_package( Git )
-
-# The commit's hash.
-execute_process( COMMAND
-                 "${GIT_EXECUTABLE}" rev-parse --short HEAD
-                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                 OUTPUT_VARIABLE GIT_HASH
-                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-               )
-
-# The date of the commit.
-execute_process( COMMAND
-                 "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
-                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                 OUTPUT_VARIABLE GIT_DATE
-                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-               )
-
-# generate version.cpp
-message( "GIT_HASH=${GIT_HASH}" )
-configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
-                @ONLY
-              )
-
-
 add_definitions( -DPICOJSON_USE_INT64 )
 
 if ( USE_SYSTEM_CURL )
@@ -37,9 +11,6 @@ if ( USE_SYSTEM_CURL )
 endif( )
 
 find_package( Threads )
-
-include_directories( ${CURL_INCLUDE_DIR} )
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 if ( APPLE OR UNIX )
 
@@ -93,17 +64,44 @@ set( INCLUDE_FILES
      warhawk.h
      warhawk_api.h
      webclient.h
+     version.h
    )
 
-list( APPEND SOURCE_FILES "${CMAKE_CURRENT_BINARY_DIR}/version.cpp" version.h )
+set( WARHAWK_TARGET warhawk-reborn )
 
-add_executable( warhawk-reborn
+add_executable( ${WARHAWK_TARGET}
                 ${SOURCE_FILES}
                 ${INCLUDE_FILES}
               )
 
 
-target_link_libraries( warhawk-reborn
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_BINARY_DIR} )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CURL_INCLUDE_DIR} )
+
+target_link_libraries( ${WARHAWK_TARGET}
                        ${PLATFORM_LIBS}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
+
+# Create version.
+
+add_custom_target( gitversion ALL
+                   DEPENDS ${CMAKE_BINARY_DIR}/version.h
+                 )
+
+add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/version.h
+                    COMMAND ${CMAKE_COMMAND}
+                    -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+                    -DBINARY_DIR=${CMAKE_BINARY_DIR}
+                    -P ${CMAKE_SOURCE_DIR}/scripts/git.cmake
+                  )
+
+# version.h is a generated file.
+set_source_files_properties( ${CMAKE_BINARY_DIR}/version.h
+                             PROPERTIES GENERATED TRUE
+                             HEADER_FILE_ONLY TRUE
+                     )
+
+
+add_dependencies( ${WARHAWK_TARGET} gitversion )

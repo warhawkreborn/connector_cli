@@ -12,6 +12,9 @@ endif( )
 
 message( "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}" )
 
+# C++17
+add_definitions( -std=c++17 )
+
 if ( APPLE )
 
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.10" )
@@ -19,9 +22,6 @@ if ( APPLE )
 
   # Standard library.
   add_definitions( -stdlib=libc++ )
-
-  # C++14
-  add_definitions( -std=c++14 )
 
   # Warnings as errors.
   # add_definitions( -Werror )
