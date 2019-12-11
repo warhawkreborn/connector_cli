@@ -2,6 +2,16 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn )
 
+execute_process( COMMAND
+                 "git" rev-parse --short HEAD
+                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                 OUTPUT_VARIABLE GITHASH
+                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
+
+message( "GITHASH = ${GITHASH}" )
+
+add_definitions( -DGITHASH=[=["${GITHASH}"]=] )
 add_definitions( -DPICOJSON_USE_INT64 )
 
 if ( USE_SYSTEM_CURL )

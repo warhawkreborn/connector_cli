@@ -5,9 +5,31 @@
 #include "warhawk.h"
 #include "warhawk_api.h"
 
+const std::string Version = "1.1";
+
+// Default to "devel" but CMAKE or packaging should replace with GIT HASH.
+const std::string GitHash = "devel";
+
 
 int main( int argc_, const char **argv_ )
 {
+  if ( argc_ > 1 )
+  {
+    std::string option = argv_[ 1 ];
+
+    if ( option == "-v" || option == "--version" )
+    {
+#ifdef GITHASH
+      GitHash = GITHASH;
+#else
+      std::cout << "WarHawk Reborn Version " << Version << "-" << GitHash << std::endl;
+      return 0;
+    }
+
+    std::cerr << "Unknown option." << std::endl;
+    return 1;
+  }
+
   std::cout << "Warhawk bridge booting..." << std::endl;
 
   warhawk::net::udp_server udpServer( WARHAWK_UDP_PORT );
