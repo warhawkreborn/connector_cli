@@ -14,7 +14,7 @@ RPMDIR := rpmbuild
 TOP_DIR := $(shell pwd)/../..
 
 NAME    := $(shell grep '^Name:'   < $(SPEC_FILE) | sed -e 's/^Name: //')
-VERSION := $(shell grep 'Version:' < $(SPEC_FILE) | sed -e 's/^Version: //')
+VERSION := $(shell grep '^const std::string Version = ' ../../src/main.cpp | sed -e 's/^const std::string Version = //' -e 's/\"//g' -e 's/;//')
 RELEASE := $(shell git rev-parse --short HEAD)
 
 SOURCE_RPM_DIR := $(HOME)/$(RPMDIR)/SOURCES/

@@ -1,5 +1,5 @@
 Name: warhawk-reborn
-Version: 1.1
+Version: @VERSION@
 Release: @RELEASE@%{?dist}
 Vendor: David Summers
 URL: https://warhawk.thalhammer.it
@@ -34,7 +34,7 @@ cd build
 
 scl enable devtoolset-8 bash <<EOF
 gcc --version
-cmake3 ..
+cmake3 .. -DWARHAWK_BUILD=@RELEASE@
 EOF
 
 make

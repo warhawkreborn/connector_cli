@@ -2,6 +2,13 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn )
 
+if ( WARHAWK_BUILD )
+
+  add_definitions( -DWARHAWK_BUILD=${WARHAWK_BUILD} )
+  message( "WARHAWK_BUILD = ${WARHAWK_BUILD}" )
+
+endif( )
+
 add_definitions( -DPICOJSON_USE_INT64 )
 
 if ( USE_SYSTEM_CURL )

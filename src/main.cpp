@@ -1,3 +1,4 @@
+#include <sstream>
 #include <thread>
 
 #include "forward_server.h"
@@ -6,15 +7,28 @@
 #include "warhawk_api.h"
 #include "version.h"
 
+// Macros
+#define STRINGIFY_( x ) #x
+#define STRINGIFY( x ) STRINGIFY_( x )
+
+
+// WarHawk Reborn Version
 const std::string Version = "1.1";
 
 
-void PrintVersion( )
+// Generate string version.
+std::string VersionString( )
 {
-  std::cout << "WarHawk Reborn Version " << Version << "-" <<
-    warhawk::Version::GIT_HASH <<
-    " (" << warhawk::Version::GIT_DATE << ")" <<
-    std::endl;
+  std::stringstream ss;
+  ss << "WarHawk Reborn Version " << Version << "-";
+#ifdef WARHAWK_BUILD
+  ss << STRINGIFY( WARHAWK_BUILD );
+#else
+  ss << warhawk::Version::GIT_HASH;
+#endif
+  ss << " (" << warhawk::Version::GIT_DATE << ")";
+
+  return ss.str( );
 }
 
 
@@ -26,7 +40,7 @@ int main( int argc_, const char **argv_ )
 
     if ( option == "-v" || option == "--version" )
     {
-      PrintVersion( );
+      std::cout << VersionString( ) << std::endl;
 
       return 0;
     }
@@ -35,7 +49,7 @@ int main( int argc_, const char **argv_ )
     return 1;
   }
 
-  PrintVersion( );
+  std::cout << VersionString( ) << std::endl;;
 
   std::cout << "Warhawk bridge booting..." << std::endl;
 
