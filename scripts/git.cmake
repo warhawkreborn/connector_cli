@@ -5,7 +5,7 @@ find_package( Git )
 # The commit's hash.
 execute_process( COMMAND
                  "${GIT_EXECUTABLE}" rev-parse --short HEAD
-                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                 WORKING_DIRECTORY "${SOURCE_DIR}"
                  OUTPUT_VARIABLE GIT_HASH
                  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
                )
@@ -13,7 +13,7 @@ execute_process( COMMAND
 # The date of the commit.
 execute_process( COMMAND
                  "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
-                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                 WORKING_DIRECTORY "${SOURCE_DIR}"
                  OUTPUT_VARIABLE GIT_DATE
                  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
                )
