@@ -25,8 +25,8 @@ else( )
   add_definitions( -D_WINSOCK_DEPRECATED_NO_WARNINGS )
   add_definitions( -D_CRT_SECURE_NO_WARNINGS         )
 
-  set( CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT"  )
-  set( CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   /MTd" )
+  set( CMAKE_CPP_FLAGS_RELEASE "${CMAKE_CPP_FLAGS_RELEASE} /MT"  )
+  set( CMAKE_CPP_FLAGS_DEBUG   "${CMAKE_CPP_FLAGS_DEBUG}   /MTd" )
 
   set( PLATFORM_LIBS
        libcurl
