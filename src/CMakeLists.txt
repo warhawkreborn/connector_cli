@@ -74,7 +74,7 @@ set( INCLUDE_FILES
      version.h
    )
 
-set( WARHAWK_TARGET warhawk-reborn )
+set( WARHAWK_TARGET warhawkreborn )
 
 add_executable( ${WARHAWK_TARGET}
                 ${SOURCE_FILES}
@@ -112,3 +112,20 @@ set_source_files_properties( ${CMAKE_BINARY_DIR}/version.h
 
 
 add_dependencies( ${WARHAWK_TARGET} gitversion )
+
+install(TARGETS ${WARHAWK_TARGET}
+        RUNTIME DESTINATION bin)
+
+install(FILES warhawkreborn.service
+        DESTINATION "/lib/systemd/system/"
+        COMPONENT "warhawkreborn")
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Dominik Thalhammer <dominik@thalhammer.it>")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Connector to allow discovery of warhawk servers")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/warhawkreborn/connector_unix")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
+
+include(CPack)

@@ -1,0 +1,11 @@
+[Unit]
+Description=Warhawk Reborn Connector
+After=network.target
+
+[Service]
+User=nobody
+Type=simple
+ExecStart=/usr/bin/warhawkreborn
+
+[Install]
+WantedBy=multi-user.target
