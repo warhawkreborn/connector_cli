@@ -13,7 +13,7 @@
 
 
 // WarHawk Reborn Version
-const std::string Version = "1.1";
+const std::string Version = "1.1.0";
 
 
 // Generate string version.
