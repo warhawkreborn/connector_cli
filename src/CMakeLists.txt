@@ -78,3 +78,15 @@ target_link_libraries( warhawk-reborn
                        ${PLATFORM_LIBS}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
+
+install(TARGETS warhawk-reborn
+        RUNTIME DESTINATION bin)
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Dominik Thalhammer <dominik@thalhammer.it>")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Connector to allow discovery of warhawk servers")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/warhawkreborn/connector_unix")
+
+include(CPack)
