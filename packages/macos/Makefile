@@ -1,4 +1,4 @@
-NAME := warhawk-reborn
+NAME := warhawkreborn
 WARHAWK_DIR = $(shell cd ../..; pwd)
 BUILD_DIR = ${WARHAWK_DIR}/../build-${NAME}
 
