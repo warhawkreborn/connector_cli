@@ -6,8 +6,8 @@
 # binary RPM the user has to log in as root.                             #
 ##########################################################################
 
-SPEC_FILE := ./warhawk-reborn.spec
-VERSION_FILE := ./warhawk-reborn.spec
+SPEC_FILE := ./warhawkreborn.spec
+VERSION_FILE := ./warhawkreborn.spec
 
 RPMDIR := rpmbuild
 

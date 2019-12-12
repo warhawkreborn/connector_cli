@@ -9,9 +9,9 @@ After=network.target syslog.target
 [Service]
 # see man systemd.service 
 Type=simple
-ExecStart=/usr/bin/warhawk-reborn
+ExecStart=/usr/bin/warhawkreborn
 RemainAfterExit=true
-ExecStop=/usr/bin/pkill warhawk-reborn
+ExecStop=/usr/bin/pkill warhawkreborn
 StandardOutput=journal
 
 [Install]
