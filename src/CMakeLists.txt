@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.6.3 )
 
-project( WarHawkReborn )
+project( WarHawkReborn VERSION 1.1.0 )
 
 if ( WARHAWK_BUILD )
 
