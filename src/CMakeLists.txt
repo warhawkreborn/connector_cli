@@ -68,19 +68,23 @@ set( INCLUDE_FILES
      webclient.h
    )
 
-add_executable( warhawk-reborn
+add_executable( warhawkreborn
                 ${SOURCE_FILES}
                 ${INCLUDE_FILES}
               )
 
 
-target_link_libraries( warhawk-reborn
+target_link_libraries( warhawkreborn
                        ${PLATFORM_LIBS}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
 
-install(TARGETS warhawk-reborn
+install(TARGETS warhawkreborn
         RUNTIME DESTINATION bin)
+
+install(FILES warhawkreborn.service
+        DESTINATION "/lib/systemd/system/"
+        COMPONENT "warhawkreborn")
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Dominik Thalhammer <dominik@thalhammer.it>")
@@ -88,5 +92,6 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Connector to allow discovery of warhawk servers")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/warhawkreborn/connector_unix")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
 
 include(CPack)
