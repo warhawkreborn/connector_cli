@@ -115,9 +115,19 @@ target_link_libraries( ${WARHAWK_TARGET}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
 
-install( TARGETS ${WARHAWK_TARGET}
-         RUNTIME DESTINATION .
-       )
+if ( UNIX )
+
+  install( TARGETS ${WARHAWK_TARGET}
+           RUNTIME DESTINATION bin
+         )
+
+else( )
+
+  install( TARGETS ${WARHAWK_TARGET}
+           RUNTIME DESTINATION .
+         )
+
+endif( )
 
 if ( UNIX )
 
