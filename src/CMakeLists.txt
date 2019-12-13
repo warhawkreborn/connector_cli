@@ -9,7 +9,7 @@ if ( NOT Git_FOUND )
 
 endif( )
 
-if ( GIT_HASH STREQUAL "" )
+if ( "${GIT_HASH}" STREQUAL "" )
 
   message( "Finding GIT parameters" )
 

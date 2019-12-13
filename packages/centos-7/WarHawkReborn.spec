@@ -34,7 +34,7 @@ cd build
 
 scl enable devtoolset-8 bash <<EOF
 gcc --version
-cmake3 .. -DWARHAWK_BUILD=@RELEASE@
+cmake3 .. -DGIT_HASH=@RELEASE@
 EOF
 
 make
