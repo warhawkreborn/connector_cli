@@ -5,28 +5,23 @@
 #include "search_server.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
-#include "version.h"
 
 // Macros
 #define STRINGIFY_( x ) #x
 #define STRINGIFY( x ) STRINGIFY_( x )
 
 
-// WarHawk Reborn Version
-const std::string Version = "1.1.0";
-
-
 // Generate string version.
 std::string VersionString( )
 {
   std::stringstream ss;
-  ss << "WarHawk Reborn Version " << Version << "-";
+  ss << "WarHawk Reborn Version " << STRINGIFY( PROJECT_VERSION ) << "-";
 #ifdef WARHAWK_BUILD
   ss << STRINGIFY( WARHAWK_BUILD );
 #else
-  ss << warhawk::Version::GIT_HASH;
+  ss << STRINGIFY( GIT_HASH );
 #endif
-  ss << " (" << warhawk::Version::GIT_DATE << ")";
+  ss << " (" << STRINGIFY( GIT_DATE ) << ")";
 
   return ss.str( );
 }

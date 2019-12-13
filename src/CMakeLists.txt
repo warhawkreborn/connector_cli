@@ -2,6 +2,32 @@ cmake_minimum_required( VERSION 3.6.3 )
 
 project( WarHawkReborn VERSION 1.1.0 )
 
+find_package( Git )
+if ( NOT Git_FOUND )
+
+  message( FATAL "GIT not found." )
+
+endif( )
+
+execute_process( COMMAND
+                 "${GIT_EXECUTABLE}" rev-parse --short HEAD
+                 WORKING_DIRECTORY "${SOURCE_DIR}"
+                 OUTPUT_VARIABLE GIT_HASH
+                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
+
+# The date of the commit.
+execute_process( COMMAND
+                 "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
+                 WORKING_DIRECTORY "${SOURCE_DIR}"
+                 OUTPUT_VARIABLE GIT_DATE
+                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
+
+add_definitions( -DPROJECT_VERSION=${PROJECT_VERSION} )
+add_definitions( -DGIT_HASH=${GIT_HASH}               )
+add_definitions( -DGIT_DATE=${GIT_DATE}               )
+
 if ( WARHAWK_BUILD )
 
   add_definitions( -DWARHAWK_BUILD=${WARHAWK_BUILD} )
@@ -71,7 +97,6 @@ set( INCLUDE_FILES
      warhawk.h
      warhawk_api.h
      webclient.h
-     version.h
    )
 
 set( WARHAWK_TARGET warhawkreborn )
@@ -90,28 +115,6 @@ target_link_libraries( ${WARHAWK_TARGET}
                        ${PLATFORM_LIBS}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
-
-# Create version.
-
-add_custom_target( gitversion ALL
-                   DEPENDS ${CMAKE_BINARY_DIR}/version.h
-                 )
-
-add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/version.h
-                    COMMAND ${CMAKE_COMMAND}
-                    -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-                    -DBINARY_DIR=${CMAKE_BINARY_DIR}
-                    -P ${CMAKE_SOURCE_DIR}/scripts/git.cmake
-                  )
-
-# version.h is a generated file.
-set_source_files_properties( ${CMAKE_BINARY_DIR}/version.h
-                             PROPERTIES GENERATED TRUE
-                             HEADER_FILE_ONLY TRUE
-                     )
-
-
-add_dependencies( ${WARHAWK_TARGET} gitversion )
 
 install(TARGETS ${WARHAWK_TARGET}
         RUNTIME DESTINATION bin)

@@ -1,11 +1,11 @@
-Name: warhawkreborn
+Name: WarHawkReborn
 Version: @VERSION@
 Release: @RELEASE@%{?dist}
 Vendor: David Summers
 URL: https://warhawk.thalhammer.it
 License: GPL
 Summary: WarHawk lives again on the Sony PlayStation 3
-Source: warhawkreborn-%{version}.tar.gz
+Source: %{name}-%{version}.tar.gz
 Group: Utilities/System
 Packager: david@summersoft.fay.ar.us
 BuildRequires: cmake3

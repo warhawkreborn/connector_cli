@@ -6,15 +6,15 @@
 # binary RPM the user has to log in as root.                             #
 ##########################################################################
 
-SPEC_FILE := ./warhawkreborn.spec
-VERSION_FILE := ./warhawkreborn.spec
+SPEC_FILE := ./WarHawkReborn.spec
+VERSION_FILE := ../../src/CMakeLists.txt
 
 RPMDIR := rpmbuild
 
 TOP_DIR := $(shell pwd)/../..
 
-NAME    := $(shell grep '^Name:'   < $(SPEC_FILE) | sed -e 's/^Name: //')
-VERSION := $(shell grep '^const std::string Version = ' ../../src/main.cpp | sed -e 's/^const std::string Version = //' -e 's/\"//g' -e 's/;//')
+NAME    := $(shell grep '^Name:' < $(SPEC_FILE) | sed -e 's/^Name: //')
+VERSION := $(shell grep "WarHawkReborn VERSION" ${VERSION_FILE} | awk '{ print $$4 }')
 RELEASE := $(shell git rev-parse --short HEAD)
 
 SOURCE_RPM_DIR := $(HOME)/$(RPMDIR)/SOURCES/
