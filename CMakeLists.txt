@@ -46,7 +46,8 @@ endif( )
 
 if ( NOT USE_SYSTEM_CURL )
 
-  add_subdirectory( libs/curl )
+  # Build the library but don't install any of it's targets.
+  add_subdirectory( libs/curl EXCLUDE_FROM_ALL )
 
 endif( )
 

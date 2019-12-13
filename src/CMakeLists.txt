@@ -115,14 +115,25 @@ target_link_libraries( ${WARHAWK_TARGET}
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
 
-install(TARGETS ${WARHAWK_TARGET}
-        RUNTIME DESTINATION bin)
+install( TARGETS ${WARHAWK_TARGET}
+         RUNTIME DESTINATION .
+       )
 
-install(FILES warhawkreborn.service
-        DESTINATION "/lib/systemd/system/"
-        COMPONENT "warhawkreborn")
+if ( UNIX )
 
-set(CPACK_GENERATOR "DEB")
+  install( FILES warhawkreborn.service
+           DESTINATION "/lib/systemd/system/"
+           COMPONENT   "warhawkreborn"
+         )
+
+endif( )
+
+if ( UNIX )
+
+  set( CPACK_GENERATOR "DEB" )
+
+endif( )
+
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Dominik Thalhammer <dominik@thalhammer.it>")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Connector to allow discovery of warhawk servers")
