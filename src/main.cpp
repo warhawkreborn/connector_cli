@@ -16,12 +16,8 @@ std::string VersionString( )
 {
   std::stringstream ss;
   ss << "WarHawk Reborn Version " << STRINGIFY( PROJECT_VERSION ) << "-";
-#ifdef WARHAWK_BUILD
-  ss << STRINGIFY( WARHAWK_BUILD );
-#else
   ss << STRINGIFY( GIT_HASH );
-#endif
-  ss << " (" << STRINGIFY( GIT_DATE ) << ")";
+  ss << " (" << __DATE__ << " " << __TIME__ << ")";
 
   return ss.str( );
 }
