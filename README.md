@@ -1,5 +1,5 @@
 # connector_unix
-Connector to allow discovery of servers and hosting local servers.
+Connector to allow discovery of PlayStation 3 WarHawk servers and hosting local servers.
 
 Works on Linux ( CentOS 7, Debian, Raspberry Pi ), MacOS, and Windows.
 
