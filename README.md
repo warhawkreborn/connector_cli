@@ -13,13 +13,31 @@ Linux ( Debian, RaspberryPi ):
 
 ### Compiling / Building
 
-Linux ( CentOS 7): cd packaging/centos-7; make
+Linux ( CentOS 7):
 
-Linux (Debian, RaspberryPi ): mkdir build; cd build; cmake ..; cmake; cpack
+cd packaging/centos-7
+make
 
-MacOS: cd packaging/macos; make
+Linux (Debian, RaspberryPi ):
 
-Windows: mkdir build; cd build; cmake ..; cmake; cpack
+mkdir build
+cd build
+cmake ..
+cmake
+cpack
+
+MacOS:
+
+cd packaging/macos
+make
+
+Windows:
+
+mkdir build
+cd build
+cmake ..
+cmake
+cpack
 
 It should successfully compile and generate an installer.
 
@@ -40,13 +58,15 @@ It should automatically start the service.
 MacOS:
 
 Install the PKG file.
-Execute the /usr/local/bin/warhawk/reborn command from a terminal.
+Then execute the following command
+/usr/local/bin/warhawk/reborn
 
 Windows:
 
 Install the EXE installer.
 
-Execute the /Program Files/WarHawkReborn 1.1.0\warhawkreborn.exe program.
+Execute the following program.
+/Program Files/WarHawkReborn 1.1.0\warhawkreborn.exe
 
 
 ### Usage
