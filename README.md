@@ -59,14 +59,14 @@ MacOS:
 
 Install the PKG file.
 Then execute the following command
-- /usr/local/bin/warhawk/reborn
+- /usr/local/bin/warhawkreborn
 
 Windows:
 
 Install the EXE installer.
 
 Execute the following program.
-- /Program Files/WarHawkReborn 1.1.0\warhawkreborn.exe
+- \Program Files\WarHawkReborn 1.1.0\warhawkreborn.exe
 
 
 ### Usage
