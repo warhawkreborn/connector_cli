@@ -15,29 +15,29 @@ Linux ( Debian, RaspberryPi ):
 
 Linux ( CentOS 7):
 
-cd packaging/centos-7
-make
+- cd packaging/centos-7
+- make
 
 Linux (Debian, RaspberryPi ):
 
-mkdir build
-cd build
-cmake ..
-cmake
-cpack
+- mkdir build
+- cd build
+- cmake ..
+- cmake
+- cpack
 
 MacOS:
 
-cd packaging/macos
-make
+- cd packaging/macos
+- make
 
 Windows:
 
-mkdir build
-cd build
-cmake ..
-cmake
-cpack
+- mkdir build
+- cd build
+- cmake ..
+- cmake
+- cpack
 
 It should successfully compile and generate an installer.
 
@@ -46,8 +46,8 @@ It should successfully compile and generate an installer.
 Linux ( CentOS 7 ):
 
 Install the generated RPM file.
-systemctl enable warhawk
-systemctl start warhawk
+- systemctl enable warhawk
+- systemctl start warhawk
 
 Linux ( Debian, RaspberryPi ):
 
@@ -59,14 +59,14 @@ MacOS:
 
 Install the PKG file.
 Then execute the following command
-/usr/local/bin/warhawk/reborn
+- /usr/local/bin/warhawk/reborn
 
 Windows:
 
 Install the EXE installer.
 
 Execute the following program.
-/Program Files/WarHawkReborn 1.1.0\warhawkreborn.exe
+- /Program Files/WarHawkReborn 1.1.0\warhawkreborn.exe
 
 
 ### Usage
