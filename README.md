@@ -1,17 +1,79 @@
 # connector_unix
-Connector to allow discovery of servers and hosting local servers
+Connector to allow discovery of PlayStation 3 WarHawk servers and hosting local servers.
 
-Works on Linux( CentOS 7, Debian, Raspberry Pi), MacOS, and Windows
+Works on Linux ( CentOS 7, Debian, Raspberry Pi ), MacOS, and Windows.
 
-### Compiling
+### Build Prerequisites
+
 You need to install a couple of dependencies:
+
+Linux ( Debian, RaspberryPi ):
 
 ```sudo apt install make build-essential libcurl4-openssl-dev libboost-system-dev libssl-dev```
 
-Build using cmake.
+### Compiling / Building
 
-It should compile fine and generate a file called warhawk-reborn.
+Linux ( CentOS 7):
 
-Execute it using ```./warhawk-reborn```.
+- cd packaging/centos-7
+- make
+
+Linux (Debian, RaspberryPi ):
+
+- mkdir build
+- cd build
+- cmake ..
+- cmake
+- cpack
+
+MacOS:
+
+- cd packaging/macos
+- make
+
+Windows:
+
+- mkdir build
+- cd build
+- cmake ..
+- cmake
+- cpack
+
+It should successfully compile and generate an installer.
+
+### Installing
+
+Linux ( CentOS 7 ):
+
+Install the generated RPM file.
+- systemctl enable warhawk
+- systemctl start warhawk
+
+Linux ( Debian, RaspberryPi ):
+
+Install the generated DEB file.
+
+It should automatically start the service.
+
+MacOS:
+
+Install the PKG file.
+Then execute the following command
+- /usr/local/bin/warhawkreborn
+
+Windows:
+
+Install the EXE installer.
+
+Execute the following program.
+- \Program Files\WarHawkReborn 1.1.0\warhawkreborn.exe
+
+
+### Usage
 
 Go to your PS3, enter local games mode and search for games.
+
+
+### Status
+
+https://warhawk.thalhammer.it/

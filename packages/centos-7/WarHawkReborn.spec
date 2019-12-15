@@ -1,11 +1,11 @@
-Name: warhawk-reborn
-Version: 1.1
+Name: WarHawkReborn
+Version: @VERSION@
 Release: @RELEASE@%{?dist}
 Vendor: David Summers
 URL: https://warhawk.thalhammer.it
 License: GPL
 Summary: WarHawk lives again on the Sony PlayStation 3
-Source: warhawk-reborn-%{version}.tar.gz
+Source: %{name}-%{version}.tar.gz
 Group: Utilities/System
 Packager: david@summersoft.fay.ar.us
 BuildRequires: cmake3
@@ -34,7 +34,7 @@ cd build
 
 scl enable devtoolset-8 bash <<EOF
 gcc --version
-cmake3 ..
+cmake3 .. -DGIT_HASH=@RELEASE@
 EOF
 
 make
@@ -44,7 +44,7 @@ make
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 
 # Install executable
-cp build/src/warhawk-reborn $RPM_BUILD_ROOT/usr/bin
+cp build/src/warhawkreborn $RPM_BUILD_ROOT/usr/bin
 
 # Install systemd service
 mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system
@@ -56,5 +56,5 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %doc README.md
-/usr/bin/warhawk-reborn
+/usr/bin/warhawkreborn
 /usr/lib/systemd/system/warhawk.service

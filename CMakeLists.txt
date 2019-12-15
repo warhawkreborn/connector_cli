@@ -14,14 +14,14 @@ message( "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}" )
 
 if ( APPLE )
 
+  # C++17
+  add_definitions( -std=c++17 )
+
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.10" )
   set( CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -lc++" )
 
   # Standard library.
   add_definitions( -stdlib=libc++ )
-
-  # C++14
-  add_definitions( -std=c++14 )
 
   # Warnings as errors.
   # add_definitions( -Werror )
@@ -30,9 +30,14 @@ if ( APPLE )
 
 elseif ( MSVC )
 
+  add_definitions( /std:c++17  /Zc:__cplusplus )
+
   set( USE_SYSTEM_CURL OFF )
 
 else( )
+
+  # C++17
+  add_definitions( -std=c++17 )
 
   set( USE_SYSTEM_CURL ON )
 
@@ -41,7 +46,8 @@ endif( )
 
 if ( NOT USE_SYSTEM_CURL )
 
-  add_subdirectory( libs/curl )
+  # Build the library but don't install any of it's targets.
+  add_subdirectory( libs/curl EXCLUDE_FROM_ALL )
 
 endif( )
 

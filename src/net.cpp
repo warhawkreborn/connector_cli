@@ -38,7 +38,9 @@ udp_server::udp_server( uint16_t port_ )
 
   if ( m_fd < 0 )
   {
-    throw std::runtime_error( "ERROR opening socket" );
+    std::stringstream ss;
+    ss << "ERROR opening socket: " << errno << ".  Check to see if port " << m_port << " is already in use.";
+    throw std::runtime_error( ss.str( ).c_str( ) );
   }
 
   int optval = 1;
@@ -122,7 +124,7 @@ bool udp_server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > 
 }
 
 
-std::array< uint8_t, 4 > udp_server::get_ip( const std::string &host_ )
+std::array< uint8_t, 4 > udp_server::StringToIp( const std::string &host_ )
 {
   auto host_entry = gethostbyname( host_.c_str() );
 
@@ -143,8 +145,10 @@ uint16_t udp_server::GetPort( ) const
 }
 
 
-std::string udp_server::ip_to_string(const std::array<uint8_t, 4>& ip) {
-    return std::to_string(ip[0]) + "." + std::to_string(ip[1]) + "." + std::to_string(ip[2]) + "." + std::to_string(ip[3]);
+std::string udp_server::IpToString( const std::array< uint8_t, 4 > &ip_ )
+{
+  return std::to_string( ip_[ 0 ] ) + "." + std::to_string( ip_[ 1 ] ) + "." +
+         std::to_string( ip_[ 2 ] ) + "." + std::to_string( ip_[ 3 ] );
 }
 
 } // namespace net

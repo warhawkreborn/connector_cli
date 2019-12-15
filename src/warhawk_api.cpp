@@ -36,20 +36,20 @@ std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
   {
     try
     {
-      auto ip = warhawk::net::udp_server::get_ip( e.get( "hostname" ).get< std::string >() );
+      auto ip = warhawk::net::udp_server::StringToIp( e.get( "hostname" ).get< std::string >( ) );
 
-      if ( e.get( "state" ).get< std::string >() != "online" )
+      if ( e.get( "state" ).get< std::string >( ) != "online" )
       {
         continue;
       }
 
       ServerEntry entry;
-      entry.m_name = e.get( "name" ).get< std::string >();
+      entry.m_name = e.get( "name" ).get< std::string >( );
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
-      entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >() );
+      entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >( ) );
       // NOTE: Converting hostname to array and back might seems redundant, but its not,
       // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
-      entry.m_ip = warhawk::net::udp_server::ip_to_string(ip);
+      entry.m_ip = warhawk::net::udp_server::IpToString( ip );
 
       if ( entry.m_frame.size() < 4 || (entry.m_frame.size() - 4) < sizeof(warhawk::net::server_info_response) )
       {
@@ -123,7 +123,7 @@ std::string API::AddHost( std::string hostname_, std::string uniqueId_, bool per
 
   picojson::object jsonObject;
   jsonObject[ "hostname"   ] = picojson::value( std::string( hostname_ ) );
-  if( !uniqueId_.empty() )
+  if ( !uniqueId_.empty( ) )
   {
     jsonObject[ "fcm_id"     ] = picojson::value( std::string( uniqueId_ ) );
   }
