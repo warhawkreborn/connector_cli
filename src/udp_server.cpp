@@ -73,8 +73,13 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
   int optval = broadcast_ ? 1 : 0;
   int err = setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
 
+#ifdef WIN32
   int n = sendto(
-    m_fd, (const char *) data_.data(), (size_t) data_.size(), 0, (sockaddr *) &clientaddr_, sizeof( sockaddr ) );
+    m_fd, (const char *) data_.data( ), (int) data_.size( ), 0, (sockaddr *) &clientaddr_, sizeof( sockaddr ) );
+#else
+  int n = sendto(
+    m_fd, (const char *) data_.data( ), (size_t) data_.size( ), 0, (sockaddr *) &clientaddr_, sizeof( sockaddr ) );
+#endif
 
   if ( n != (int) data_.size() )
   {
