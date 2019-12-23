@@ -1,3 +1,10 @@
+//
+// This program acts as an intermediary which does several things
+// 1. Gets a list of current remote warhawk servers from https://warhawk.thalhammer.it/api/ URL.
+// 2. Broadcasts that list of servers to a warhawk client when it requests the list of servers.
+// 3. Watches for warhawk local warhawk servers on the network and sends those so the remote server.
+//
+
 #include <sstream>
 #include <thread>
 
@@ -23,12 +30,15 @@ std::string VersionString( )
 }
 
 
+// Main program
 int main( int argc_, const char **argv_ )
 {
+  // Check to see whether we should parse any command-line arguments.
   if ( argc_ > 1 )
   {
     std::string option = argv_[ 1 ];
 
+    // Check for -v or --version commandline argument.
     if ( option == "-v" || option == "--version" )
     {
       std::cout << VersionString( ) << std::endl;
@@ -46,8 +56,10 @@ int main( int argc_, const char **argv_ )
 
   try
   {
+    // Set up to listen for UDP packets on standard WarHawk port.
     warhawk::net::udp_server udpServer( WARHAWK_UDP_PORT );
 
+    // 
     Server packetServer( udpServer );
 
     std::thread packetServerThread( [&]( )

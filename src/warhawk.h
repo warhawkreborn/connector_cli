@@ -6,7 +6,10 @@
 #include <cstdint>
 #include <vector>
 
+// Network port that WarHawk sends and listens on.
 const int         WARHAWK_UDP_PORT = 10029;
+
+// Server that distributes the list of active WarHawk servers.
 const std::string WARHAWK_API_BASE = "https://warhawk.thalhammer.it/api/";
 
 
@@ -16,6 +19,7 @@ namespace warhawk
 namespace net
 {
 
+// Decoded WarHawk server_info_response packet.
 struct server_info_response
 {
   uint8_t  m_unknown_1[ 108 ];
@@ -50,8 +54,12 @@ struct server_info_response
   uint8_t  m_unknown_11[ 56 ];
 };
 
+
+// Make sure that the packet size is correct (different compilers may pad structures differently).
 static_assert( sizeof( server_info_response ) == 368, "Size missmatch, check compiler" );
 
+// Build a network packet from the individual components.
+// TODO: Document t1, t2.
 template< typename T >
 inline std::vector< uint8_t > build_packet( uint8_t t1_, uint8_t t2_, const T& data_ )
 {

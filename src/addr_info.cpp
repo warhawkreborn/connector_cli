@@ -90,14 +90,13 @@ void *AddrInfo::GetInAddr( const struct sockaddr *sa_ )
 
 std::string AddrInfo::SockAddrToAddress( const struct sockaddr *sa_ )
 {
-  std::string stringAddress;
-
   struct addrinfo p;
   p.ai_addr = (struct sockaddr *) sa_;
   p.ai_family = sa_->sa_family;
 
   char s[INET6_ADDRSTRLEN];
   inet_ntop( p.ai_family, GetInAddr( (struct sockaddr *) p.ai_addr ), s, sizeof( s ) );
+  std::string stringAddress;
   stringAddress = s;
   return stringAddress;
 }
@@ -147,7 +146,13 @@ std::string AddrInfo::GetAddr( ) const
 
   Get( ai );
 
-  int e = getnameinfo( ai.ai_addr, ai.ai_addrlen, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
+  int e = getnameinfo( ai.ai_addr,
+                       ai.ai_addrlen,
+                       buf,
+                       sizeof( buf ),
+                       NULL,
+                       0,
+                       NI_NUMERICHOST );
 
   free( ai.ai_canonname );
   free( ai.ai_addr );
@@ -161,6 +166,7 @@ std::string AddrInfo::GetAddr( ) const
 
   return &buf[0];
 }
+
 
 bool AddrInfo::SetAddr( const std::string &address_ )
 {

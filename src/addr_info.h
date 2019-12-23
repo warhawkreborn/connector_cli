@@ -1,6 +1,13 @@
 #ifndef ADDR_INFO_H
 #define ADDR_INFO_H
 
+//
+// This is a helper class to manipulate AddrInfo and addrinfo structures.
+// AddrInfo and addrinfo structures are used when binding to sockets to send and retrieve the
+// internet address, family, port, protocol, etc., and convert back and forth between the binary
+// and string IPv4 and IPv6 address formats.
+//
+
 #if defined( __linux__ ) || defined( __APPLE__ )
 
 #include <sys/types.h>
@@ -32,24 +39,27 @@ class AddrInfo
     AddrInfo( const addrinfo & );
     ~AddrInfo( );
 
+    // Convert from addrinfo to AddrInfo
     void Set( const addrinfo & );
+
+    // Convert from AddrInfo to addrinfo.
     void Get(       addrinfo & ) const;
 
-    int GetAiFlags( ) const;
-    int GetAiFamily( ) const;
-    int GetAiSockType( ) const;
-    int GetAiProtocol( ) const;
-    size_t GetAiAddrLen( ) const;
-    std::string GetAiCanonName( );
-    const sockaddr_storage *GetAiAddr( ) const;
+    int GetAiFlags( ) const;         // Get the Address Flags.
+    int GetAiFamily( ) const;        // Get the Address Family.
+    int GetAiSockType( ) const;      // Get the Socket Type.
+    int GetAiProtocol( ) const;      // Get the Address Protocol.
+    size_t GetAiAddrLen( ) const;    // Get the Address Length.
+    std::string GetAiCanonName( );   // Get the Canonical Name for the Address.
+    const sockaddr_storage *GetAiAddr( ) const; // Get the sockaddr_storage for the Address.
 
-    std::string GetAddr( ) const;
-    bool SetAddr( const std::string & );
+    std::string GetAddr( ) const;        // Get the Address in std::string format.
+    bool SetAddr( const std::string & ); // Set the Address from std::string format.
 
-    static std::string SockAddrToAddress( const struct sockaddr * );
+    static std::string SockAddrToAddress( const struct sockaddr * ); // Convert sockaddr to std::string format.
 
-    static uint16_t SockAddrToPort(             const struct sockaddr * );
-    static void PortToSockAddr( const uint16_t,       struct sockaddr * );
+    static uint16_t SockAddrToPort(             const struct sockaddr * ); // Get Port from sockaddr.
+    static void PortToSockAddr( const uint16_t,       struct sockaddr * ); // Set Port from sockaddr.
 
   protected:
 
@@ -70,6 +80,8 @@ class AddrInfo
     //
     // Methods
     //
+
+    // Get pointer to sockaddr_in or sockaddr_in6 depending on address family of sockaddr. 
     static void *GetInAddr( const struct sockaddr * );
 };
 

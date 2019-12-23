@@ -1,6 +1,11 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+//
+// This class watches for packets and distributes them to the
+// clients that register with it.
+//
+
 #include <iostream>
 #include <map>
 
@@ -19,18 +24,28 @@ class Server
     Server( warhawk::net::udp_server &udpServer_ );
     virtual ~Server();
 
+    // Run the Server process.
     void run( );
 
+    // Send packets.
     void send(    const sockaddr_storage &clientaddr, const std::vector< uint8_t > &data, const bool broadcast = false );
+
+    // Receive packets.
     bool receive(       sockaddr_storage &clientaddr, std::vector< uint8_t > &data );
 
+    // Check for valid packet.
     bool valid_packet( const std::vector< uint8_t > &data_ );
 
+    // Return the associated UdpServer.
     warhawk::net::udp_server &GetServer( );
 
+    // Register a message handler.
     void Register(   MessageHandler * );
+
+    // Unregister a message handler.
     void Unregister( MessageHandler * );
 
+    // Convert a HEX-formatted string to binary.
     std::vector< uint8_t > hex2bin( const std::string & );
 
   protected:
