@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #endif
 
-#include "net.h"
+#include "udp_server.h"
 #include "network.h"
 
 

@@ -73,10 +73,10 @@ set( SOURCE_FILES
      discovery_packet.cpp
      forward_server.cpp
      main.cpp
-     net.cpp
      network.cpp
      search_server.cpp
      server.cpp
+     udp_server.cpp
      warhawk_api.cpp
      webclient.cpp
    )
@@ -87,12 +87,12 @@ set( INCLUDE_FILES
      discovery_packet.h
      forward_server.h
      message_handler.h
-     net.h
      network.h
      picojson.h
      search_server.h
      server.h
      server_entry.h
+     udp_server.h
      warhawk.h
      warhawk_api.h
      webclient.h

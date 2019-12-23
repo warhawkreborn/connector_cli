@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "message_handler.h"
-#include "net.h"
+#include "udp_server.h"
 #include "server.h"
 #include "server_entry.h"
 
