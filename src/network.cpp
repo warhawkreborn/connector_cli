@@ -410,3 +410,9 @@ void Network::AddAddress( IpAddresses_t &addrList_, const AddrInfo &info_ )
     addrList_.push_back( info_ );
   }
 }
+
+
+const Network::IpAddresses_t &Network::GetMyIpAddresses( )
+{
+  return m_MyIpAddresses;
+}

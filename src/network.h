@@ -51,10 +51,7 @@ class Network
     Network( );
     ~Network( );
 
-    const IpAddresses_t &GetMyIpAddresses( )
-    {
-      return m_MyIpAddresses;
-    }
+    const IpAddresses_t &GetMyIpAddresses( );
 
     bool OnAddressList( const IpAddresses_t &, const sockaddr_storage &address ) const; // True if this is one of my addresses.
 
