@@ -1,6 +1,10 @@
 #ifndef WARHAWK_H
 #define WARHAWK_H
 
+//
+// Defines various information related to the WarHawk game.
+//
+
 #pragma once
 
 #include <cstdint>
@@ -38,7 +42,7 @@ struct server_info_response
   uint8_t  m_time_eclapsed;
   uint8_t  m_unknown_7[ 4 ];
   uint8_t  m_mapsize[ 16 ];
-  uint16_t m_point_limit; // Note: Big endian
+  uint16_t m_point_limit;   // Note: Big endian
   uint16_t m_point_current; // Note: Big endian
   uint8_t  m_unknown_8[ 3 ];
   uint8_t  m_time_limit;

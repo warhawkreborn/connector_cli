@@ -1,6 +1,11 @@
 #ifndef MESSAGE_SERVER_H
 #define MESSAGE_SERVER_H
 
+//
+// A MessageHandler allows registered subscribers to handle processing of particular
+// message.
+//
+
 #include <vector>
 
 #include "udp_server.h"

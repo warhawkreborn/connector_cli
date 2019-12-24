@@ -70,8 +70,13 @@ int main( int argc_, const char **argv_ )
       std::cout << "Stopping Packet Server." << std::endl;
     } );
 
+    // The ForwardServer watches for requests from the local network and
+    // responds with a list of remote servers.
     ForwardServer forwardServer( &packetServer );
 
+    // The SearchServer broadcasts a request for servers on the local network.
+    // Any responses it receives are then sent on to the remote server that
+    // publishes the list of available public servers. 
     SearchServer searchServer( &packetServer );
 
     std::thread searchServerThread( [&] ( )
@@ -81,6 +86,8 @@ int main( int argc_, const char **argv_ )
       std::cout << "SearchServer thread ended." << std::endl;
     } );
 
+    // The main loop periodically queries the server that holds a list of available
+    // public servers and updates that list into the SearchServer and ForwardServer.
     while ( true )
     {
       std::cout << "MainLoop: Updating server list" << std::endl;
@@ -98,10 +105,11 @@ int main( int argc_, const char **argv_ )
       if ( list.size( ) > 0 )
       {
         forwardServer.SetEntries( list );
-        searchServer.SetEntries(list);
+        searchServer.SetEntries(  list );
 
         std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
 
+        // Print out the list.
         for ( auto &e : list )
         {
           std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;

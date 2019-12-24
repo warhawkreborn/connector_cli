@@ -1,6 +1,11 @@
 #ifndef WEBCLIENT_H
 #define WEBCLIENT_H
 
+//
+// This class allows the caller to execute various web client requests and
+// return the response.
+//
+
 #pragma once
 
 #include <map>

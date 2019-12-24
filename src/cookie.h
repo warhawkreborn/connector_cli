@@ -1,5 +1,12 @@
 #pragma once
 
+//
+// A Cookie is a piece of information that has a name, path, domain, value and expiration
+// time (along with a couple of other pieces of information).
+// It is used to store information on remote clients so that when the reconnect, the
+// server will be able to identify them and then make use of that information.
+//
+
 #include <ostream>
 #include <string>
 #include <set>

@@ -1,6 +1,13 @@
 #ifndef SEARCH_SERVER_H
 #define SEARCH_SERVER_H
 
+//
+// The SearchServer periodically broadcasts a request for local network servers.
+// Once it broadcasts, it listens for one second for any responses.
+// Any responses it gets are then sent on to the remote server list server to publish
+// as available public servers.
+//
+
 #include <iostream>
 #include <list>
 #include <vector>

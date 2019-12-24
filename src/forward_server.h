@@ -1,6 +1,11 @@
 #ifndef FORWARD_SERVER_H
 #define FORWARD_SERVER_H
 
+//
+// The ForwardServer watches for requests for servers from the local network and
+// responds to valid requests with a list of remote servers.
+//
+
 #include <iostream>
 
 #include "message_handler.h"

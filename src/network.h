@@ -1,6 +1,14 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+//
+// The Network class provides various helper routines needed to do network processing,
+// including keeping track of the list of IP addresses that are configured on this
+// network host.
+// For instance, this allows a caller to determine whether a received packet came from
+// from itself or not, to prevent recursive loops on packet processing.
+//
+
 #if defined( __linux__ ) || defined( __APPLE__ )
 // These return codes are Windows-specific so define them for Linux
 #define INVALID_SOCKET -1
@@ -90,7 +98,6 @@ class Network
     // DATA
     //////////////////////////////
 
-    uint16_t m_Port;
     AddrInfo m_RemoteAddr; // Should default to IPv4 Broadcast or IPv6 Multi-cast but could also be IPv4 / IPv6 unicast.
     IpAddresses_t m_MyIpAddresses; // List of my own IP addresses.
 };
