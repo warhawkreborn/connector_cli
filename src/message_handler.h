@@ -1,5 +1,4 @@
-#ifndef MESSAGE_SERVER_H
-#define MESSAGE_SERVER_H
+#pragma once
 
 //
 // A MessageHandler allows registered subscribers to handle processing of particular
@@ -24,6 +23,3 @@ class MessageHandler
 
   private:
 };
-
-
-#endif // MESSAGE_SERVER_H

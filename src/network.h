@@ -1,5 +1,4 @@
-#ifndef NETWORK_H
-#define NETWORK_H
+#pragma once
 
 //
 // The Network class provides various helper routines needed to do network processing,
@@ -101,5 +100,3 @@ class Network
     AddrInfo m_RemoteAddr; // Should default to IPv4 Broadcast or IPv6 Multi-cast but could also be IPv4 / IPv6 unicast.
     IpAddresses_t m_MyIpAddresses; // List of my own IP addresses.
 };
-
-#endif // NETWORK_H

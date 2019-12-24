@@ -1,13 +1,10 @@
-#ifndef NET_H
-#define NET_H
+#pragma once
 
 //
 // This class contains the network socket and port for active connections.
 // It allows the caller to set up a socket, bind it to a port, and then
 // send and receive packets on that port/socket.
 //
-
-#pragma once
 
 #ifdef WIN32
 #include <WS2tcpip.h>
@@ -69,5 +66,3 @@ class udp_server
 } // End namespace net
 
 } // End namespace warhawk
-
-#endif // NET_H

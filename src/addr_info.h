@@ -1,5 +1,4 @@
-#ifndef ADDR_INFO_H
-#define ADDR_INFO_H
+#pragma once
 
 //
 // This is a helper class to manipulate AddrInfo and addrinfo structures.
@@ -84,6 +83,3 @@ class AddrInfo
     // Get pointer to sockaddr_in or sockaddr_in6 depending on address family of sockaddr. 
     static void *GetInAddr( const struct sockaddr * );
 };
-
-
-#endif // ADDR_INFO_H

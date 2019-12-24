@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 //
 // This class watches for packets and distributes them to the
@@ -65,5 +64,3 @@ class Server
     using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
     MessageHandlers m_MessageHandlers;
 };
-
-#endif // SERVER_H

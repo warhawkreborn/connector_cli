@@ -1,6 +1,3 @@
-#ifndef DISCOVERY_PACKET_H
-#define DISCOVERY_PACKET_H
-
 //
 // The WarHawk DiscoveryPacket contains information about the current WarHawk server
 // including current map, number of players, and other information.
@@ -66,5 +63,3 @@ class DiscoveryPacket
 };
 
 } // End namespace warhawk
-
-#endif // DISCOVERY_PACKET_H

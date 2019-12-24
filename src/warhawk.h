@@ -1,11 +1,8 @@
-#ifndef WARHAWK_H
-#define WARHAWK_H
+#pragma once
 
 //
 // Defines various information related to the WarHawk game.
 //
-
-#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -80,5 +77,3 @@ inline std::vector< uint8_t > build_packet( uint8_t t1_, uint8_t t2_, const T& d
 } // End namespace net
 
 } // End namespace warhawk
-
-#endif // WARHAWK_H

@@ -1,5 +1,4 @@
-#ifndef WARHAWK_API_H
-#define WARHAWK_API_H
+#pragma once
 
 //
 // This class defines the high-level API to:
@@ -40,5 +39,3 @@ class API
 };
 
 } // End namespace warhawk
-
-#endif // WARHAWK_API_H

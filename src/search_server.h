@@ -1,5 +1,4 @@
-#ifndef SEARCH_SERVER_H
-#define SEARCH_SERVER_H
+#pragma once
 
 //
 // The SearchServer periodically broadcasts a request for local network servers.
@@ -66,5 +65,3 @@ class SearchServer : public MessageHandler
 
     PacketList m_PacketList;
 };
-
-#endif // SEARCH_SERVER_H

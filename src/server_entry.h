@@ -1,5 +1,4 @@
-#ifndef SERVER_ENTRY_H
-#define SERVER_ENTRY_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -15,5 +14,3 @@ struct ServerEntry
   std::vector< uint8_t > m_frame;
   std::string            m_ip;
 };
-
-#endif // SERVER_ENTRY_H

@@ -1,5 +1,4 @@
-#ifndef FORWARD_SERVER_H
-#define FORWARD_SERVER_H
+#pragma once
 
 //
 // The ForwardServer watches for requests for servers from the local network and
@@ -42,5 +41,3 @@ class ForwardServer : public MessageHandler
     std::vector< ServerEntry >  m_entries;
     Server                     *m_server;
 };
-
-#endif // FORWARD_SERVER_H
