@@ -59,7 +59,8 @@ int main( int argc_, const char **argv_ )
     // Set up to listen for UDP packets on standard WarHawk port.
     warhawk::net::udp_server udpServer( WARHAWK_UDP_PORT );
 
-    // 
+    // The Packet server watches for packets and distributes them to the
+    // clients that register with it.
     Server packetServer( udpServer );
 
     std::thread packetServerThread( [&]( )

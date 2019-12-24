@@ -70,6 +70,7 @@ endif( )
 
 set( SOURCE_FILES
      addr_info.cpp
+     cookie.cpp
      discovery_packet.cpp
      forward_server.cpp
      main.cpp
