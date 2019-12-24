@@ -42,7 +42,7 @@ struct cookie
 
 }; // End struct cookie
 
-inline bool operator <( const cookie &a, const cookie &b );
+bool operator <( const cookie &a, const cookie &b );
 
 struct cookie_list
 {
