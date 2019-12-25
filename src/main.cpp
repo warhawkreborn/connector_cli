@@ -17,7 +17,23 @@
 #endif
 
 // uWebSockets includes
+#ifdef WIN32
+#pragma warning( push )
+#pragma warning( disable : 4018 )
+#pragma warning( disable : 4244 )
+#pragma warning( disable : 4267 )
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-w"
+#endif
+
 #include "App.h"
+
+#ifdef WIN32
+#pragma warning( pop )
+#else
+#pragma GCC diagnostic pop
+#endif
 
 // Includes originally from uWebSockets examples/helpers but copied and improved.
 #include "uwebsockets_async_file_reader.h"
@@ -137,7 +153,7 @@ int main( int argc_, const char **argv_ )
           {
             asyncFileStreamer.streamFile( res, url );
           }
-          catch( const std::exception &e_ )
+          catch( const std::exception & )
           {
             std::cout << "HTTP Server can't find file '" << url << "'." << std::endl;
             res->end( "Can't find requested file.\r\n" );

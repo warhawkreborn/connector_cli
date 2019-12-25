@@ -43,10 +43,10 @@ struct AsyncFileReader
     }
 
     /* Returns any data already cached for this offset */
-    std::string_view peek( int offset_ )
+    std::string_view peek( std::streamoff offset_ )
     {
       /* Did we hit the cache? */
-      if ( m_HasCache && offset_ >= m_CacheOffset && ( ( offset_ - m_CacheOffset ) < m_Cache.length() ) )
+      if ( m_HasCache && offset_ >= m_CacheOffset && ( size_t( offset_ - m_CacheOffset ) ) < m_Cache.length( ) )
       {
         /* Cache hit */
         // std::cout << "Cache hit!" << std::endl;
@@ -55,7 +55,7 @@ struct AsyncFileReader
             std::cout << "LESS THAN WHAT WE HAVE!" << std::endl;
         }*/
 
-        int chunkSize = std::min< int >( m_FileSize - offset_, m_Cache.length( ) - offset_ + m_CacheOffset );
+        size_t chunkSize = std::min< size_t >( m_FileSize - offset_, m_Cache.length( ) - offset_ + m_CacheOffset );
 
         return std::string_view( m_Cache.data( ) + offset_ - m_CacheOffset, chunkSize );
       }
@@ -83,7 +83,7 @@ struct AsyncFileReader
       // disable cache
       m_HasCache = false;
 
-      std::async( std::launch::async, [ this, cb_, offset_ ] ( )
+      auto f = std::async( std::launch::async, [ this, cb_, offset_ ] ( )
       {
         // std::cout << "ASYNC Caching 1 MB at offset = " << offset << std::endl;
 
@@ -102,7 +102,7 @@ struct AsyncFileReader
 
         m_Loop->defer( [ this, cb_, offset_ ] ( )
         {
-          int chunkSize = std::min< int >( m_Cache.length( ), m_FileSize - offset_ );
+          size_t chunkSize = std::min< size_t >( m_Cache.length( ), m_FileSize - offset_ );
 
           // båda dessa sker?
           if ( chunkSize == 0 )
@@ -126,7 +126,7 @@ struct AsyncFileReader
     {
     }
 
-    int getFileSize( )
+    size_t getFileSize( )
     {
       return m_FileSize;
     }
@@ -141,8 +141,8 @@ struct AsyncFileReader
     /* The pending async file read (yes we only support one pending read) */
     std::function< void( std::string_view ) > m_PendingReadCb = nullptr;
 
-    int           m_FileSize = 0;
-    std::string   m_FileName = "";
-    std::ifstream m_Fin      { };
-    uWS::Loop    *m_Loop     = nullptr;
+    std::streamoff m_FileSize = 0;
+    std::string    m_FileName = "";
+    std::ifstream  m_Fin      { };
+    uWS::Loop     *m_Loop     = nullptr;
 };
