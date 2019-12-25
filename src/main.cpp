@@ -8,6 +8,15 @@
 #include <sstream>
 #include <thread>
 
+#ifdef WIN32
+#include <direct.h>
+#endif
+
+#include "App.h"
+#include "helpers/AsyncFileReader.h"
+#include "helpers/AsyncFileStreamer.h"
+#include "helpers/Middleware.h"
+
 #include "forward_server.h"
 #include "request_server.h"
 #include "search_server.h"
@@ -96,6 +105,53 @@ int main( int argc_, const char **argv_ )
       requestServer.run( );
       std::cout << "RequestServer thread ended." << std::endl;
     } );
+
+    const int port = 80;
+    const std::string root = "./";
+
+    AsyncFileStreamer asyncFileStreamer( root );
+
+    while ( true )
+    {
+      uWS::App( )
+        .get( "/*", [&asyncFileStreamer]( auto *res, auto *req )
+        {
+          res->onAborted( [res] ( )
+          {
+            std::cout << "Get method aborted on error." << std::endl;
+          } );
+
+          serveFile( res, req );
+          std::string_view svUrl = req->getUrl( );
+          std::string url( svUrl.data( ), svUrl.size( ) );
+          url = url.substr( 1 ); // Skip past first '/'.
+          try
+          {
+            asyncFileStreamer.streamFile( res, url );
+          }
+          catch( const std::exception &e_ )
+          {
+            std::cout << "HTTP Server can't find file '" << url << "'." << std::endl;
+            res->end( "Can't find requested file.\r\n" );
+          }
+        } )
+        .listen( port, [port, root]( auto *token )
+        {
+          if ( token )
+          {
+            char *ptr = _getcwd( nullptr, 0 );
+            if ( ptr == nullptr )
+            {
+              std::cout << "Can't get current working directory." << std::endl;
+            }
+            else
+            {
+              std::cout << "HTTP Server on port " << port << ", serving directory '" << ptr << "'." << std::endl;
+            }
+          }
+        } )
+        .run( );
+    }
 
     packetServerThread.join( );
     searchServerThread.join( );

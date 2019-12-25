@@ -34,8 +34,6 @@ if ( WARHAWK_BUILD )
 
 endif( )
 
-add_definitions( -DPICOJSON_USE_INT64 )
-
 if ( USE_SYSTEM_CURL )
 
   find_package( CURL REQUIRED )
@@ -112,9 +110,14 @@ add_executable( ${WARHAWK_TARGET}
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_BINARY_DIR} )
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CURL_INCLUDE_DIR} )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libs/uWebSockets/uWebSockets-0.16.5/src )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libs/uWebSockets/uWebSockets-0.16.5/examples )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libs/uSockets/uSockets-0.3.4/src )
 
 target_link_libraries( ${WARHAWK_TARGET}
                        ${PLATFORM_LIBS}
+                       uSockets
+                       uv_a
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
 
