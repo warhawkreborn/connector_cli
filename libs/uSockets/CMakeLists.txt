@@ -23,6 +23,8 @@ add_library( ${USOCKETS_TARGET}
              ${SOURCE_FILES}
            )
 
+target_include_directories( ${USOCKETS_TARGET} PRIVATE ${SRC_DIR} )
+
 target_link_libraries( ${USOCKETS_TARGET}
                        ${PLATFORM_LIBS}
                        uv_a
