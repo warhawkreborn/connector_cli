@@ -94,6 +94,9 @@ set( INCLUDE_FILES
      server.h
      server_entry.h
      udp_server.h
+     uwebsockets_async_file_reader.h
+     uwebsockets_async_file_streamer.h
+     uwebsockets_middleware.h
      warhawk.h
      warhawk_api.h
      webclient.h

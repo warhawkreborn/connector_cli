@@ -5,6 +5,7 @@
 // 3. Watches for warhawk local warhawk servers on the network and sends those so the remote server.
 //
 
+// System includes
 #include <sstream>
 #include <thread>
 
@@ -15,11 +16,15 @@
 #include <unistd.h>
 #endif
 
+// uWebSockets includes
 #include "App.h"
-#include "helpers/AsyncFileReader.h"
-#include "helpers/AsyncFileStreamer.h"
-#include "helpers/Middleware.h"
 
+// Includes originally from uWebSockets examples/helpers but copied and improved.
+#include "uwebsockets_async_file_reader.h"
+#include "uwebsockets_async_file_streamer.h"
+#include "uwebsockets_middleware.h"
+
+// WarHawkReborn includes
 #include "forward_server.h"
 #include "request_server.h"
 #include "search_server.h"
