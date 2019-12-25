@@ -51,4 +51,8 @@ if ( NOT USE_SYSTEM_CURL )
 
 endif( )
 
+add_subdirectory( libs/libuv/libuv-1.34.0 )
+add_subdirectory( libs/uSockets )
+#add_subdirectory( libs/uWebSockets/uWebSockets )
+
 add_subdirectory( src )
