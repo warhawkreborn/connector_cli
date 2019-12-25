@@ -149,6 +149,12 @@ int main( int argc_, const char **argv_ )
           std::string_view svUrl = req->getUrl( );
           std::string url( svUrl.data( ), svUrl.size( ) );
           url = url.substr( 1 ); // Skip past first '/'.
+
+          if ( url == "" )
+          {
+            url = "index.html";
+          }
+
           try
           {
             asyncFileStreamer.streamFile( res, url );
