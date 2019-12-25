@@ -10,6 +10,9 @@
 
 #ifdef WIN32
 #include <direct.h>
+#define getcwd _getcwd
+#else
+#include <unistd.h>
 #endif
 
 #include "App.h"
@@ -139,7 +142,7 @@ int main( int argc_, const char **argv_ )
         {
           if ( token )
           {
-            char *ptr = _getcwd( nullptr, 0 );
+            char *ptr = getcwd( nullptr, 0 );
             if ( ptr == nullptr )
             {
               std::cout << "Can't get current working directory." << std::endl;
