@@ -24,7 +24,7 @@
 #pragma warning( disable : 4267 )
 #else
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-w"
+//#pragma GCC diagnostic ignored "-w"
 #endif
 
 #include "App.h"
@@ -153,10 +153,11 @@ int main( int argc_, const char **argv_ )
           {
             asyncFileStreamer.streamFile( res, url );
           }
-          catch( const std::exception & )
+          catch( const std::exception &e_ )
           {
-            std::cout << "HTTP Server can't find file '" << url << "'." << std::endl;
-            res->end( "Can't find requested file.\r\n" );
+            std::stringstream ss;
+            ss << "HTTP Server error: " << e_.what( ) << std::endl;
+            res->end( ss.str( ) );
           }
         } )
         .listen( port, [port, root]( auto *token )

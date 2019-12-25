@@ -1,6 +1,8 @@
 // Copied and improved from uWebSockets/examples/helpers.
 
 #include <filesystem>
+#include <sstream>
+
 
 struct AsyncFileStreamer
 {
@@ -40,7 +42,9 @@ struct AsyncFileStreamer
 
     if ( it == m_AsyncFileReaders.end( ) )
     {
-      std::cout << "Did not find file: " << url_ << std::endl;
+      std::stringstream ss;
+      ss << "Did not find file: " << url_;
+      throw std::runtime_error( ss.str( ) );
     }
     else
     {
