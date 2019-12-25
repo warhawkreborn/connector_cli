@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "forward_server.h"
+#include "request_server.h"
 #include "search_server.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
@@ -28,7 +29,6 @@ std::string VersionString( )
 
   return ss.str( );
 }
-
 
 // Main program
 int main( int argc_, const char **argv_ )
@@ -50,7 +50,7 @@ int main( int argc_, const char **argv_ )
     return 1;
   }
 
-  std::cout << VersionString( ) << std::endl;;
+  std::cout << VersionString( ) << std::endl;
 
   std::cout << "Warhawk bridge booting..." << std::endl;
 
@@ -63,7 +63,7 @@ int main( int argc_, const char **argv_ )
     // clients that register with it.
     Server packetServer( udpServer );
 
-    std::thread packetServerThread( [&]( )
+    std::thread packetServerThread( [&] ( )
     {
       std::cout << "Starting Packet Server..." << std::endl;
       packetServer.run( );
@@ -76,7 +76,7 @@ int main( int argc_, const char **argv_ )
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then sent on to the remote server that
-    // publishes the list of available public servers. 
+    // publishes the list of available public servers.
     SearchServer searchServer( &packetServer );
 
     std::thread searchServerThread( [&] ( )
@@ -86,38 +86,20 @@ int main( int argc_, const char **argv_ )
       std::cout << "SearchServer thread ended." << std::endl;
     } );
 
-    // The main loop periodically queries the server that holds a list of available
-    // public servers and updates that list into the SearchServer and ForwardServer.
-    while ( true )
+    // The RequestServer periodically queries the remote WarHawk Server List Server
+    // and puts the resuling list of servers into the forwardServer and searchServer.
+    RequestServer requestServer( forwardServer, packetServer, searchServer );
+
+    std::thread requestServerThread( [&] ( )
     {
-      std::cout << "MainLoop: Updating server list" << std::endl;
-      std::vector< ServerEntry > list;
-      try
-      {
-        list = warhawk::API::DownloadServerList( &packetServer );
-      }
-      catch ( const std::exception &e_ )
-      {
-        std::cout << "MainLoop: Error = " << e_.what( ) << std::endl;
-        std::cout << "MainLoop: Check network connection." << std::endl;
-      }
+      std::cout << "Starting Request Server..." << std::endl;
+      requestServer.run( );
+      std::cout << "RequestServer thread ended." << std::endl;
+    } );
 
-      if ( list.size( ) > 0 )
-      {
-        forwardServer.SetEntries( list );
-        searchServer.SetEntries(  list );
-
-        std::cout << "MainLoop: " << list.size() << " servers found" << std::endl;
-
-        // Print out the list.
-        for ( auto &e : list )
-        {
-          std::cout << "MainLoop: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
-        }
-      }
-
-      std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
-    }
+    packetServerThread.join( );
+    searchServerThread.join( );
+    requestServerThread.join( );
   }
   catch ( const std::exception e_ )
   {

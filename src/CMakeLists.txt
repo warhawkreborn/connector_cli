@@ -75,6 +75,7 @@ set( SOURCE_FILES
      forward_server.cpp
      main.cpp
      network.cpp
+     request_server.cpp
      search_server.cpp
      server.cpp
      udp_server.cpp
@@ -90,6 +91,7 @@ set( INCLUDE_FILES
      message_handler.h
      network.h
      picojson.h
+     request_server.h
      search_server.h
      server.h
      server_entry.h
