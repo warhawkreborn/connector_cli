@@ -11,6 +11,9 @@ set( SOURCE_FILES
      ${SRC_DIR}/loop.c
      ${SRC_DIR}/socket.c
      ${SRC_DIR}/ssl.c
+     ${SRC_DIR}/eventing/epoll_kqueue.c
+     ${SRC_DIR}/eventing/gcd.c
+     ${SRC_DIR}/eventing/libuv.c
    )
 
 set( INCLUDE_FILES
