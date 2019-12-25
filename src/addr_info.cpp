@@ -35,7 +35,7 @@ void AddrInfo::Set( const addrinfo &info_ )
   m_ai_family     = info_.ai_family;
   m_ai_socktype   = info_.ai_socktype;
   m_ai_protocol   = info_.ai_protocol;
-  m_ai_addrlen    = info_.ai_addrlen;
+  m_ai_addrlen    = (socklen_t) info_.ai_addrlen;
   m_ai_canonname  = info_.ai_canonname == NULL ? "" : info_.ai_canonname;
   memcpy( &m_ai_addr, info_.ai_addr, m_ai_addrlen );
 }
@@ -60,7 +60,7 @@ const sockaddr_storage *AddrInfo::GetAiAddr( ) const
 }
 
 
-size_t AddrInfo::GetAiAddrLen( ) const
+socklen_t AddrInfo::GetAiAddrLen( ) const
 {
   return m_ai_addrlen;
 }
@@ -147,7 +147,7 @@ std::string AddrInfo::GetAddr( ) const
   Get( ai );
 
   int e = getnameinfo( ai.ai_addr,
-                       ai.ai_addrlen,
+                       (socklen_t) ai.ai_addrlen,
                        buf,
                        sizeof( buf ),
                        NULL,

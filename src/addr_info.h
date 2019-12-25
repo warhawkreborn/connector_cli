@@ -48,7 +48,7 @@ class AddrInfo
     int GetAiFamily( ) const;        // Get the Address Family.
     int GetAiSockType( ) const;      // Get the Socket Type.
     int GetAiProtocol( ) const;      // Get the Address Protocol.
-    size_t GetAiAddrLen( ) const;    // Get the Address Length.
+    socklen_t GetAiAddrLen( ) const;    // Get the Address Length.
     std::string GetAiCanonName( );   // Get the Canonical Name for the Address.
     const sockaddr_storage *GetAiAddr( ) const; // Get the sockaddr_storage for the Address.
 
@@ -72,7 +72,7 @@ class AddrInfo
     int m_ai_family;
     int m_ai_socktype;
     int m_ai_protocol;
-    size_t m_ai_addrlen;
+    socklen_t m_ai_addrlen;
     std::string m_ai_canonname;
     sockaddr_storage m_ai_addr;
 
