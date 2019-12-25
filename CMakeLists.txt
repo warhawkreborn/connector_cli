@@ -17,7 +17,7 @@ if ( APPLE )
   # C++17
   set( CMAKE_CXX_STANDARD 17 )
 
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.10" )
+  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.15" )
   set( CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -lc++" )
 
   # Standard library.
