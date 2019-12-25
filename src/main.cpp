@@ -109,7 +109,7 @@ int main( int argc_, const char **argv_ )
       std::cout << "RequestServer thread ended." << std::endl;
     } );
 
-    const int port = 80;
+    const int port = 8080;
     const std::string root = "./";
 
     AsyncFileStreamer asyncFileStreamer( root );
