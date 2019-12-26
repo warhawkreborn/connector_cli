@@ -61,15 +61,19 @@ void HttpServer::run( )
     try
     {
       uWS::App( )
-        .get( "/*", [ &asyncFileStreamer ]( auto *res, auto *req )
+        .get( "/api/servers", [ ] ( auto *res_, auto *req_ )
         {
-          res->onAborted( [res] ( )
+          // res_.end( requestServer.HmtlString( ) );
+        } )
+        .get( "/*", [ &asyncFileStreamer ]( auto *res_, auto *req_ )
+        {
+          res_->onAborted( [ res_ ] ( )
           {
             std::cout << "Get method aborted on error." << std::endl;
           } );
 
-          serveFile( res, req );
-          std::string_view svUrl = req->getUrl( );
+          serveFile( res_, req_ );
+          std::string_view svUrl = req_->getUrl( );
           std::string url( svUrl.data( ), svUrl.size( ) );
           url = url.substr( 1 ); // Skip past first '/'.
 
@@ -80,18 +84,18 @@ void HttpServer::run( )
 
           try
           {
-            asyncFileStreamer.streamFile( res, url );
+            asyncFileStreamer.streamFile( res_, url );
           }
           catch( const std::exception &e_ )
           {
             std::stringstream ss;
             ss << "HTTP Server error: " << e_.what( ) << std::endl;
-            res->end( ss.str( ) );
+            res_->end( ss.str( ) );
           }
         } )
-        .listen( port, [ port, root ]( auto *token )
+        .listen( port, [ port, root ]( auto *token_ )
         {
-          if ( token )
+          if ( token_ )
           {
             char *ptr = getcwd( nullptr, 0 );
             if ( ptr == nullptr )
