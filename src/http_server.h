@@ -22,6 +22,17 @@ class HttpServer
 
   private:
 
+    //
+    // Methods
+    //
+
+    void OnListen( );
+    std::string OnGetApiServers( );
+
+    //
+    // Data
+    //
+
     int            m_Port = 8080;
     std::string    m_RootDirectory;
     ForwardServer &m_ForwardServer;
