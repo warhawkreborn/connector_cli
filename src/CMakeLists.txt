@@ -178,6 +178,15 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/warhawkreborn/connector_unix")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-${GIT_HASH}" )
-set(CPACK_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/html" "html" )
+
+if ( UNIX )
+
+  set( CPACK_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/html" "/usr/share/warhawkreborn/html" )
+
+else( )
+
+  set( CPACK_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/html" "html" )
+
+endif( )
 
 include(CPack)
