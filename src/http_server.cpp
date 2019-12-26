@@ -53,6 +53,20 @@ HttpServer::~HttpServer( )
 // Main program
 void HttpServer::run( )
 {
+  if ( m_RootDirectory == "" )
+  {
+    char *ptr = getcwd( nullptr, 0 );
+    if ( ptr == nullptr )
+    {
+      std::cout << "Can't get current working directory." << std::endl;
+    }
+    else
+    {
+      std::string currentDir = ptr;
+      m_RootDirectory = currentDir + "/html";
+    }
+  }
+
   AsyncFileStreamer asyncFileStreamer( m_RootDirectory );
 
   while ( true )
@@ -82,11 +96,10 @@ void HttpServer::run( )
           serveFile( res_, req_ );
           std::string_view svUrl = req_->getUrl( );
           std::string url( svUrl.data( ), svUrl.size( ) );
-          url = url.substr( 1 ); // Skip past first '/'.
 
-          if ( url == "" )
+          if ( url == "/" )
           {
-            url = "index.html";
+            url = "/index.html";
           }
 
           try
@@ -104,21 +117,8 @@ void HttpServer::run( )
         {
           if ( token_ )
           {
-            if ( m_RootDirectory == "" )
-            {
-              char *ptr = getcwd( nullptr, 0 );
-              if ( ptr == nullptr )
-              {
-                std::cout << "Can't get current working directory." << std::endl;
-              }
-              else
-              {
-                std::string currentDir = ptr;
-                m_RootDirectory = currentDir + "/html";
-              }
-            }
-
-            std::cout << "HTTP Server on port " << m_Port << ", serving directory '" << m_RootDirectory << "'." << std::endl;
+            std::cout << "HTTP Server on port " << m_Port << ", serving directory '" << m_RootDirectory << "'."
+                      << std::endl;
           }
         } )
         .run( );

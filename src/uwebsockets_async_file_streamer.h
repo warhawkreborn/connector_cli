@@ -19,20 +19,27 @@ struct AsyncFileStreamer
 
   void updateRootCache( )
   {
-      // todo: if the root folder changes, we want to reload the cache
-      for( auto &p : std::filesystem::recursive_directory_iterator( m_Root ) )
+    // todo: if the root folder changes, we want to reload the cache
+    for( auto &p : std::filesystem::recursive_directory_iterator( m_Root ) )
+    {
+      std::string url = p.path( ).string( ).substr( m_Root.length( ) );
+
+      // Change all '\\' to '/'.
+      std::transform( url.begin( ), url.end( ), url.begin( ), [ ] ( unsigned char c_ )
       {
-        std::string url = p.path( ).string( ).substr( m_Root.length( ) );
-        if ( url == "/index.html" )
+        if ( c_ == '\\' )
         {
-            url = "/";
+          c_ = '/';
         }
 
-        char *key = new char[ url.length( ) ];
-        memcpy( key, url.data( ), url.length( ) );
+        return c_;
+      } );
 
-        m_AsyncFileReaders[ std::string_view( key, url.length( ) ) ] = new AsyncFileReader( p.path( ).string( ) );
-      }
+      char *key = new char[ url.length( ) ];
+      memcpy( key, url.data( ), url.length( ) );
+
+      m_AsyncFileReaders[ std::string_view( key, url.length( ) ) ] = new AsyncFileReader( p.path( ).string( ) );
+    }
   }
 
   template < bool SSL >

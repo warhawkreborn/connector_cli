@@ -74,6 +74,7 @@ void Usage( )
 // Main program
 int main( int argc_, const char **argv_ )
 {
+  std::string program = argv_[ 0 ];
   int port = WARHAWK_HTTP_PORT;
   std::string root = ""; // When it is blank then the http server will add "./html" to the current directory.
 
