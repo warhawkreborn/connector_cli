@@ -132,7 +132,7 @@ int main( int argc_, const char **argv_ )
     } );
 
     const int port = WARHAWK_HTTP_PORT;
-    const std::string root = "./";
+    const std::string root = "./html/";
 
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
