@@ -67,65 +67,72 @@ void HttpServer::run( )
     }
   }
 
-  AsyncFileStreamer asyncFileStreamer( m_RootDirectory );
-
-  while ( true )
+  try
   {
-    try
+    AsyncFileStreamer asyncFileStreamer( m_RootDirectory );
+
+    while ( true )
     {
-      uWS::App( )
-        // /api/servers endpoint.
-        .get( "/api/servers", [ this ] ( auto *res_, auto *req_ )
-        {
-          std::stringstream html;
-          m_ForwardServer.ForEachServer( [ &html ] ( auto entry_ )
+      try
+      {
+        uWS::App( )
+          // /api/servers endpoint.
+          .get( "/api/servers", [ this ] ( auto *res_, auto *req_ )
           {
-            html << "Server: " << entry_.m_name << ", IP: " << entry_.m_ip << std::endl;
-          } );
+            std::stringstream html;
+            m_ForwardServer.ForEachServer( [ &html ] ( auto entry_ )
+            {
+              html << "Server: " << entry_.m_name << ", IP: " << entry_.m_ip << std::endl;
+            } );
 
-          res_->end( html.str( ) );
-        } )
-        // Serve files.
-        .get( "/*", [ &asyncFileStreamer ]( auto *res_, auto *req_ )
-        {
-          res_->onAborted( [ res_ ] ( )
+            res_->end( html.str( ) );
+          } )
+          // Serve files.
+          .get( "/*", [ &asyncFileStreamer ]( auto *res_, auto *req_ )
           {
-            std::cout << "Get method aborted on error." << std::endl;
-          } );
+            res_->onAborted( [ res_ ] ( )
+            {
+              std::cout << "Get method aborted on error." << std::endl;
+            } );
 
-          serveFile( res_, req_ );
-          std::string_view svUrl = req_->getUrl( );
-          std::string url( svUrl.data( ), svUrl.size( ) );
+            serveFile( res_, req_ );
+            std::string_view svUrl = req_->getUrl( );
+            std::string url( svUrl.data( ), svUrl.size( ) );
 
-          if ( url == "/" )
-          {
-            url = "/index.html";
-          }
+            if ( url == "/" )
+            {
+              url = "/index.html";
+            }
 
-          try
+            try
+            {
+              asyncFileStreamer.streamFile( res_, url );
+            }
+            catch( const std::exception &e_ )
+            {
+              std::stringstream ss;
+              ss << "HTTP Server error: " << e_.what( ) << std::endl;
+              res_->end( ss.str( ) );
+            }
+          } )
+          .listen( m_Port, [ this ]( auto *token_ )
           {
-            asyncFileStreamer.streamFile( res_, url );
-          }
-          catch( const std::exception &e_ )
-          {
-            std::stringstream ss;
-            ss << "HTTP Server error: " << e_.what( ) << std::endl;
-            res_->end( ss.str( ) );
-          }
-        } )
-        .listen( m_Port, [ this ]( auto *token_ )
-        {
-          if ( token_ )
-          {
-            std::cout << "HTTP Server on port " << m_Port << ", serving directory '" << m_RootDirectory << "'."
-                      << std::endl;
-          }
-        } )
-        .run( );
+            if ( token_ )
+            {
+              std::cout << "HTTP Server on port " << m_Port << ", serving directory '" << m_RootDirectory << "'."
+                        << std::endl;
+            }
+          } )
+          .run( );
+      }
+      catch ( const std::exception e_ )
+      {
+        std::cout << "Error: " << e_.what() << std::endl;
+      }
     }
-    catch ( const std::exception e_ )
-    {
-      std::cout << "Error: " << e_.what() << std::endl;
-    }
+  }
+  catch ( const std::exception &e_ )
+  {
+    std::cout << "HTTP Server error: " << e_.what( ) << std::endl;
   }
 }

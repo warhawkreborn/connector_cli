@@ -7,6 +7,7 @@
 //
 
 // System includes
+#include <filesystem>
 #include <sstream>
 #include <thread>
 
@@ -75,8 +76,26 @@ void Usage( )
 int main( int argc_, const char **argv_ )
 {
   std::string program = argv_[ 0 ];
+
   int port = WARHAWK_HTTP_PORT;
   std::string root = ""; // When it is blank then the http server will add "./html" to the current directory.
+
+#ifdef WIN32
+  // For Windows, search upwards in the directory tree until we find the html directory.
+  std::filesystem::path path = program;
+  while ( path.string( ).length( ) > 0 && !std::filesystem::exists( path.string( ) + "/html" ) )
+  {
+    path = path.parent_path( );
+  }
+
+  if ( path.string( ).length( ) == 0 )
+  {
+    std::cerr << "Can't locate HTML directory relative to WarHawkReborn executable." << std::endl;
+    return 1;
+  }
+
+  root = path.string( ) + "/html";
+#endif
 
   // Check to see whether we should parse any command-line arguments.
   if ( argc_ > 1 )

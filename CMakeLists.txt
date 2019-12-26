@@ -54,8 +54,8 @@ if ( NOT USE_SYSTEM_CURL )
 
 endif( )
 
-add_subdirectory( libs/libuv/libuv-1.34.0 )
-add_subdirectory( libs/uSockets )
+add_subdirectory( libs/libuv/libuv-1.34.0 EXCLUDE_FROM_ALL )
+add_subdirectory( libs/uSockets EXCLUDE_FROM_ALL )
 # uWebSockets is a header only library, so no need to build a static library.
 #add_subdirectory( libs/uWebSockets )
 

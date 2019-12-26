@@ -60,7 +60,7 @@ std::string cookie::to_string( ) const
   return res;
 }
 
-inline bool operator <( const cookie &a_, const cookie &b_ )
+bool operator <( const cookie &a_, const cookie &b_ )
 {
   return std::tie( a_.m_domain, a_.m_path, a_.m_name, a_.m_include_sub ) <
          std::tie( b_.m_domain, b_.m_path, b_.m_name, b_.m_include_sub );
