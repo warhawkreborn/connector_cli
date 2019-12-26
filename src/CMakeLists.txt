@@ -42,13 +42,23 @@ endif( )
 
 find_package( Threads )
 
-if ( APPLE OR UNIX )
+if ( APPLE )
 
   set( PLATFORM_LIBS 
        curl
        dl
        z
      )
+
+elseif ( UNIX )
+
+  set( PLATFORM_LIBS 
+       curl
+       dl
+       z
+       stdc++fs
+     )
+
 
 else( )
 
