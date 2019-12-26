@@ -66,6 +66,7 @@ std::string VersionString( )
   return ss.str( );
 }
 
+
 void Usage( )
 {
   std::cout << "Usage: warhawkreborn [ ( -h | --help ] [ ( -v | --version ) ] [ ( -p | --port ) <port> ] [ ( -r | --root) <root> ]" << std::endl;
@@ -123,24 +124,40 @@ int main( int argc_, const char **argv_ )
 
   if ( root == "" )
   {
-#ifdef WIN32
-    // For Windows, search upwards in the directory tree until we find the html directory.
+    // Search upwards in the directory tree until we find the html directory.
     std::filesystem::path path = program;
-    while ( path.string( ).length( ) > 0 && !std::filesystem::exists( path.string( ) + "/html" ) )
+    bool found = false;
+
+    while ( path.string( ).length( ) > 0 && !found )
     {
+      if ( std::filesystem::exists( path.string( ) + "/html" ) )
+      {
+        found = true;
+        break;
+      }
+
       path = path.parent_path( );
     }
 
-    if ( path.string( ).length( ) == 0 )
+    if ( !found )
     {
-      std::cerr << "Can't locate HTML directory relative to WarHawkReborn executable." << std::endl;
-      return 1;
-    }
+      // Check defaultRoot directory.
+      const std::string defaultRoot = "/usr/share/warhawkreborn/html";
 
-    root = path.string( ) + "/html";
-#else
-    root = "/usr/share/warhawkreborn/html";
-#endif
+      if ( std::filesystem::exists( defaultRoot ) )
+      {
+        root = defaultRoot;
+      }
+      else
+      {
+        std::cerr << "Can't locate HTML directory." << std::endl;
+        return 1;
+      }
+    }
+    else
+    {
+      root = path.string( ) + "/html";
+    }
   }
 
   std::cout << VersionString( ) << std::endl;
