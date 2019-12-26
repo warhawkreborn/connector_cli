@@ -42,6 +42,7 @@
 
 // WarHawkReborn includes
 #include "forward_server.h"
+#include "http_server.h"
 #include "request_server.h"
 #include "search_server.h"
 #include "warhawk.h"
@@ -135,54 +136,8 @@ int main( int argc_, const char **argv_ )
 
     AsyncFileStreamer asyncFileStreamer( root );
 
-    while ( true )
-    {
-      uWS::App( )
-        .get( "/*", [&asyncFileStreamer]( auto *res, auto *req )
-        {
-          res->onAborted( [res] ( )
-          {
-            std::cout << "Get method aborted on error." << std::endl;
-          } );
-
-          serveFile( res, req );
-          std::string_view svUrl = req->getUrl( );
-          std::string url( svUrl.data( ), svUrl.size( ) );
-          url = url.substr( 1 ); // Skip past first '/'.
-
-          if ( url == "" )
-          {
-            url = "index.html";
-          }
-
-          try
-          {
-            asyncFileStreamer.streamFile( res, url );
-          }
-          catch( const std::exception &e_ )
-          {
-            std::stringstream ss;
-            ss << "HTTP Server error: " << e_.what( ) << std::endl;
-            res->end( ss.str( ) );
-          }
-        } )
-        .listen( port, [port, root]( auto *token )
-        {
-          if ( token )
-          {
-            char *ptr = getcwd( nullptr, 0 );
-            if ( ptr == nullptr )
-            {
-              std::cout << "Can't get current working directory." << std::endl;
-            }
-            else
-            {
-              std::cout << "HTTP Server on port " << port << ", serving directory '" << ptr << "'." << std::endl;
-            }
-          }
-        } )
-        .run( );
-    }
+    HttpServer httpServer( port, root );
+    httpServer.run( );
 
     packetServerThread.join( );
     searchServerThread.join( );

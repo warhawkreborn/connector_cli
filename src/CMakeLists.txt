@@ -81,6 +81,7 @@ set( SOURCE_FILES
      cookie.cpp
      discovery_packet.cpp
      forward_server.cpp
+     http_server.cpp
      main.cpp
      network.cpp
      request_server.cpp
@@ -96,6 +97,7 @@ set( INCLUDE_FILES
      cookie.h
      discovery_packet.h
      forward_server.h
+     http_server.h
      message_handler.h
      network.h
      picojson.h
