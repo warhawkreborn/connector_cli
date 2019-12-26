@@ -80,10 +80,43 @@ void HttpServer::run( )
           .get( "/api/servers", [ this ] ( auto *res_, auto *req_ )
           {
             std::stringstream html;
+
+            html << "<html>"  << std::endl;
+            html << "<head>"  << std::endl;
+            html << "  <title>WarHawkReborn</title>" << std::endl;
+            html << "</head>" << std::endl;
+            html << "<body bgcolor='#000000'>" << std::endl;
+
+            html << "<center>" << std::endl;
+
+            html << "<img src='/images/warhawk.png'>" << std::endl;
+
+            html << "<p>" << std::endl;
+
+            html << "<h1 style='color: #00ff00;'>Servers</h1>" << std::endl;
+
+            html << "</p>" << std::endl;
+
+            html << "<table>" << std::endl;
+            html << "  <tr>"  << std::endl;
+            html << "    <th style='color: #00ff00;'>Name</th>"       << std::endl;
+            html << "    <th style='color: #00ff00;'>IP Address</th>" << std::endl;
+            html << "  </tr>" << std::endl;
+
             m_ForwardServer.ForEachServer( [ &html ] ( auto entry_ )
             {
-              html << "Server: " << entry_.m_name << ", IP: " << entry_.m_ip << std::endl;
+              html << "  <tr>" << std::endl;
+              html << "    <td style='color: #00ff00;'>" << entry_.m_name << "</td>" << std::endl;
+              html << "    <td style='color: #00ff00;'>" << entry_.m_ip   << "</td>" << std::endl;
+              html << "  </tr>" << std::endl;
             } );
+
+            html << "</table>" << std::endl;
+
+            html << "</center>" << std::endl;
+
+            html << "</body>" << std::endl;
+            html << "</html>" << std::endl;
 
             res_->end( html.str( ) );
           } )
