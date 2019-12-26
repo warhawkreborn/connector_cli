@@ -33,12 +33,14 @@
 #include "uwebsockets_async_file_streamer.h"
 #include "uwebsockets_middleware.h"
 
+#include "forward_server.h"
 #include "http_server.h"
 
 
-HttpServer::HttpServer( const int port_, const std::string rootDirectory_ )
+HttpServer::HttpServer( const int port_, const std::string rootDirectory_, ForwardServer &forwardServer_ )
   : m_Port( port_ )
   , m_RootDirectory( rootDirectory_ )
+  , m_ForwardServer( forwardServer_ )
 {
 }
 
@@ -61,10 +63,18 @@ void HttpServer::run( )
     try
     {
       uWS::App( )
-        .get( "/api/servers", [ ] ( auto *res_, auto *req_ )
+        // /api/servers endpoint.
+        .get( "/api/servers", [ this ] ( auto *res_, auto *req_ )
         {
-          // res_.end( requestServer.HmtlString( ) );
+          std::stringstream html;
+          m_ForwardServer.ForEachServer( [ &html ] ( auto entry_ )
+          {
+            html << "Server: " << entry_.m_name << ", IP: " << entry_.m_ip << std::endl;
+          } );
+
+          res_->end( html.str( ) );
         } )
+        // Serve files.
         .get( "/*", [ &asyncFileStreamer ]( auto *res_, auto *req_ )
         {
           res_->onAborted( [ res_ ] ( )

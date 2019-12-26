@@ -6,12 +6,14 @@
 
 #include <string>
 
+class ForwardServer;
+
 
 class HttpServer
 {
   public:
 
-    HttpServer( const int port, const std::string rootDirectory_ );
+    HttpServer( const int port, const std::string rootDirectory_, ForwardServer & );
     ~HttpServer( );
 
     void run( );
@@ -20,6 +22,7 @@ class HttpServer
 
   private:
 
-    int         m_Port = 8080;
-    std::string m_RootDirectory;
+    int            m_Port = 8080;
+    std::string    m_RootDirectory;
+    ForwardServer &m_ForwardServer;
 };
