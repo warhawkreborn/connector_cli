@@ -5,6 +5,7 @@
 // responds to valid requests with a list of remote servers.
 //
 
+#include <functional>
 #include <iostream>
 
 #include "message_handler.h"
@@ -23,6 +24,9 @@ class ForwardServer : public MessageHandler
     void SetEntries( std::vector< ServerEntry > );
 
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
+
+    // Iterate through each server entry in the list of servers.
+    void ForEachServer( std::function< void ( const ServerEntry & ) > );
 
   protected:
 

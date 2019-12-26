@@ -41,12 +41,12 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
   {
     std::cout << "ForwardServer: Sending server list" << std::endl;
 
-    std::unique_lock< std::mutex > lck( m_mutex );
+    Server *server = m_server;
 
-    for ( auto &e : m_entries )
+    ForEachServer( [ server, client_ ] ( auto e )
     {
-      m_server->send( client_, e.m_frame );
-    }
+      server->send( client_, e.m_frame );
+    } );
   }
   else
   {
@@ -54,6 +54,16 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
   }
 }
 
+
+void ForwardServer::ForEachServer( std::function< void ( const ServerEntry & ) > func_ )
+{
+  std::unique_lock< std::mutex > lck( m_mutex );
+
+  for ( auto &e : m_entries )
+  {
+    func_( e );
+  }
+}
 
 bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 {
