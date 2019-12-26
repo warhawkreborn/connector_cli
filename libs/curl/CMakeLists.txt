@@ -11,7 +11,7 @@ set( HTTP_ONLY         ON  CACHE BOOL "Do build HTTP_ONLY code"      )
 
 if ( WIN32 )
 
-  set( CMAKE_USE_WINSSL ON )
+  set( CMAKE_USE_WINSSL ON CACHE BOOL "Do build with WIN SLL"        )
 
 endif( )
 
