@@ -10,6 +10,8 @@
 // Network port that WarHawk sends and listens on.
 const int         WARHAWK_UDP_PORT = 10029;
 
+const int         WARHAWK_HTTP_PORT = 8080;
+
 // Server that distributes the list of active WarHawk servers.
 const std::string WARHAWK_API_BASE = "https://warhawk.thalhammer.it/api/";
 

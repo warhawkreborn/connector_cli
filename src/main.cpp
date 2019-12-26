@@ -131,10 +131,8 @@ int main( int argc_, const char **argv_ )
       std::cout << "RequestServer thread ended." << std::endl;
     } );
 
-    const int port = 8080;
+    const int port = WARHAWK_HTTP_PORT;
     const std::string root = "./";
-
-    AsyncFileStreamer asyncFileStreamer( root );
 
     HttpServer httpServer( port, root );
     httpServer.run( );
