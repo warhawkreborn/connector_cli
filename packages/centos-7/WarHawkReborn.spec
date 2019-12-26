@@ -20,7 +20,10 @@ This acts as a simple bridge between the PlayStation 3 and a host that contains 
 If you set your router port forwarding to forward port 10029 to your PlayStation 3 then you can also *HOST* WarHawk games for others to join.
 
 %changelog
-* Sat Dec 07 2019 David Summers <david@summersoft.fay-ar.us> @VERSION@-@RELEASE@
+* Thu Dec 26 2019 David Summers <david@summersoft.fay-ar.us> @VERSION@-@RELEASE@
+- Added web server at (default) port 8080.
+
+* Sat Dec 07 2019 David Summers <david@summersoft.fay-ar.us> 1.1-1c1251b
 - First version that can host a local WarHawk server so that other Internet
   players can join.
 
@@ -50,6 +53,10 @@ cp build/src/warhawkreborn $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system
 cp packages/centos-7/warhawk.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 
+# Install html pages
+mkdir -p $RPM_BUILD_ROOT/usr/share/warhawkreborn
+cp -r html $RPM_BUILD_ROOT/usr/share/warhawkreborn
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -58,3 +65,4 @@ rm -rf $RPM_BUILD_ROOT
 %doc README.md
 /usr/bin/warhawkreborn
 /usr/lib/systemd/system/warhawk.service
+/usr/share/warhawkreborn

@@ -9,7 +9,7 @@ After=network.target syslog.target
 [Service]
 # see man systemd.service 
 Type=simple
-ExecStart=/usr/bin/warhawkreborn
+ExecStart=/usr/bin/warhawkreborn -r /usr/share/warhawkreborn/html
 RemainAfterExit=true
 ExecStop=/usr/bin/pkill warhawkreborn
 StandardOutput=journal
