@@ -3,6 +3,7 @@
 // 1. Gets a list of current remote warhawk servers from https://warhawk.thalhammer.it/api/ URL.
 // 2. Broadcasts that list of servers to a warhawk client when it requests the list of servers.
 // 3. Watches for warhawk local warhawk servers on the network and sends those so the remote server.
+// 4. Provides a web server to show the list of servers and other information.
 //
 
 // System includes
@@ -64,24 +65,57 @@ std::string VersionString( )
   return ss.str( );
 }
 
+void Usage( )
+{
+  std::cout << "Usage: warhawkreborn [ ( -h | --help ] [ ( -v | --version ) ] [ ( -p | --port ) <port> ] [ ( -r | --root) <root> ]" << std::endl;
+}
+
+
 // Main program
 int main( int argc_, const char **argv_ )
 {
+  int port = WARHAWK_HTTP_PORT;
+  std::string root = ""; // When it is blank then the http server will add "./html" to the current directory.
+
   // Check to see whether we should parse any command-line arguments.
   if ( argc_ > 1 )
   {
-    std::string option = argv_[ 1 ];
-
-    // Check for -v or --version commandline argument.
-    if ( option == "-v" || option == "--version" )
+    for ( int i = 1; i < argc_; ++i )
     {
-      std::cout << VersionString( ) << std::endl;
+      std::string option = argv_[ i ];
 
-      return 0;
+      if ( argc_ == 2 && ( option == "-h" || option == "--help" ) )
+      {
+        Usage( );
+        return 0;
+      }
+
+      if ( option == "-p" || option == "--port" )
+      {
+        ++i;
+        port = atoi( argv_[ i ] );
+        continue;
+      }
+
+      if ( option == "-r" || option == "--root" )
+      {
+        ++i;
+        root = argv_[ i ];
+        continue;
+      }
+
+      // Check for -v or --version commandline argument.
+      if ( argc_ == 2 && ( option == "-v" || option == "--version" ) )
+      {
+        std::cout << VersionString( ) << std::endl;
+
+        return 0;
+      }
+
+      std::cerr << "Unknown option '" << option << "'." << std::endl;
+      Usage( );
+      return 1;
     }
-
-    std::cerr << "Unknown option." << std::endl;
-    return 1;
   }
 
   std::cout << VersionString( ) << std::endl;
@@ -130,9 +164,6 @@ int main( int argc_, const char **argv_ )
       requestServer.run( );
       std::cout << "RequestServer thread ended." << std::endl;
     } );
-
-    const int port = WARHAWK_HTTP_PORT;
-    const std::string root = "./html/";
 
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
