@@ -36,4 +36,4 @@ build_pkg : build
 	
 	cd ${BUILD_DIR}; rm -rf pkg *.pkg
 	cd ${BUILD_DIR}; mkdir -p pkg; cp src/warhawkreborn pkg/
-	cd ${BUILD_DIR}; productbuild --root ${BUILD_DIR}/pkg /usr/local/bin ${BUILD_DIR}/${NAME}-${WARHAWK_VERSION}-${GIT_HASH}.pkg
+	cd ${BUILD_DIR}; productbuild --root ${BUILD_DIR}/pkg /usr/local/bin --root ${BUILD_DIR}/src/html /usr/local/share/warhawkreborn/html ${BUILD_DIR}/${NAME}-${WARHAWK_VERSION}-${GIT_HASH}.pkg

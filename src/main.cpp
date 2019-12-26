@@ -128,7 +128,7 @@ int main( int argc_, const char **argv_ )
     std::filesystem::path path = program;
     bool found = false;
 
-    while ( path.string( ).length( ) > 0 && !found )
+    while ( path.string( ).length( ) > 1 && !found )
     {
       if ( std::filesystem::exists( path.string( ) + "/html" ) )
       {
@@ -142,7 +142,11 @@ int main( int argc_, const char **argv_ )
     if ( !found )
     {
       // Check defaultRoot directory.
+#ifdef __APPLE__
+      const std::string defaultRoot = "/usr/local/share/warhawkreborn/html";
+#else
       const std::string defaultRoot = "/usr/share/warhawkreborn/html";
+#endif
 
       if ( std::filesystem::exists( defaultRoot ) )
       {
