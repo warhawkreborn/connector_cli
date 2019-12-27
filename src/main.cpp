@@ -191,17 +191,10 @@ int main( int argc_, const char **argv_ )
     // and puts the resuling list of servers into the forwardServer and searchServer.
     RequestServer requestServer( forwardServer, packetServer, searchServer );
 
-    std::thread requestServerThread( [&] ( )
-    {
-      std::cout << "Starting Request Server..." << std::endl;
-      requestServer.run( );
-      std::cout << "RequestServer thread ended." << std::endl;
-    } );
-
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
 
-    requestServerThread.join( );
+    // Servers and threads will destruct here as the variables go out of scope.
   }
   catch ( const std::exception e_ )
   {

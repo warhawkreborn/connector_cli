@@ -15,6 +15,8 @@ RequestServer::RequestServer( ForwardServer &forwardServer_, Server &packetServe
   : m_ForwardServer( forwardServer_ )
   , m_PacketServer(  packetServer_  )
   , m_SearchServer(  searchServer_  )
+  , m_Thread( [&] ( ) { run( ); } )
+
 {
 }
 
@@ -26,6 +28,8 @@ RequestServer::~RequestServer( )
 
 void RequestServer::run( )
 {
+  std::cout << "Starting Request Server..."<< std::endl;
+
   // This loop periodically queries the server that holds a list of available
   // public servers and updates that list into the SearchServer and ForwardServer.
   while ( true )
@@ -58,4 +62,6 @@ void RequestServer::run( )
 
     std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
   }
+
+  std::cout << "RequestServer thread ended." << std::endl;
 }

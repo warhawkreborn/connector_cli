@@ -25,4 +25,7 @@ class RequestServer
     ForwardServer &m_ForwardServer;
     Server        &m_PacketServer;
     SearchServer  &m_SearchServer;
+
+    // Make sure this is always last so that the thread destructs (joins) first.
+    std::thread m_Thread;
 };
