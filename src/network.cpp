@@ -117,9 +117,9 @@ bool Network::StartWinsock( )
 //////////////////////////////////////////////////////////////////////
 void Network::_Init( )
 {
-  AddAddress( m_MyIpAddresses, "127.0.0.1" );
+  AddAddress( m_MyIpAddresses, "127.0.0.1", 8 );
 
-  AddAddress( m_MyIpAddresses, "::1" );
+  AddAddress( m_MyIpAddresses, "::1", 128 );
 
 #if defined( __linux__ ) || defined( __APPLE__ )
   struct ifaddrs *addrs = NULL;
@@ -197,7 +197,7 @@ void Network::_Init( )
 
   // Make an initial call to GetAdaptersAddresses to get the 
   // size needed into the outBufLen variable
-  if ( GetAdaptersAddresses( AF_UNSPEC, 0, NULL, pAddresses, &outBufLen ) == ERROR_BUFFER_OVERFLOW )
+  if ( GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, pAddresses, &outBufLen ) == ERROR_BUFFER_OVERFLOW )
   {
     free(pAddresses);
     pAddresses = (IP_ADAPTER_ADDRESSES*) malloc( outBufLen );
@@ -205,13 +205,14 @@ void Network::_Init( )
 
   // Make a second call to GetAdapters Addresses to get the
   // actual data we want
-  if ( ( dwRetVal = GetAdaptersAddresses( AF_UNSPEC, 0, NULL, pAddresses, &outBufLen ) ) == NO_ERROR )
+  if ( ( dwRetVal = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, pAddresses, &outBufLen ) ) == NO_ERROR )
   {
     // If successful, output some information from the data we received
     while ( pAddresses )
     {
       for ( IP_ADAPTER_UNICAST_ADDRESS *ptr = pAddresses->FirstUnicastAddress;
-            ptr != NULL; ptr = ptr->Next )
+            ptr != NULL;
+            ptr = ptr->Next )
       {
         char buf[ 256 ];
         memset( &buf[0], 0, sizeof(buf) );
@@ -228,31 +229,7 @@ void Network::_Init( )
 
         if ( ai )
         {
-          AddrInfo info( *ai );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
-      }
-
-      for ( IP_ADAPTER_ANYCAST_ADDRESS *ptr = pAddresses->FirstAnycastAddress;
-            ptr != NULL; ptr = ptr->Next )
-      {
-        char buf[ 256 ];
-        memset( &buf[0], 0, sizeof(buf) );
-        getnameinfo( ptr->Address.lpSockaddr, ptr->Address.iSockaddrLength, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
-
-        addrinfo *ai = NULL;
-
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
-        if ( e != 0 )
-        {
-          // FIXME - Add error checking.
-          return; // Error.
-        }
-
-        if ( ai )
-        {
-          AddrInfo info( *ai );
+          AddrInfo info( *ai, (int) ptr->OnLinkPrefixLength );
           AddAddress( m_MyIpAddresses, info );
           freeaddrinfo( ai );
         }
@@ -270,7 +247,7 @@ void Network::_Init( )
         itr != m_MyIpAddresses.end(); ++itr )
   {
     AddrInfo *ptr = &(*itr);
-    std::cout << "My Address: " << ptr->GetAddr( ) << std::endl;;
+    std::cout << "My Address: " << ptr->GetAddr( ) << ", PrefixLen: " << ptr->GetPrefixLen( ) << std::endl;;
   }
 #endif
 }
@@ -369,7 +346,7 @@ std::string Network::GetNextInterface( )
 }
 
 
-void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_ )
+void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_, int prefixLen_ )
 {
   addrinfo *ai = NULL;
 
@@ -382,7 +359,7 @@ void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_ )
 
   if ( ai )
   {
-    AddrInfo info( *ai );
+    AddrInfo info( *ai, prefixLen_ );
 
     AddAddress( addrList_, info );
 

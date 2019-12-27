@@ -86,7 +86,7 @@ class Network
 
     void _Init( );
 
-    void AddAddress( IpAddresses_t &, const char *     );
+    void AddAddress( IpAddresses_t &, const char *, const int prefixLen );
     void AddAddress( IpAddresses_t &, const AddrInfo & );
 
     // Return interface information from OS.
