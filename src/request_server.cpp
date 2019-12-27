@@ -23,6 +23,8 @@ RequestServer::RequestServer( ForwardServer &forwardServer_, Server &packetServe
 
 RequestServer::~RequestServer( )
 {
+  m_Done = true;
+  m_Thread.join( );
 }
 
 
@@ -32,7 +34,7 @@ void RequestServer::run( )
 
   // This loop periodically queries the server that holds a list of available
   // public servers and updates that list into the SearchServer and ForwardServer.
-  while ( true )
+  while ( !m_Done )
   {
     std::cout << "RequestServer: Updating server list" << std::endl;
     std::vector< ServerEntry > list;

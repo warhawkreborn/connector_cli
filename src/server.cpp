@@ -1,3 +1,4 @@
+#include "addr_info.h"
 #include "server.h"
 
 
@@ -11,6 +12,17 @@ Server::Server( warhawk::net::udp_server &udpServer_ )
 
 Server::~Server( )
 {
+  m_Done = true;
+
+  // Broadcast zero-length packet to make sure this server shuts down
+  AddrInfo clientAddr;
+  clientAddr.SetAddr( "255.255.255.255" );
+  clientAddr.PortToSockAddr( m_server.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  std::vector< uint8_t > packet;
+  const bool broadcast = true;
+  m_server.send( *clientAddr.GetAiAddr(), packet, broadcast );
+
+  m_Thread.join();
 }
 
 
@@ -21,7 +33,7 @@ void Server::run( )
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
 
-  while ( m_server.receive( client, data ) )
+  while ( !m_Done && m_server.receive( client, data ) )
   {
     if ( data.size( ) > 0 )
     {

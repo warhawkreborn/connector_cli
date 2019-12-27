@@ -43,7 +43,7 @@ class SearchServer : public MessageHandler
 
     std::mutex                  m_mutex;
     std::vector< ServerEntry >  m_entries;
-    Server                     *m_server;
+    Server                     *m_server = nullptr;
 
     enum class STATE
     {
@@ -63,7 +63,9 @@ class SearchServer : public MessageHandler
 
     using PacketList = std::list< PacketData >;
 
-    PacketList m_PacketList;
+    PacketList  m_PacketList;
+
+    bool        m_Done = false;
 
     // Make sure this is always last so that the thread destructs (joins) first.
     std::thread m_Thread;

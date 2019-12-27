@@ -26,6 +26,8 @@ class RequestServer
     Server        &m_PacketServer;
     SearchServer  &m_SearchServer;
 
+    bool           m_Done = false;
+
     // Make sure this is always last so that the thread destructs (joins) first.
-    std::thread m_Thread;
+    std::thread    m_Thread;
 };

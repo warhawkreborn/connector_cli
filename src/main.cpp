@@ -191,16 +191,21 @@ int main( int argc_, const char **argv_ )
     // and puts the resuling list of servers into the forwardServer and searchServer.
     RequestServer requestServer( forwardServer, packetServer, searchServer );
 
+#ifndef TEST_SHUTDOWN
+    // Run the HTTP server in the main thread.
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
+#endif
 
     // Servers and threads will destruct here as the variables go out of scope.
   }
   catch ( const std::exception e_ )
   {
-    std::cout << "Error: " << e_.what( ) << std::endl;
+    std::cout << "FATAL ERROR - Shutting down. Error: " << e_.what( ) << std::endl;
     return -1;
   }
+
+  std::cout << "WarHawk Reborn server shutting down properly." << std::endl;
 
   return 0;
 }

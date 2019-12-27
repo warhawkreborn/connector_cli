@@ -65,6 +65,8 @@ class Server
     using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
     MessageHandlers m_MessageHandlers;
 
+    bool        m_Done = false;
+
     // Make sure this is always last so that the thread destructs (joins) first.
     std::thread m_Thread;
 };

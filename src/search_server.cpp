@@ -21,6 +21,8 @@ SearchServer::SearchServer( Server *server_ )
 SearchServer::~SearchServer( )
 {
   m_server->Unregister( this );
+  m_Done = true;
+  m_Thread.join( );
 }
 
 
@@ -34,7 +36,7 @@ void SearchServer::run( )
 
   const std::vector< uint8_t > discoveryPacketData = m_server->hex2bin( m_DiscoveryPacket );
 
-  while ( true )
+  while ( !m_Done )
   {
     switch ( m_CurrentState )
     {
