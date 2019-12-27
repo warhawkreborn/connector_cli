@@ -77,6 +77,7 @@ else( )
 endif( )
 
 set( SOURCE_FILES
+     actor.cpp
      addr_info.cpp
      cookie.cpp
      discovery_packet.cpp
@@ -94,7 +95,9 @@ set( SOURCE_FILES
    )
 
 set( INCLUDE_FILES
+     actor.h
      addr_info.h
+     blocking_queue.h
      cookie.h
      discovery_packet.h
      forward_server.h
