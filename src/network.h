@@ -89,6 +89,8 @@ class Network
 
     void AddAddress( IpAddresses_t &, const char *address, const int prefixLen );
 
+    int GetPrefixLen( const std::string &netmask ); // Return the prefix length of the nextmask;
+
     // Return interface information from OS.
     std::string GetFirstInterface( );
     std::string GetNextInterface(  );
