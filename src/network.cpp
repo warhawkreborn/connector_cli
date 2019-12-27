@@ -136,32 +136,39 @@ void Network::_Init( )
 
   for ( tmp = addrs; tmp; tmp = tmp->ifa_next )
   {
-    char buf[ 256 ];
-    memset( &buf[0], 0, sizeof(buf) );
+    char abuf[ 256 ];
+    char nbuf[ 256 ];
+    memset( &abuf[ 0 ], 0, sizeof(abuf) );
+    memset( &nbuf[ 0 ], 0, sizeof(nbuf) );
     sockaddr *sa = tmp->ifa_addr;
+    sockaddr *na = tmp->ifa_netmask;
     if ( sa != NULL )
     {
       switch ( sa->sa_family )
       {
         case AF_INET:
           inet_ntop( sa->sa_family, &((struct sockaddr_in *) sa)->sin_addr,
-            buf, sizeof(buf) );
+            abuf, sizeof(abuf) );
+          inet_ntop( sa->sa_family, &((struct sockaddr_in *) na)->sin_addr,
+            nbuf, sizeof(nbuf) );
           break;
 
         case AF_INET6:
           inet_ntop( sa->sa_family, &((struct sockaddr_in6 *) sa)->sin6_addr,
-            buf, sizeof(buf) );
+            abuf, sizeof(abuf) );
+          inet_ntop( sa->sa_family, &((struct sockaddr_in6 *) na)->sin6_addr,
+            nbuf, sizeof(nbuf) );
           break;
 
         default:
           break;
       }
 
-      if ( buf[0] )
+      if ( abuf[0] )
       {
         addrinfo *ai = NULL;
 
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
+        int e = getaddrinfo( &abuf[0], NULL, NULL, &ai );
         if ( e != 0 )
         {
           if ( addrs != NULL )
@@ -172,9 +179,16 @@ void Network::_Init( )
           return; // Error.
         }
 
-        if ( ai )
+        int prefixLen = 0;
+
+        if ( nbuf[ 0 ] )
         {
-          AddrInfo info( *ai );
+          prefixLen = GetPrefixLen( nbuf );
+        }
+
+        if ( ai && abuf[ 0 ] && nbuf[ 0 ] )
+        {
+          AddrInfo info( *ai, prefixLen );
           AddAddress( m_MyIpAddresses, info );
           freeaddrinfo( ai );
         }
@@ -392,4 +406,100 @@ void Network::AddAddress( IpAddresses_t &addrList_, const AddrInfo &info_ )
 const Network::IpAddresses_t &Network::GetMyIpAddresses( )
 {
   return m_MyIpAddresses;
+}
+
+
+int Network::GetPrefixLen( const std::string &netmask_ )
+{
+  int prefixLen = 0;
+
+  if ( netmask_.find( '.' ) != std::string::npos )
+  {
+    std::string netmask = netmask_;
+    while ( netmask.length( ) > 0 )
+    {
+      size_t pos = netmask.find( "." );
+      std::string num;
+      if ( pos != std::string::npos )
+      {
+        num = netmask.substr( 0, pos );
+        netmask = netmask.substr( pos + 1 );
+      }
+      else
+      {
+        num = netmask;
+        netmask = "";
+      }
+
+      int bits = atoi( num.c_str( ) );
+      while ( bits != 0 )
+      {
+        if ( bits & 1 )
+        {
+          prefixLen++;
+        }
+
+        bits >>= 1;
+      }
+    }
+    // Count IPv4 bits.
+    for ( unsigned char c : netmask )
+    {
+      if ( c == '.' )
+      {
+        continue;
+      }
+
+      char str[ 2 ];
+      str[ 0 ] = c;
+      str[ 1 ] = 0;
+
+      int n = atoi( str );
+
+      while ( n != 0 )
+      {
+        if ( n %1 == 1 )
+        {
+          prefixLen++;
+        }
+      }
+    }
+  }
+  else if ( netmask_.find( ':' ) != std::string::npos )
+  {
+    // Count IPv6 bits.
+    for ( unsigned char c : netmask_ )
+    {
+      int num = 0;
+
+      if ( c >= '0' && c <= '9' )
+      {
+        num = c - '0';
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+        num = c - 'a' + 10;
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+        num = c - 'A' + 10;
+      }
+      else
+      {
+        continue;
+      }
+
+      while ( num != 0 )
+      {
+        if ( num & 1 )
+        {
+          prefixLen++;
+        }
+
+        num >>= 1;
+      }
+    }
+  }
+
+  return prefixLen;
 }
