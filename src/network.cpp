@@ -164,34 +164,16 @@ void Network::_Init( )
           break;
       }
 
-      if ( abuf[0] )
+      int prefixLen = 0;
+
+      if ( nbuf[ 0 ] )
       {
-        addrinfo *ai = NULL;
+        prefixLen = GetPrefixLen( nbuf );
+      }
 
-        int e = getaddrinfo( &abuf[0], NULL, NULL, &ai );
-        if ( e != 0 )
-        {
-          if ( addrs != NULL )
-          {
-            freeifaddrs( addrs );
-          }
-          // FIXME - Add error checking.
-          return; // Error.
-        }
-
-        int prefixLen = 0;
-
-        if ( nbuf[ 0 ] )
-        {
-          prefixLen = GetPrefixLen( nbuf );
-        }
-
-        if ( ai && abuf[ 0 ] && nbuf[ 0 ] )
-        {
-          AddrInfo info( *ai, prefixLen );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
+      if ( abuf[ 0 ] && nbuf[ 0 ] )
+      {
+        AddAddress( m_MyIpAddresses, abuf, prefixLen );
       }
     }
   }
@@ -381,6 +363,7 @@ int Network::GetPrefixLen( const std::string &netmask_ )
       }
 
       int bits = atoi( num.c_str( ) );
+      // Count IPv4 bits.
       while ( bits != 0 )
       {
         if ( bits & 1 )
@@ -389,28 +372,6 @@ int Network::GetPrefixLen( const std::string &netmask_ )
         }
 
         bits >>= 1;
-      }
-    }
-    // Count IPv4 bits.
-    for ( unsigned char c : netmask )
-    {
-      if ( c == '.' )
-      {
-        continue;
-      }
-
-      char str[ 2 ];
-      str[ 0 ] = c;
-      str[ 1 ] = 0;
-
-      int n = atoi( str );
-
-      while ( n != 0 )
-      {
-        if ( n %1 == 1 )
-        {
-          prefixLen++;
-        }
       }
     }
   }
