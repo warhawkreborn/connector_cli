@@ -63,4 +63,7 @@ class Server
     std::mutex      m_mutex; // Protect m_MessageHandlers.
     using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
     MessageHandlers m_MessageHandlers;
+
+    // Make sure this is always last so that the thread destructs (joins) first.
+    std::thread m_Thread;
 };

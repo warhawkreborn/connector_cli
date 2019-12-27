@@ -5,6 +5,7 @@ Server::Server( warhawk::net::udp_server &udpServer_ )
   : m_server( udpServer_ )
   , m_mutex( )
   , m_MessageHandlers( )
+  , m_Thread( [ & ] ( ) { run( ); } )
 {
 }
 
@@ -15,6 +16,8 @@ Server::~Server( )
 
 void Server::run( )
 {
+  std::cout << "Starting Packet Server..." << std::endl;
+
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
 
@@ -30,6 +33,8 @@ void Server::run( )
       }
     }
   }
+
+  std::cout << "Stopping Packet Server." << std::endl;
 }
 
 void Server::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )

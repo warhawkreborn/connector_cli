@@ -177,12 +177,6 @@ int main( int argc_, const char **argv_ )
     // clients that register with it.
     Server packetServer( udpServer );
 
-    std::thread packetServerThread( [&] ( )
-    {
-      std::cout << "Starting Packet Server..." << std::endl;
-      packetServer.run( );
-      std::cout << "Stopping Packet Server." << std::endl;
-    } );
 
     // The ForwardServer watches for requests from the local network and
     // responds with a list of remote servers.
@@ -214,7 +208,6 @@ int main( int argc_, const char **argv_ )
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
 
-    packetServerThread.join( );
     searchServerThread.join( );
     requestServerThread.join( );
   }
