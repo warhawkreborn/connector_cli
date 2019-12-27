@@ -3,6 +3,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <thread>
 
 #include "blocking_queue.h"
 
