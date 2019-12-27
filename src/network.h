@@ -38,6 +38,7 @@
 #include <vector>
 
 #include "addr_info.h"
+#include "ip_address.h"
 
 struct addrinfo;
 
@@ -49,7 +50,7 @@ class Network
     // DECLARATIONS
     //////////////////////////////
 
-    typedef std::vector< AddrInfo > IpAddresses_t;
+    typedef std::vector< IpAddress > IpAddresses_t;
 
     //////////////////////////////
     // METHODS
@@ -86,8 +87,7 @@ class Network
 
     void _Init( );
 
-    void AddAddress( IpAddresses_t &, const char *, const int prefixLen );
-    void AddAddress( IpAddresses_t &, const AddrInfo & );
+    void AddAddress( IpAddresses_t &, const char *address, const int prefixLen );
 
     // Return interface information from OS.
     std::string GetFirstInterface( );
@@ -97,6 +97,5 @@ class Network
     // DATA
     //////////////////////////////
 
-    AddrInfo m_RemoteAddr; // Should default to IPv4 Broadcast or IPv6 Multi-cast but could also be IPv4 / IPv6 unicast.
     IpAddresses_t m_MyIpAddresses; // List of my own IP addresses.
 };

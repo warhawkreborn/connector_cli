@@ -35,7 +35,7 @@ class AddrInfo
   public:
 
     AddrInfo( );
-    AddrInfo( const addrinfo &, const int &prefixLen );
+    AddrInfo( const addrinfo & );
     ~AddrInfo( );
 
     // Convert from addrinfo to AddrInfo
@@ -54,8 +54,6 @@ class AddrInfo
 
     std::string GetAddr( ) const;        // Get the Address in std::string format.
     bool SetAddr( const std::string & ); // Set the Address from std::string format.
-
-    int GetPrefixLen( ) const;           // Get the prefix length associated with this address.
 
     static std::string SockAddrToAddress( const struct sockaddr * ); // Convert sockaddr to std::string format.
 
@@ -77,7 +75,6 @@ class AddrInfo
     socklen_t        m_ai_addrlen;
     std::string      m_ai_canonname;
     sockaddr_storage m_ai_addr;
-    int              m_PrefixLen;
 
     //
     // Methods

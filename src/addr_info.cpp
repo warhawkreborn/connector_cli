@@ -18,10 +18,9 @@ AddrInfo::AddrInfo( )
 }
 
 
-AddrInfo::AddrInfo( const addrinfo &info_, const int &prefixLen_ )
+AddrInfo::AddrInfo( const addrinfo &info_ )
 {
   Set( info_ );
-  m_PrefixLen = prefixLen_;
 }
 
 
@@ -209,10 +208,4 @@ bool AddrInfo::SetAddr( const std::string &address_ )
   }
 
   return true; // OK.
-}
-
-
-int AddrInfo::GetPrefixLen( ) const
-{
-  return m_PrefixLen;
 }

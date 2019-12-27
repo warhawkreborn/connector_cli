@@ -82,6 +82,7 @@ set( SOURCE_FILES
      discovery_packet.cpp
      forward_server.cpp
      http_server.cpp
+     ip_address.cpp
      main.cpp
      network.cpp
      request_server.cpp
@@ -98,6 +99,7 @@ set( INCLUDE_FILES
      discovery_packet.h
      forward_server.h
      http_server.h
+     ip_address.h
      message_handler.h
      network.h
      picojson.h

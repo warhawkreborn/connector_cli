@@ -217,22 +217,7 @@ void Network::_Init( )
         char buf[ 256 ];
         memset( &buf[0], 0, sizeof(buf) );
         getnameinfo( ptr->Address.lpSockaddr, ptr->Address.iSockaddrLength, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
-
-        addrinfo *ai = NULL;
-
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
-        if ( e != 0 )
-        {
-          // FIXME - Add error checking.
-          return; // Error.
-        }
-
-        if ( ai )
-        {
-          AddrInfo info( *ai, (int) ptr->OnLinkPrefixLength );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
+        AddAddress( m_MyIpAddresses, buf, ptr->OnLinkPrefixLength );
       }
 
       pAddresses = pAddresses->Next;
@@ -246,8 +231,8 @@ void Network::_Init( )
   for ( IpAddresses_t::iterator itr = m_MyIpAddresses.begin();
         itr != m_MyIpAddresses.end(); ++itr )
   {
-    AddrInfo *ptr = &(*itr);
-    std::cout << "My Address: " << ptr->GetAddr( ) << ", PrefixLen: " << ptr->GetPrefixLen( ) << std::endl;;
+    IpAddress *ptr = &(*itr);
+    std::cout << "My Address: " << ptr->GetAddress( ) << "/" << ptr->GetPrefixLength( ) << std::endl;;
   }
 #endif
 }
@@ -265,8 +250,8 @@ bool Network::OnAddressList( const IpAddresses_t &addrList_,
   for ( IpAddresses_t::const_iterator itr = addrList_.begin( );
         itr != addrList_.end( ); ++itr )
   {
-    const AddrInfo *ptr = &( *itr );
-    std::string address = ptr->GetAddr( );
+    const IpAddress *ptr = &( *itr );
+    std::string address = ptr->GetAddress( );
     if ( incomingAddr == address )
     {
       return true; // Yes, this is one of my addresses.
@@ -348,44 +333,8 @@ std::string Network::GetNextInterface( )
 
 void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_, int prefixLen_ )
 {
-  addrinfo *ai = NULL;
-
-  int e = getaddrinfo( addr_, NULL, NULL, &ai );
-  if ( e != 0 )
-  {
-    // FIXME - Add error checking.
-    return; // Error.
-  }
-
-  if ( ai )
-  {
-    AddrInfo info( *ai, prefixLen_ );
-
-    AddAddress( addrList_, info );
-
-    freeaddrinfo( ai );
-  }
-}
-
-
-void Network::AddAddress( IpAddresses_t &addrList_, const AddrInfo &info_ )
-{
-  bool found = false;
-  for ( IpAddresses_t::iterator itr = addrList_.begin( );
-        itr != addrList_.end( ); ++itr )
-  {
-    if ( itr->GetAiAddrLen( ) == info_.GetAiAddrLen( ) &&
-         memcmp( itr->GetAiAddr( ), info_.GetAiAddr( ), itr->GetAiAddrLen( ) ) == 0 )
-    {
-      found = true;
-      break;
-    } 
-  }
-
-  if ( !found )
-  {
-    addrList_.push_back( info_ );
-  }
+  IpAddress addr( addr_, prefixLen_ );
+  addrList_.push_back( addr );
 }
 
 
