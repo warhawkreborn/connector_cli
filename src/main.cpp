@@ -187,13 +187,6 @@ int main( int argc_, const char **argv_ )
     // publishes the list of available public servers.
     SearchServer searchServer( &packetServer );
 
-    std::thread searchServerThread( [&] ( )
-    {
-      std::cout << "Starting Search Server..." << std::endl;
-      searchServer.run( );
-      std::cout << "SearchServer thread ended." << std::endl;
-    } );
-
     // The RequestServer periodically queries the remote WarHawk Server List Server
     // and puts the resuling list of servers into the forwardServer and searchServer.
     RequestServer requestServer( forwardServer, packetServer, searchServer );
@@ -208,7 +201,6 @@ int main( int argc_, const char **argv_ )
     HttpServer httpServer( port, root, forwardServer );
     httpServer.run( );
 
-    searchServerThread.join( );
     requestServerThread.join( );
   }
   catch ( const std::exception e_ )

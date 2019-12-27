@@ -64,4 +64,7 @@ class SearchServer : public MessageHandler
     using PacketList = std::list< PacketData >;
 
     PacketList m_PacketList;
+
+    // Make sure this is always last so that the thread destructs (joins) first.
+    std::thread m_Thread;
 };

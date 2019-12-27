@@ -11,6 +11,8 @@ SearchServer::SearchServer( Server *server_ )
   , m_entries( )
   , m_server( server_ )
   , m_CurrentState( STATE::STATE_BROADCASTING )
+  , m_Thread( [&] ( ) { run( ); } )
+
 {
   m_server->Register( this );
 }
@@ -24,6 +26,8 @@ SearchServer::~SearchServer( )
 
 void SearchServer::run( )
 {
+  std::cout << "Starting Search Server..." << std::endl;
+
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
   clientAddr.PortToSockAddr( m_server->GetServer( ).GetPort( ), (sockaddr *) clientAddr.GetAiAddr( ) );
@@ -133,6 +137,8 @@ void SearchServer::run( )
         break;
     }
   }
+
+  std::cout << "SearchServer thread ended." << std::endl;
 }
 
 
