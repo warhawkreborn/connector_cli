@@ -8,6 +8,7 @@
 //
 
 #include <iostream>
+#include <functional>
 #include <list>
 #include <vector>
 
@@ -16,11 +17,46 @@
 #include "udp_server.h"
 #include "server.h"
 #include "server_entry.h"
+#include "warhawk_api.h"
 
 
 class SearchServer : public MessageHandler
 {
   public:
+
+    //
+    // Declarations
+    //
+
+    typedef struct PacketData
+    {
+      PacketData::PacketData( const std::string &address_, const warhawk::DiscoveryPacket &data_ )
+        : m_address( address_ ), m_data( data_ )
+      {
+      }
+
+      std::string m_address;
+      warhawk::DiscoveryPacket m_data;
+    } PacketData;
+
+    using PacketList = std::list< PacketData >;
+
+    typedef struct LocalServerData
+    {
+      LocalServerData( const PacketData &data_, const warhawk::API::ForwardingResponse &response_ )
+        : m_PacketData( data_ ), m_Response( response_ )
+      {
+      }
+
+      PacketData m_PacketData;
+      warhawk::API::ForwardingResponse m_Response;
+    } LocalServerData;
+
+    using LocalServerList = std::vector< LocalServerData >;
+
+    //
+    // Methods
+    //
 
     SearchServer( Server * );
     ~SearchServer( );
@@ -31,9 +67,21 @@ class SearchServer : public MessageHandler
 
     void SetEntries( std::vector< ServerEntry > e_ );
 
+    void ForEachServer( std::function< void ( const LocalServerData & ) > );
+
   protected:
 
   private:
+
+    //
+    // Methods
+    //
+
+    void ForEachServerNoLock( std::function< void( const LocalServerData & ) > );
+
+    //
+    // Data
+    //
 
     const std::string m_DiscoveryPacket =
       "c381b800001900b6018094004654000005000000010000000000020307000000c0a814ac000000002d27000000000000010000005761726861"
@@ -55,15 +103,10 @@ class SearchServer : public MessageHandler
 
     STATE m_CurrentState;
 
-    struct PacketData
-    {
-      std::string              m_address;
-      warhawk::DiscoveryPacket m_data;
-    };
-
-    using PacketList = std::list< PacketData >;
 
     PacketList  m_PacketList;
+
+    LocalServerList m_LocalServers;
 
     bool        m_Done = false;
 

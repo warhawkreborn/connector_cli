@@ -17,35 +17,35 @@ class DiscoveryPacket
 
     DiscoveryPacket( std::vector< uint8_t > data );
 
-    std::string GetName( );
+    std::string GetName( ) const;
 
-    std::string GetGameMode( );
+    std::string GetGameMode( ) const;
 
-    std::string GetMap( );
+    std::string GetMap( ) const;
 
-    std::string GetMapName( );
+    std::string GetMapName( ) const;
 
-    int GetMapSize( );
+    int GetMapSize( ) const;
 
-    int GetMaxPlayers( );
+    int GetMaxPlayers( ) const;
 
-    int GetCurrentPlayers( );
+    int GetCurrentPlayers( ) const;
 
-    int GetMinPlayers( );
+    int GetMinPlayers( ) const;
 
-    int GetTimeElapsed( );
+    int GetTimeElapsed( ) const;
 
-    int GetTimeLimit( );
+    int GetTimeLimit( ) const;
 
-    int GetStartWaitTime( );
+    int GetStartWaitTime( ) const;
 
-    int GetSpawnWaitTime( );
+    int GetSpawnWaitTime( ) const;
 
-    int GetRoundsPlayed( );
+    int GetRoundsPlayed( ) const;
 
-    int GetPointLimit( );
+    int GetPointLimit( ) const;
 
-    int GetCurrentPoints( );
+    int GetCurrentPoints( ) const;
 
     void setPort( int i );
 

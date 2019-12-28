@@ -193,7 +193,7 @@ int main( int argc_, const char **argv_ )
 
 #ifndef TEST_SHUTDOWN
     // Run the HTTP server in the main thread.
-    HttpServer httpServer( port, root, forwardServer );
+    HttpServer httpServer( port, root, forwardServer, searchServer );
     httpServer.run( );
 #endif
 

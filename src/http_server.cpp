@@ -35,12 +35,17 @@
 
 #include "forward_server.h"
 #include "http_server.h"
+#include "search_server.h"
 
 
-HttpServer::HttpServer( const int port_, const std::string rootDirectory_, ForwardServer &forwardServer_ )
+HttpServer::HttpServer( const int port_,
+                        const std::string rootDirectory_,
+                        ForwardServer &forwardServer_,
+                        SearchServer  &searchServer_ )
   : m_Port( port_ )
   , m_RootDirectory( rootDirectory_ )
   , m_ForwardServer( forwardServer_ )
+  , m_SearchServer(  searchServer_  )
 {
 }
 
@@ -155,21 +160,65 @@ std::string HttpServer::OnGetApiServers( )
 
   html << "<p>" << std::endl;
 
-  html << "<h1 style='color: #00ff00;'>Servers</h1>" << std::endl;
+  html << "<h1 style='color: #00ff00;'>Remote Servers</h1>" << std::endl;
+
+  html << "</p>" << std::endl;
+
+  html << "<table>" << std::endl;
+  html << "  <tr>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Name</th>" << std::endl;  
+  html << "    <th style='color: #00ff00;'>Last Ping</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>IP Address</th>" << std::endl;
+  html << "  </tr>" << std::endl;
+
+  m_ForwardServer.ForEachServer( [&html]( auto entry_ ) {
+    html << "  <tr>" << std::endl;
+    html << "    <td style='color: #00ff00;'>" << entry_.m_name << "</td>"    << std::endl;
+    html << "    <td style='color: #00ff00;'>" << entry_.m_ping << " ms</td>" << std::endl;
+    html << "    <td style='color: #00ff00;'>" << entry_.m_ip   << "</td>"    << std::endl;
+    html << "  </tr>" << std::endl;
+  } );
+
+  html << "</table>" << std::endl;
+
+  html << "<p>" << std::endl;
+
+  html << "<h1 style='color: #00ff00;'>Local Servers</h1>" << std::endl;
 
   html << "</p>" << std::endl;
 
   html << "<table>" << std::endl;
   html << "  <tr>" << std::endl;
   html << "    <th style='color: #00ff00;'>Name</th>" << std::endl;
-  html << "    <th style='color: #00ff00;'>IP Address</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Public IP Address</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Private IP Address</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Info</th>" << std::endl;
   html << "  </tr>" << std::endl;
 
-  m_ForwardServer.ForEachServer( [&html]( auto entry_ ) {
+  m_SearchServer.ForEachServer( [ &, this ] ( const SearchServer::LocalServerData &data_ )
+  {
+#ifdef OLD
+    "State = '" << response.m_state << "', "
+                << "Public server IP = '" << response.m_ip << "', "
+                << "Local  server IP = '" << data.m_address << "', "
+                << "Name = '" << data.m_data.GetName() << "', "
+                << "MapName = '" << data.m_data.GetMapName() << "', "
+                << "GameMode = '" << data.m_data.GetGameMode() << "'" << std::endl;
+#endif
     html << "  <tr>" << std::endl;
-    html << "    <td style='color: #00ff00;'>" << entry_.m_name << "</td>" << std::endl;
-    html << "    <td style='color: #00ff00;'>" << entry_.m_ip << "</td>" << std::endl;
-    html << "  </tr>" << std::endl;
+    html << "    <td style='color: #00ff00;'><center>" << data_.m_PacketData.m_data.GetName( ) << "</center></td>" << std::endl;
+    html << "    <td style='color: #00ff00;'><center>" << data_.m_Response.m_ip                << "</center></td>" << std::endl;
+    html << "    <td style='color: #00ff00;'><center>" << data_.m_PacketData.m_address         << "</center></td>" << std::endl;
+    html << "    <td style='color: #00ff00;'>";
+      html << "Mode: "            << data_.m_PacketData.m_data.GetGameMode(       ) << "<br/>";
+      html << "Map: "             << data_.m_PacketData.m_data.GetMapName(        ) << "<br/>";
+      html << "Current Players: " << data_.m_PacketData.m_data.GetCurrentPlayers( ) << "<br/>";
+      html << "Maximum Players: " << data_.m_PacketData.m_data.GetMaxPlayers(     ) << "<br/>";
+      html << "Time Elapsed: "    << data_.m_PacketData.m_data.GetTimeElapsed(    ) << "<br/>";
+      html << "Time Limit:   "    << data_.m_PacketData.m_data.GetTimeLimit(      ) << "<br/>";
+      html << "Rounds Played: "   << data_.m_PacketData.m_data.GetRoundsPlayed(   ) << "<br/>";
+      html << "</td>" << std::endl;
+    html << "  </tr>" << std::endl;  
   } );
 
   html << "</table>" << std::endl;

@@ -119,7 +119,9 @@ API::ForwardingResponse API::CheckForwarding( )
 
 std::string API::AddHost( std::string hostname_, std::string uniqueId_, bool persistent_ )
 {
+#ifdef LOGDATA
   std::cout << "AddHost: Name = " << hostname_ << ", uniqueId = " << uniqueId_ << ", persistent = " << persistent_ << std::endl;
+#endif
 
   picojson::object jsonObject;
   jsonObject[ "hostname"   ] = picojson::value( std::string( hostname_ ) );

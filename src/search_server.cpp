@@ -51,7 +51,9 @@ void SearchServer::run( )
 
       case STATE::STATE_BROADCASTING:
       {
+#ifdef LOGDATA
         std::cout << "SearchServer: Broadcasting - Searching for new servers to publish." << std::endl;
+#endif
 
         try
         {
@@ -79,7 +81,9 @@ void SearchServer::run( )
 
       case STATE::STATE_PROCESSING:
 
+#ifdef LOGDATA
         std::cout << "SearchServer: Processing any collected packets." << std::endl;
+#endif
 
         // Now do something with any packets collected.
         {
@@ -87,7 +91,9 @@ void SearchServer::run( )
 
           if ( m_PacketList.size( ) != 0 )
           {
+#ifdef LOGDATA
             std::cout << "SearchServer: Processing " << m_PacketList.size( ) << " packets." << std::endl;
+#endif
 
             warhawk::API::ForwardingResponse response;
 
@@ -106,9 +112,9 @@ void SearchServer::run( )
               m_PacketList.clear( );
             }
 
-            for ( auto & entry : m_entries )
+            for ( auto & entry : m_LocalServers )
             {
-              if ( entry.m_ip == response.m_ip)
+              if ( entry.m_Response.m_ip == response.m_ip)
               {
                 // Skipping AddHost as it already exists
                 m_PacketList.clear( );
@@ -119,6 +125,7 @@ void SearchServer::run( )
             for ( PacketList::iterator itr = m_PacketList.begin( ); itr != m_PacketList.end( ); )
             {
               PacketData &data = *itr;
+#ifdef LOGDATA
               std::cout << "SearchServer: " <<
                 "State = '"            << response.m_state           << "', " <<
                 "Public server IP = '" << response.m_ip              << "', " <<
@@ -126,8 +133,13 @@ void SearchServer::run( )
                 "Name = '"             << data.m_data.GetName( )     << "', " <<
                 "MapName = '"          << data.m_data.GetMapName( )  << "', " <<
                 "GameMode = '"         << data.m_data.GetGameMode( ) << "'"   <<std::endl;
+#endif
 
-              auto response = warhawk::API::AddHost( data.m_data.GetName( ), "", false );
+              auto addHostResponse = warhawk::API::AddHost( data.m_data.GetName( ), "", false );
+
+              LocalServerData lsdata( data, response );
+
+              m_LocalServers.push_back( lsdata );
 
               itr = m_PacketList.erase( itr );
             }
@@ -148,7 +160,9 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
 {
   if ( m_CurrentState == STATE::STATE_COLLECTING )
   {
+#ifdef LOGDATA
     std::cout << "SearchServer: Collecting - Received packet." << std::endl;
+#endif
 
     std::string addr = AddrInfo::SockAddrToAddress( (sockaddr *) &client_ );
     PacketData data { addr, data_ };
@@ -162,4 +176,21 @@ void SearchServer::SetEntries( std::vector< ServerEntry > e_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   m_entries = std::move( e_ );
+}
+
+
+void SearchServer::ForEachServer( std::function< void( const LocalServerData & ) > func_ )
+{
+  std::unique_lock< std::mutex > lck( m_mutex );
+
+  ForEachServerNoLock( func_ );
+}
+
+
+void SearchServer::ForEachServerNoLock( std::function< void( const LocalServerData & ) > func_ )
+{
+  for ( const auto &entry : m_LocalServers )
+  {
+    func_( entry );
+  }
 }

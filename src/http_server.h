@@ -7,13 +7,17 @@
 #include <string>
 
 class ForwardServer;
+class SearchServer;
 
 
 class HttpServer
 {
   public:
 
-    HttpServer( const int port, const std::string rootDirectory_, ForwardServer & );
+    HttpServer( const int port,
+                const std::string rootDirectory_,
+                ForwardServer &,
+                SearchServer & );
     ~HttpServer( );
 
     void run( );
@@ -36,4 +40,5 @@ class HttpServer
     int            m_Port = 8080;
     std::string    m_RootDirectory;
     ForwardServer &m_ForwardServer;
+    SearchServer  &m_SearchServer;
 };

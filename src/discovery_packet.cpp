@@ -11,7 +11,7 @@ DiscoveryPacket::DiscoveryPacket( std::vector< uint8_t > data_ )
 {
 }
 
-std::string DiscoveryPacket::GetName( )
+std::string DiscoveryPacket::GetName( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -33,7 +33,7 @@ std::string DiscoveryPacket::GetName( )
 }
 
 
-std::string DiscoveryPacket::GetGameMode( )
+std::string DiscoveryPacket::GetGameMode( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -52,7 +52,7 @@ std::string DiscoveryPacket::GetGameMode( )
   }
 }
 
-std::string DiscoveryPacket::GetMap( )
+std::string DiscoveryPacket::GetMap( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -74,7 +74,7 @@ std::string DiscoveryPacket::GetMap( )
 }
 
 
-std::string DiscoveryPacket::GetMapName( )
+std::string DiscoveryPacket::GetMapName( ) const
 {
   std::string map = GetMap( );
 
@@ -89,7 +89,7 @@ std::string DiscoveryPacket::GetMapName( )
   return "Unknown";
 }
 
-int DiscoveryPacket::GetMapSize( )
+int DiscoveryPacket::GetMapSize( ) const
 {
   int i = 0;
   int start = -1;
@@ -112,7 +112,7 @@ int DiscoveryPacket::GetMapSize( )
 }
 
 
-int DiscoveryPacket::GetMaxPlayers( )
+int DiscoveryPacket::GetMaxPlayers( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -122,7 +122,7 @@ int DiscoveryPacket::GetMaxPlayers( )
   return m_data[ 239 ];
 }
 
-int DiscoveryPacket::GetCurrentPlayers( )
+int DiscoveryPacket::GetCurrentPlayers( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -133,7 +133,7 @@ int DiscoveryPacket::GetCurrentPlayers( )
 }
 
 
-int DiscoveryPacket::GetMinPlayers( )
+int DiscoveryPacket::GetMinPlayers( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -144,7 +144,7 @@ int DiscoveryPacket::GetMinPlayers( )
 }
 
 
-int DiscoveryPacket::GetTimeElapsed( )
+int DiscoveryPacket::GetTimeElapsed( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -155,7 +155,7 @@ int DiscoveryPacket::GetTimeElapsed( )
 }
 
 
-int DiscoveryPacket::GetTimeLimit( )
+int DiscoveryPacket::GetTimeLimit( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -166,7 +166,7 @@ int DiscoveryPacket::GetTimeLimit( )
 }
 
 
-int DiscoveryPacket::GetStartWaitTime( )
+int DiscoveryPacket::GetStartWaitTime( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -177,7 +177,7 @@ int DiscoveryPacket::GetStartWaitTime( )
 }
 
 
-int DiscoveryPacket::GetSpawnWaitTime( )
+int DiscoveryPacket::GetSpawnWaitTime( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -188,7 +188,7 @@ int DiscoveryPacket::GetSpawnWaitTime( )
 }
 
 
-int DiscoveryPacket::GetRoundsPlayed( )
+int DiscoveryPacket::GetRoundsPlayed( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -199,7 +199,7 @@ int DiscoveryPacket::GetRoundsPlayed( )
 }
 
 
-int DiscoveryPacket::GetPointLimit( )
+int DiscoveryPacket::GetPointLimit( ) const
 {
   if ( m_data.size( ) == 0 )
   {
@@ -210,7 +210,7 @@ int DiscoveryPacket::GetPointLimit( )
 }
 
 
-int DiscoveryPacket::GetCurrentPoints( )
+int DiscoveryPacket::GetCurrentPoints( ) const
 {
   if ( m_data.size( ) == 0 )
   {

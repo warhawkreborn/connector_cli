@@ -36,7 +36,10 @@ void RequestServer::run( )
   // public servers and updates that list into the SearchServer and ForwardServer.
   while ( !m_Done )
   {
+#ifdef LOGDATA
     std::cout << "RequestServer: Updating server list" << std::endl;
+#endif
+
     std::vector< ServerEntry > list;
     try
     {
@@ -53,6 +56,7 @@ void RequestServer::run( )
       m_ForwardServer.SetEntries( list );
       m_SearchServer.SetEntries( list );
 
+#ifdef LOGDATA
       std::cout << "RequestServer: " << list.size() << " servers found" << std::endl;
 
       // Print out the list.
@@ -60,6 +64,7 @@ void RequestServer::run( )
       {
         std::cout << "RequestServer: " << e.m_name << " " << e.m_ping << "ms" << std::endl;
       }
+#endif
     }
 
     std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
