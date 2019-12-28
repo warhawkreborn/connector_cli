@@ -30,7 +30,7 @@ class SearchServer : public MessageHandler
 
     typedef struct PacketData
     {
-      PacketData::PacketData( const std::string &address_, const warhawk::DiscoveryPacket &data_ )
+      PacketData( const std::string &address_, const warhawk::DiscoveryPacket &data_ )
         : m_address( address_ ), m_data( data_ )
       {
       }
