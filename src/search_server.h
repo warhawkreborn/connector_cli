@@ -44,11 +44,12 @@ class SearchServer : public MessageHandler
     typedef struct LocalServerData
     {
       LocalServerData( const PacketData &data_, const warhawk::API::ForwardingResponse &response_ )
-        : m_PacketData( data_ ), m_Response( response_ )
+        : m_PacketData( data_ )
+        , m_Response( response_ )
       {
       }
 
-      PacketData m_PacketData;
+      PacketData                       m_PacketData;
       warhawk::API::ForwardingResponse m_Response;
     } LocalServerData;
 
@@ -76,6 +77,11 @@ class SearchServer : public MessageHandler
     //
     // Methods
     //
+
+    void DoStateWaiting( );
+    void DoStateBroadcasting( );
+    void DoStateCollecting( );
+    void DoStateProcessing( );
 
     void ForEachServerNoLock( std::function< void( const LocalServerData & ) > );
 
