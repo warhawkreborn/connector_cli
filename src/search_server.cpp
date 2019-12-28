@@ -6,21 +6,21 @@
 #include "warhawk_api.h"
 
 
-SearchServer::SearchServer( Server *server_ )
+SearchServer::SearchServer( PacketServer *packetServer_ )
   : m_mutex( )
   , m_entries( )
-  , m_server( server_ )
+  , m_PacketServer( packetServer_ )
   , m_CurrentState( STATE::STATE_BROADCASTING )
   , m_Thread( [&] ( ) { run( ); } )
 
 {
-  m_server->Register( this );
+  m_PacketServer->Register( this );
 }
 
 
 SearchServer::~SearchServer( )
 {
-  m_server->Unregister( this );
+  m_PacketServer->Unregister( this );
   m_Done = true;
   m_Thread.join( );
 }
@@ -117,15 +117,15 @@ void SearchServer::DoStateBroadcasting( )
 
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
-  clientAddr.PortToSockAddr( m_server->GetServer().GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  clientAddr.PortToSockAddr( m_PacketServer->GetServer().GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
 
-  const std::vector< uint8_t > discoveryPacketData = m_server->hex2bin( m_DiscoveryPacket );
+  const std::vector< uint8_t > discoveryPacketData = m_PacketServer->hex2bin( m_DiscoveryPacket );
 
   try
   {
     // Broadcast Server Discovery Packet
     const bool broadcast = true;
-    m_server->send( *clientAddr.GetAiAddr(), discoveryPacketData, broadcast );
+    m_PacketServer->send( *clientAddr.GetAiAddr(), discoveryPacketData, broadcast );
   }
   catch ( const std::exception &e_ )
   {

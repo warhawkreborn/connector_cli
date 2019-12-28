@@ -14,9 +14,9 @@
 
 #include "discovery_packet.h"
 #include "message_handler.h"
-#include "udp_server.h"
-#include "server.h"
+#include "packet_server.h"
 #include "server_list.h"
+#include "udp_server.h"
 #include "warhawk_api.h"
 
 
@@ -59,7 +59,7 @@ class SearchServer : public MessageHandler
     // Methods
     //
 
-    SearchServer( Server * );
+    SearchServer( PacketServer * );
     ~SearchServer( );
 
     void run( );
@@ -99,7 +99,7 @@ class SearchServer : public MessageHandler
 
     std::mutex                  m_mutex;
     std::vector< ServerEntry >  m_entries;
-    Server                     *m_server = nullptr;
+    PacketServer               *m_PacketServer = nullptr;
 
     enum class STATE
     {

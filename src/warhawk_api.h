@@ -22,7 +22,7 @@ class API
 {
   public:
 
-    static std::vector< ServerEntry > DownloadServerList( Server * );
+    static std::vector< ServerEntry > DownloadServerList( PacketServer * );
 
     struct ForwardingResponse
     {

@@ -1,6 +1,6 @@
 #include "udp_server.h"
 #include "picojson.h"
-#include "server.h"
+#include "packet_server.h"
 #include "server_list.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
@@ -10,7 +10,7 @@
 namespace warhawk
 {
 
-std::vector< ServerEntry > API::DownloadServerList( Server *server_ )
+std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
 {
   auto req = warhawk::common::request::default_get( WARHAWK_API_BASE + "server/" );
   warhawk::common::webclient client;

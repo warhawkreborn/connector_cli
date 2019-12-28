@@ -2,19 +2,19 @@
 #include "search_server.h"
 
 
-ForwardServer::ForwardServer( Server *server_, SearchServer &searchServer_ )
+ForwardServer::ForwardServer( PacketServer *server_, SearchServer &searchServer_ )
   : m_mutex( )
   , m_entries( )
-  , m_server( server_ )
+  , m_PacketServer( server_ )
   , m_SearchServer( searchServer_ )
 {
-  m_server->Register( this );
+  m_PacketServer->Register( this );
 }
 
 
 ForwardServer::~ForwardServer( )
 {
-  m_server->Unregister( this );
+  m_PacketServer->Unregister( this );
 }
 
 
@@ -58,11 +58,9 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
     std::cout << "ForwardServer: Sending server list" << std::endl;
 #endif
 
-    Server *server = m_server;
-
-    ForEachServer( [ server, client_ ] ( auto e )
+    ForEachServer( [ this, client_ ] ( auto e )
     {
-      server->send( client_, e.m_frame );
+      m_PacketServer->send( client_, e.m_frame );
     } );
   }
   else

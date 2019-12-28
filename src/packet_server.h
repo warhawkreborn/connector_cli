@@ -17,12 +17,12 @@
 class MessageHandler;
 
 
-class Server
+class PacketServer
 {
   public:
 
-    Server( warhawk::net::udp_server &udpServer_ );
-    virtual ~Server();
+    PacketServer( warhawk::net::udp_server &udpServer_ );
+    virtual ~PacketServer( );
 
     // Run the Server process.
     void run( );

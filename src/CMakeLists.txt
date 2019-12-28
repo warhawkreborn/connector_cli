@@ -86,9 +86,9 @@ set( SOURCE_FILES
      ip_address.cpp
      main.cpp
      network.cpp
+     packet_server.cpp
      request_server.cpp
      search_server.cpp
-     server.cpp
      server_list.cpp
      udp_server.cpp
      warhawk_api.cpp
@@ -106,10 +106,10 @@ set( INCLUDE_FILES
      ip_address.h
      message_handler.h
      network.h
+     packet_server.h
      picojson.h
      request_server.h
      search_server.h
-     server.h
      server_list.h
      udp_server.h
      uwebsockets_async_file_reader.h

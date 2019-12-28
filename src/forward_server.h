@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include "message_handler.h"
-#include "udp_server.h"
-#include "server.h"
+#include "packet_server.h"
 #include "server_list.h"
+#include "udp_server.h"
 
 class SearchServer;
 
@@ -20,7 +20,7 @@ class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( Server *, SearchServer & );
+    ForwardServer( PacketServer *, SearchServer & );
     ~ForwardServer( );
  
     void SetEntries( std::vector< ServerEntry > );
@@ -45,6 +45,6 @@ class ForwardServer : public MessageHandler
 
     std::mutex                  m_mutex;
     std::vector< ServerEntry >  m_entries;
-    Server                     *m_server = nullptr;
+    PacketServer               *m_PacketServer = nullptr;
     SearchServer               &m_SearchServer;
 };

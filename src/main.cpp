@@ -182,7 +182,7 @@ int main( int argc_, const char **argv_ )
 
     // The Packet server watches for packets and distributes them to the
     // clients that register with it.
-    Server packetServer( udpServer );
+    PacketServer packetServer( udpServer );
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then sent on to the remote server that

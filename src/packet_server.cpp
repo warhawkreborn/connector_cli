@@ -1,8 +1,8 @@
 #include "addr_info.h"
-#include "server.h"
+#include "packet_server.h"
 
 
-Server::Server( warhawk::net::udp_server &udpServer_ )
+PacketServer::PacketServer( warhawk::net::udp_server &udpServer_ )
   : m_server( udpServer_ )
   , m_mutex( )
   , m_MessageHandlers( )
@@ -10,7 +10,7 @@ Server::Server( warhawk::net::udp_server &udpServer_ )
 {
 }
 
-Server::~Server( )
+PacketServer::~PacketServer()
 {
   m_Done = true;
 
@@ -26,7 +26,7 @@ Server::~Server( )
 }
 
 
-void Server::run( )
+void PacketServer::run()
 {
   std::cout << "Starting Packet Server..." << std::endl;
 
@@ -49,19 +49,19 @@ void Server::run( )
   std::cout << "Stopping Packet Server." << std::endl;
 }
 
-void Server::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
+void PacketServer::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
   m_server.send( clientaddr_, data_, broadcast_ );
 }
 
 
-bool Server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
+bool PacketServer::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
   return m_server.receive( clientaddr_, data_ );
 }
 
 
-bool Server::valid_packet( const std::vector< uint8_t > &data_ )
+bool PacketServer::valid_packet( const std::vector< uint8_t > &data_ )
 {
   if ( data_.size() < 4 )
   {
@@ -80,20 +80,20 @@ bool Server::valid_packet( const std::vector< uint8_t > &data_ )
 }
 
 
-warhawk::net::udp_server &Server::GetServer( )
+warhawk::net::udp_server &PacketServer::GetServer()
 {
   return m_server;
 }
 
 
-void Server::Register( MessageHandler *handler_ )
+void PacketServer::Register( MessageHandler *handler_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   m_MessageHandlers[ handler_ ] = handler_;
 }
 
 
-void Server::Unregister( MessageHandler *handler_ )
+void PacketServer::Unregister( MessageHandler *handler_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   MessageHandlers::iterator itr = m_MessageHandlers.find( handler_ );
@@ -104,7 +104,7 @@ void Server::Unregister( MessageHandler *handler_ )
   }
 }
 
-std::vector< uint8_t > Server::hex2bin( const std::string &str_ )
+std::vector< uint8_t > PacketServer::hex2bin( const std::string &str_ )
 {
   if ( str_.size() % 2 )
   {

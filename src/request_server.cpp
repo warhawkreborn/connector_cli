@@ -4,14 +4,14 @@
 #include <vector>
 
 #include "forward_server.h"
+#include "packet_server.h"
 #include "request_server.h"
 #include "search_server.h"
-#include "server.h"
 #include "server_list.h"
 #include "warhawk_api.h"
 
 
-RequestServer::RequestServer( ForwardServer &forwardServer_, Server &packetServer_, SearchServer &searchServer_ )
+RequestServer::RequestServer( ForwardServer &forwardServer_, PacketServer &packetServer_, SearchServer &searchServer_ )
   : m_ForwardServer( forwardServer_ )
   , m_PacketServer(  packetServer_  )
   , m_SearchServer(  searchServer_  )
