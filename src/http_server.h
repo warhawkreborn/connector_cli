@@ -31,7 +31,7 @@ class HttpServer
     //
 
     void OnListen( );
-    std::string OnGetApiServers( );
+    std::string OnGetMainPage( );
 
     //
     // Data

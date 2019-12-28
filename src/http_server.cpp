@@ -37,6 +37,8 @@
 #include "http_server.h"
 #include "search_server.h"
 
+extern std::string VersionString( );
+
 
 HttpServer::HttpServer( const int port_,
                         const std::string rootDirectory_,
@@ -82,9 +84,9 @@ void HttpServer::run( )
       {
         uWS::App( )
           // /api/servers endpoint.
-          .get( "/api/servers", [ this ] ( auto *res_, auto *req_ )
+          .get( "/", [ this ] ( auto *res_, auto *req_ )
           {
-            std::string html = OnGetApiServers( );
+            std::string html = OnGetMainPage( );
 
             res_->end( html );
           } )
@@ -144,13 +146,13 @@ void HttpServer::OnListen( )
 }
 
 
-std::string HttpServer::OnGetApiServers( )
+std::string HttpServer::OnGetMainPage( )
 {
   std::stringstream html;
 
   html << "<html>" << std::endl;
   html << "<head>" << std::endl;
-  html << "  <title>WarHawkReborn</title>" << std::endl;
+  html << "  <title>" << VersionString( ) << "</title>" << std::endl;
   html << "</head>" << std::endl;
   html << "<body bgcolor='#000000'>" << std::endl;
 
