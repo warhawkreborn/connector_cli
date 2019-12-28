@@ -29,10 +29,10 @@ namespace warhawk
 namespace net
 {
 
-udp_server::udp_server( uint16_t port_ )
+udp_server::udp_server( Network &network_, uint16_t port_ )
   : m_fd( 0 )
   , m_port( port_ )
-  , m_Network( nullptr )
+  , m_Network( network_ )
 {
   m_fd = socket( AF_INET, SOCK_DGRAM, 0 );
 
@@ -56,15 +56,11 @@ udp_server::udp_server( uint16_t port_ )
   {
     throw std::runtime_error( "ERROR on binding" );
   }
-
-  // Set up for determining if I'm receiving packets from myself.
-  m_Network = new Network;
 }
 
 
 udp_server::~udp_server( )
 {
-  delete m_Network;
 }
 
 
@@ -117,7 +113,7 @@ bool udp_server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > 
   }
 
   // Did this come from me?
-  if ( m_Network->OnAddressList( m_Network->GetMyIpAddresses( ), clientaddr_ ) )
+  if ( m_Network.OnAddressList( m_Network.GetMyIpAddresses( ), clientaddr_ ) )
   {
     // If yes, then return true but with a zero data length packet.
     n = 0;

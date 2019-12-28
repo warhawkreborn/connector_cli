@@ -36,7 +36,7 @@ class udp_server
 {
   public:
 
-    udp_server( uint16_t port ); // Bind a port to the socket.
+    udp_server( Network &, uint16_t port ); // Bind a port to the socket.
     ~udp_server( );
 
     udp_server( const udp_server & ) = delete;            // Don't allow copying of this class.
@@ -60,7 +60,7 @@ class udp_server
 
     SOCKET   m_fd;
     uint16_t m_port;
-    Network *m_Network;
+    Network &m_Network;
 };
 
 } // End namespace net

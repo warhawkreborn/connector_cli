@@ -45,6 +45,7 @@
 // WarHawkReborn includes
 #include "forward_server.h"
 #include "http_server.h"
+#include "network.h"
 #include "request_server.h"
 #include "search_server.h"
 #include "warhawk.h"
@@ -170,8 +171,10 @@ int main( int argc_, const char **argv_ )
 
   try
   {
+    Network network;
+
     // Set up to listen for UDP packets on standard WarHawk port.
-    warhawk::net::udp_server udpServer( WARHAWK_UDP_PORT );
+    warhawk::net::udp_server udpServer( network, WARHAWK_UDP_PORT );
 
     // The Packet server watches for packets and distributes them to the
     // clients that register with it.
