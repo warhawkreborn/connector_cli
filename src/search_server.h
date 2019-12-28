@@ -68,6 +68,8 @@ class SearchServer : public MessageHandler
 
     void SetEntries( std::vector< ServerEntry > e_ );
 
+    bool LocalServerContainsIp( const std::string &ip ); // True if the list contains this IP.
+
     void ForEachServer( std::function< void ( const LocalServerData & ) > );
 
   protected:

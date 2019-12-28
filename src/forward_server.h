@@ -13,12 +13,14 @@
 #include "server.h"
 #include "server_entry.h"
 
+class SearchServer;
+
 
 class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( Server * );
+    ForwardServer( Server *, SearchServer & );
     ~ForwardServer( );
  
     void SetEntries( std::vector< ServerEntry > );
@@ -43,5 +45,6 @@ class ForwardServer : public MessageHandler
 
     std::mutex                  m_mutex;
     std::vector< ServerEntry >  m_entries;
-    Server                     *m_server;
+    Server                     *m_server = nullptr;
+    SearchServer               &m_SearchServer;
 };

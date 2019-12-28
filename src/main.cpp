@@ -178,14 +178,14 @@ int main( int argc_, const char **argv_ )
     Server packetServer( udpServer );
 
 
-    // The ForwardServer watches for requests from the local network and
-    // responds with a list of remote servers.
-    ForwardServer forwardServer( &packetServer );
-
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then sent on to the remote server that
     // publishes the list of available public servers.
     SearchServer searchServer( &packetServer );
+
+    // The ForwardServer watches for requests from the local network and
+    // responds with a list of remote servers.
+    ForwardServer forwardServer( &packetServer, searchServer );
 
     // The RequestServer periodically queries the remote WarHawk Server List Server
     // and puts the resuling list of servers into the forwardServer and searchServer.

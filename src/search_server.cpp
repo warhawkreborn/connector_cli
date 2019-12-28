@@ -217,3 +217,18 @@ void SearchServer::DoStateProcessing( )
 
   m_CurrentState = STATE::STATE_WAITING;
 }
+
+bool SearchServer::LocalServerContainsIp( const std::string &ip_ )
+{
+  bool found = false;
+
+  ForEachServer( [ & ] ( const LocalServerData &localData_ )
+  {
+    if ( ip_ == localData_.m_Response.m_ip )
+    {
+      found = true;
+    }
+  } );
+
+  return found;
+}

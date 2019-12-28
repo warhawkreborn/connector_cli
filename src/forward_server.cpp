@@ -1,9 +1,12 @@
 #include "forward_server.h"
+#include "search_server.h"
 
-ForwardServer::ForwardServer( Server *server_ )
+
+ForwardServer::ForwardServer( Server *server_, SearchServer &searchServer_ )
   : m_mutex( )
   , m_entries( )
   , m_server( server_ )
+  , m_SearchServer( searchServer_ )
 {
   m_server->Register( this );
 }
@@ -15,10 +18,19 @@ ForwardServer::~ForwardServer( )
 }
 
 
-void ForwardServer::SetEntries( std::vector< ServerEntry > e_ )
+void ForwardServer::SetEntries( std::vector< ServerEntry > serverEntries_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
-  m_entries = std::move( e_ );
+
+  m_entries.clear( );
+
+  for ( const auto &sourceEntry : serverEntries_ )
+  {
+    if ( !m_SearchServer.LocalServerContainsIp( sourceEntry.m_ip ) )
+    {
+      m_entries.push_back( sourceEntry );
+    }
+  }
 }
 
 
@@ -29,7 +41,10 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
     // This is not a request, but a response, so we exit early.
     return;
   }
+
+#ifdef LOGDATA
   std::cout << "ForwardServer: Received packet." << std::endl;
+#endif
 
   if ( !valid_packet( data_ ) )
   {
@@ -39,7 +54,9 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
 
   if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
   {
+#ifdef LOGDATA
     std::cout << "ForwardServer: Sending server list" << std::endl;
+#endif
 
     Server *server = m_server;
 
