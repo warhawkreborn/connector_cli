@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "server_entry.h"
+#include "server_list.h"
 
 class Server;
 

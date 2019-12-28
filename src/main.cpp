@@ -171,7 +171,11 @@ int main( int argc_, const char **argv_ )
 
   try
   {
+    // "Global" Network.
     Network network;
+
+    // "Global" Server List.
+    ServerList serverList;
 
     // Set up to listen for UDP packets on standard WarHawk port.
     warhawk::net::udp_server udpServer( network, WARHAWK_UDP_PORT );
@@ -179,7 +183,6 @@ int main( int argc_, const char **argv_ )
     // The Packet server watches for packets and distributes them to the
     // clients that register with it.
     Server packetServer( udpServer );
-
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then sent on to the remote server that

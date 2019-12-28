@@ -89,6 +89,7 @@ set( SOURCE_FILES
      request_server.cpp
      search_server.cpp
      server.cpp
+     server_list.cpp
      udp_server.cpp
      warhawk_api.cpp
      webclient.cpp
@@ -109,7 +110,7 @@ set( INCLUDE_FILES
      request_server.h
      search_server.h
      server.h
-     server_entry.h
+     server_list.h
      udp_server.h
      uwebsockets_async_file_reader.h
      uwebsockets_async_file_streamer.h

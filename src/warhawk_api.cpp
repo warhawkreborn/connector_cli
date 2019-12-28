@@ -1,7 +1,7 @@
 #include "udp_server.h"
 #include "picojson.h"
 #include "server.h"
-#include "server_entry.h"
+#include "server_list.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
 #include "webclient.h"

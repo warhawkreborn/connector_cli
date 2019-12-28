@@ -7,7 +7,7 @@
 #include "request_server.h"
 #include "search_server.h"
 #include "server.h"
-#include "server_entry.h"
+#include "server_list.h"
 #include "warhawk_api.h"
 
 
