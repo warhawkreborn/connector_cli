@@ -12,7 +12,10 @@
 
 #include "server_list.h"
 
+class PacketServer;
 class Server;
+
+struct ServerEntry;
 
 
 namespace warhawk

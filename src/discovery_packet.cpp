@@ -6,6 +6,11 @@
 namespace warhawk
 {
 
+DiscoveryPacket::DiscoveryPacket( )
+  : m_data( )
+{
+}
+
 DiscoveryPacket::DiscoveryPacket( std::vector< uint8_t > data_ )
   : m_data( data_ )
 {

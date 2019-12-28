@@ -8,7 +8,6 @@
 
 SearchServer::SearchServer( PacketServer *packetServer_ )
   : m_mutex( )
-  , m_entries( )
   , m_PacketServer( packetServer_ )
   , m_CurrentState( STATE::STATE_BROADCASTING )
   , m_Thread( [&] ( ) { run( ); } )
@@ -77,14 +76,8 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
   }
 }
 
-void SearchServer::SetEntries( std::vector< ServerEntry > e_ )
-{
-  std::unique_lock< std::mutex > lck( m_mutex );
-  m_entries = std::move( e_ );
-}
 
-
-void SearchServer::ForEachServer( std::function< void( const LocalServerData & ) > func_ )
+void SearchServer::ForEachServer( std::function< void( const ServerEntry & ) > func_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
 
@@ -92,7 +85,7 @@ void SearchServer::ForEachServer( std::function< void( const LocalServerData & )
 }
 
 
-void SearchServer::ForEachServerNoLock( std::function< void( const LocalServerData & ) > func_ )
+void SearchServer::ForEachServerNoLock( std::function< void( const ServerEntry & ) > func_ )
 {
   for ( const auto &entry : m_LocalServers )
   {
@@ -184,7 +177,7 @@ void SearchServer::DoStateProcessing( )
               << "GameMode = '"         << packetData.m_data.GetGameMode( ) << "'" << std::endl;
 #endif
 
-    LocalServerList::iterator litr = std::find_if( m_LocalServers.begin( ), m_LocalServers.end( ), [&] ( LocalServerData &entry_ )
+    LocalServerList::iterator litr = std::find_if( m_LocalServers.begin( ), m_LocalServers.end( ), [&] ( ServerEntry &entry_ )
     {
       // Return true if match.
       return entry_.m_Response.m_ip == response.m_ip;
@@ -203,7 +196,9 @@ void SearchServer::DoStateProcessing( )
       auto addHostResponse = warhawk::API::AddHost( packetData.m_data.GetName( ), "", false );
 
       // Add the host to our m_LocalServers.
-      LocalServerData lsdata( packetData, response );
+      ServerEntry lsdata;
+      lsdata.m_PacketData = packetData;
+      lsdata.m_Response   = response;
 
       m_LocalServers.push_back( lsdata );
     }
@@ -222,7 +217,7 @@ bool SearchServer::LocalServerContainsIp( const std::string &ip_ )
 {
   bool found = false;
 
-  ForEachServer( [ & ] ( const LocalServerData &localData_ )
+  ForEachServer( [ & ] ( const ServerEntry &localData_ )
   {
     if ( ip_ == localData_.m_Response.m_ip )
     {

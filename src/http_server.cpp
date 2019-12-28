@@ -197,7 +197,7 @@ std::string HttpServer::OnGetMainPage( )
   html << "    <th style='color: #00ff00;'>Info</th>" << std::endl;
   html << "  </tr>" << std::endl;
 
-  m_SearchServer.ForEachServer( [ &, this ] ( const SearchServer::LocalServerData &data_ )
+  m_SearchServer.ForEachServer( [ &, this ] ( const ServerEntry &data_ )
   {
 #ifdef OLD
     "State = '" << response.m_state << "', "

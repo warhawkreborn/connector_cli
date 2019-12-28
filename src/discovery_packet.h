@@ -1,3 +1,5 @@
+#pragma once
+
 //
 // The WarHawk DiscoveryPacket contains information about the current WarHawk server
 // including current map, number of players, and other information.
@@ -14,6 +16,8 @@ namespace warhawk
 class DiscoveryPacket
 {
   public:
+
+    DiscoveryPacket( );
 
     DiscoveryPacket( std::vector< uint8_t > data );
 

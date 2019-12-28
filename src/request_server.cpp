@@ -54,7 +54,6 @@ void RequestServer::run( )
     if ( list.size() > 0 )
     {
       m_ForwardServer.SetEntries( list );
-      m_SearchServer.SetEntries( list );
 
 #ifdef LOGDATA
       std::cout << "RequestServer: " << list.size() << " servers found" << std::endl;

@@ -28,32 +28,9 @@ class SearchServer : public MessageHandler
     // Declarations
     //
 
-    typedef struct PacketData
-    {
-      PacketData( const std::string &address_, const warhawk::DiscoveryPacket &data_ )
-        : m_address( address_ ), m_data( data_ )
-      {
-      }
-
-      std::string m_address;
-      warhawk::DiscoveryPacket m_data;
-    } PacketData;
-
     using PacketList = std::list< PacketData >;
 
-    typedef struct LocalServerData
-    {
-      LocalServerData( const PacketData &data_, const warhawk::API::ForwardingResponse &response_ )
-        : m_PacketData( data_ )
-        , m_Response( response_ )
-      {
-      }
-
-      PacketData                       m_PacketData;
-      warhawk::API::ForwardingResponse m_Response;
-    } LocalServerData;
-
-    using LocalServerList = std::vector< LocalServerData >;
+    using LocalServerList = std::vector< ServerEntry >;
 
     //
     // Methods
@@ -66,11 +43,9 @@ class SearchServer : public MessageHandler
 
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 
-    void SetEntries( std::vector< ServerEntry > e_ );
-
     bool LocalServerContainsIp( const std::string &ip ); // True if the list contains this IP.
 
-    void ForEachServer( std::function< void ( const LocalServerData & ) > );
+    void ForEachServer( std::function< void ( const ServerEntry & ) > );
 
   protected:
 
@@ -85,7 +60,7 @@ class SearchServer : public MessageHandler
     void DoStateCollecting( );
     void DoStateProcessing( );
 
-    void ForEachServerNoLock( std::function< void( const LocalServerData & ) > );
+    void ForEachServerNoLock( std::function< void( const ServerEntry & ) > );
 
     //
     // Data
@@ -98,7 +73,6 @@ class SearchServer : public MessageHandler
       "00000000004503d7e0000000000000005a";
 
     std::mutex                  m_mutex;
-    std::vector< ServerEntry >  m_entries;
     PacketServer               *m_PacketServer = nullptr;
 
     enum class STATE
