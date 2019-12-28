@@ -51,6 +51,10 @@ std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
       // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
       entry.m_ip = warhawk::net::udp_server::IpToString( ip );
 
+      // Set PublicIpResponse to help get around duplicate entries.
+      entry.m_PublicIpResponse.m_ip = entry.m_ip;
+      entry.m_PublicIpResponse.m_state = "FromRemote"; // Value not returned by CheckForwarding so it won't interfere.
+
       if ( entry.m_frame.size() < 4 || (entry.m_frame.size() - 4) < sizeof(warhawk::net::server_info_response) )
       {
         // Just to be safe....

@@ -11,12 +11,10 @@
 #include "warhawk_api.h"
 
 
-RequestServer::RequestServer( ForwardServer &forwardServer_, PacketServer &packetServer_, SearchServer &searchServer_ )
-  : m_ForwardServer( forwardServer_ )
+RequestServer::RequestServer( ServerList &serverList_, PacketServer &packetServer_ )
+  : m_ServerList( serverList_ )
   , m_PacketServer(  packetServer_  )
-  , m_SearchServer(  searchServer_  )
   , m_Thread( [&] ( ) { run( ); } )
-
 {
 }
 
@@ -53,7 +51,7 @@ void RequestServer::run( )
 
     if ( list.size() > 0 )
     {
-      m_ForwardServer.SetEntries( list );
+      m_ServerList.AddRemoteServerEntries( list );
 
 #ifdef LOGDATA
       std::cout << "RequestServer: " << list.size() << " servers found" << std::endl;

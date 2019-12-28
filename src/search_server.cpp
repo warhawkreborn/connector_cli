@@ -6,8 +6,9 @@
 #include "warhawk_api.h"
 
 
-SearchServer::SearchServer( PacketServer *packetServer_ )
-  : m_mutex( )
+SearchServer::SearchServer( ServerList &serverList_, PacketServer *packetServer_ )
+  : m_ServerList( serverList_ )
+  , m_mutex( )
   , m_PacketServer( packetServer_ )
   , m_CurrentState( STATE::STATE_BROADCASTING )
   , m_Thread( [&] ( ) { run( ); } )
@@ -77,23 +78,6 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
 }
 
 
-void SearchServer::ForEachServer( std::function< void( const ServerEntry & ) > func_ )
-{
-  std::unique_lock< std::mutex > lck( m_mutex );
-
-  ForEachServerNoLock( func_ );
-}
-
-
-void SearchServer::ForEachServerNoLock( std::function< void( const ServerEntry & ) > func_ )
-{
-  for ( const auto &entry : m_LocalServers )
-  {
-    func_( entry );
-  }
-}
-
-
 void SearchServer::DoStateWaiting( )
 {
   std::this_thread::sleep_for( std::chrono::seconds( 30 ) );
@@ -145,14 +129,14 @@ void SearchServer::DoStateProcessing( )
   std::cout << "SearchServer: Processing any collected packets." << std::endl;
 #endif
 
-  warhawk::API::ForwardingResponse response;
+  warhawk::API::ForwardingResponse publicIpResponse;
 
 #ifdef LOGDATA
   std::cout << "SearchServer: Processing " << m_PacketList.size() << " packets." << std::endl;
 #endif
   try
   {
-    response = warhawk::API::CheckForwarding();
+    publicIpResponse = warhawk::API::CheckForwarding();
   }
   catch ( const std::exception &e_ )
   {
@@ -177,16 +161,10 @@ void SearchServer::DoStateProcessing( )
               << "GameMode = '"         << packetData.m_data.GetGameMode( ) << "'" << std::endl;
 #endif
 
-    LocalServerList::iterator litr = std::find_if( m_LocalServers.begin( ), m_LocalServers.end( ), [&] ( ServerEntry &entry_ )
-    {
-      // Return true if match.
-      return entry_.m_Response.m_ip == response.m_ip;
-    } );
-    
-    if ( litr == m_LocalServers.end( ) )
+    if ( !m_ServerList.ContainsLocalServerWithIp( publicIpResponse.m_ip ) )
     {
       // If it is not on the list then check the status.
-      if ( response.m_state != "online" )
+      if ( publicIpResponse.m_state != "online" )
       {
         std::cout << "SearchServer: Server not online, check your port forwarding!" << std::endl;
         continue;
@@ -195,18 +173,23 @@ void SearchServer::DoStateProcessing( )
       // Add the host to the remote server.
       auto addHostResponse = warhawk::API::AddHost( packetData.m_data.GetName( ), "", false );
 
-      // Add the host to our m_LocalServers.
+      // Add the host to our list of Local Servers.
       ServerEntry lsdata;
-      lsdata.m_PacketData = packetData;
-      lsdata.m_Response   = response;
+      lsdata.m_PacketData        = packetData;
+      lsdata.m_PublicIpResponse  = publicIpResponse;
+      lsdata.m_LocalServer       = true;
 
-      m_LocalServers.push_back( lsdata );
+      m_ServerList.AddLocalServerEntry( publicIpResponse.m_ip, lsdata );
     }
     else
     {
-      // Update the information in the list from the packet.
-      litr->m_PacketData = packetData;
-      litr->m_Response   = response;
+      ServerEntry lsdata;
+      lsdata.m_PacketData       = packetData;
+      lsdata.m_PublicIpResponse = publicIpResponse;
+      lsdata.m_LocalServer      = true;
+
+      // Update the information from the packet into the local server list.
+      m_ServerList.UpdateLocalServerEntry( publicIpResponse.m_ip, lsdata );
     }
   }
 
@@ -217,12 +200,17 @@ bool SearchServer::LocalServerContainsIp( const std::string &ip_ )
 {
   bool found = false;
 
-  ForEachServer( [ & ] ( const ServerEntry &localData_ )
+  m_ServerList.ForEachServer( [ & ] ( const ServerEntry &localData_ )
   {
-    if ( ip_ == localData_.m_Response.m_ip )
+    bool continueOn = true;
+
+    if ( ip_ == localData_.m_PublicIpResponse.m_ip )
     {
       found = true;
+      continueOn = false;
     }
+
+    return continueOn;
   } );
 
   return found;

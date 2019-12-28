@@ -1,10 +1,11 @@
 #pragma once
 
 //
-// The SearchServer periodically broadcasts a request for local network servers.
+// The SearchServer periodically broadcasts a request for local network
+// servers.
 // Once it broadcasts, it listens for one second for any responses.
-// Any responses it gets are then sent on to the remote server list server to publish
-// as available public servers.
+// Any responses it gets are then marked as local servers and then sent on to
+// the remote server list server to publish as available public servers.
 //
 
 #include <iostream>
@@ -30,13 +31,11 @@ class SearchServer : public MessageHandler
 
     using PacketList = std::list< PacketData >;
 
-    using LocalServerList = std::vector< ServerEntry >;
-
     //
     // Methods
     //
 
-    SearchServer( PacketServer * );
+    SearchServer( ServerList &, PacketServer * );
     ~SearchServer( );
 
     void run( );
@@ -44,8 +43,6 @@ class SearchServer : public MessageHandler
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 
     bool LocalServerContainsIp( const std::string &ip ); // True if the list contains this IP.
-
-    void ForEachServer( std::function< void ( const ServerEntry & ) > );
 
   protected:
 
@@ -72,8 +69,10 @@ class SearchServer : public MessageHandler
       "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002801800ffffffff000000"
       "00000000004503d7e0000000000000005a";
 
-    std::mutex                  m_mutex;
-    PacketServer               *m_PacketServer = nullptr;
+    ServerList   &m_ServerList;
+
+    std::mutex    m_mutex; // Protects the m_PacketList.
+    PacketServer *m_PacketServer = nullptr;
 
     enum class STATE
     {
@@ -87,8 +86,6 @@ class SearchServer : public MessageHandler
 
 
     PacketList  m_PacketList;
-
-    LocalServerList m_LocalServers;
 
     bool        m_Done = false;
 

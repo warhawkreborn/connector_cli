@@ -13,7 +13,7 @@ class RequestServer
 {
   public:
 
-    RequestServer( ForwardServer &, PacketServer &, SearchServer & );
+    RequestServer( ServerList &, PacketServer & );
     ~RequestServer( );
 
     void run( );
@@ -22,9 +22,8 @@ class RequestServer
 
   private:
 
-    ForwardServer &m_ForwardServer;
+    ServerList    &m_ServerList;
     PacketServer  &m_PacketServer;
-    SearchServer  &m_SearchServer;
 
     bool           m_Done = false;
 

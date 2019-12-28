@@ -2,11 +2,9 @@
 #include "search_server.h"
 
 
-ForwardServer::ForwardServer( PacketServer *server_, SearchServer &searchServer_ )
-  : m_mutex( )
-  , m_entries( )
+ForwardServer::ForwardServer( ServerList &serverList_, PacketServer *server_ )
+  : m_ServerList( serverList_ )
   , m_PacketServer( server_ )
-  , m_SearchServer( searchServer_ )
 {
   m_PacketServer->Register( this );
 }
@@ -15,22 +13,6 @@ ForwardServer::ForwardServer( PacketServer *server_, SearchServer &searchServer_
 ForwardServer::~ForwardServer( )
 {
   m_PacketServer->Unregister( this );
-}
-
-
-void ForwardServer::SetEntries( std::vector< ServerEntry > serverEntries_ )
-{
-  std::unique_lock< std::mutex > lck( m_mutex );
-
-  m_entries.clear( );
-
-  for ( const auto &sourceEntry : serverEntries_ )
-  {
-    if ( !m_SearchServer.LocalServerContainsIp( sourceEntry.m_ip ) )
-    {
-      m_entries.push_back( sourceEntry );
-    }
-  }
 }
 
 
@@ -58,9 +40,15 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
     std::cout << "ForwardServer: Sending server list" << std::endl;
 #endif
 
-    ForEachServer( [ this, client_ ] ( auto e )
+    m_ServerList.ForEachServer( [ this, client_ ] ( const ServerEntry &entry_ )
     {
-      m_PacketServer->send( client_, e.m_frame );
+      if ( !entry_.m_LocalServer )
+      {
+        m_PacketServer->send( client_, entry_.m_frame );
+      }
+
+      const bool continueOn = true;
+      return continueOn;
     } );
   }
   else
@@ -69,16 +57,6 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
   }
 }
 
-
-void ForwardServer::ForEachServer( std::function< void ( const ServerEntry & ) > func_ )
-{
-  std::unique_lock< std::mutex > lck( m_mutex );
-
-  for ( auto &e : m_entries )
-  {
-    func_( e );
-  }
-}
 
 bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 {

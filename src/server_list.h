@@ -39,7 +39,8 @@ typedef struct ServerEntry
   std::string                      m_ip;
   bool                             m_LocalServer = false;
   PacketData                       m_PacketData;
-  warhawk::API::ForwardingResponse m_Response;
+  warhawk::API::ForwardingResponse m_PublicIpResponse;
+  bool                             m_DeleteEntry = false;
 } ServerEntry;
 
 
@@ -50,15 +51,32 @@ class ServerList
     ServerList( );
     ~ServerList( );
 
-    void AddEntry( const ServerEntry & );
+    void AddRemoteServerEntries( std::vector< ServerEntry > & );
 
-    void ForEachServer( std::function< bool ( const ServerEntry & ) > );
+    void AddLocalServerEntry(    const std::string &ip, const ServerEntry & );
+    void UpdateLocalServerEntry( const std::string &ip, const ServerEntry & );
+
+    void ForEachServer( std::function< bool ( ServerEntry & ) > );
+
+    bool ContainsLocalServerWithIp( const std::string &ip );
 
   protected:
 
   private:
 
-  std::mutex      m_mutex; // Protectes the LocalServerList.
-  using LocalServerList = std::vector< ServerEntry >;
-  LocalServerList m_ServerList;
+    //
+    // Methods
+    //
+
+    void ForEachServerNoLock( std::function< bool( ServerEntry & ) > );
+
+    bool ContainsLocalServerWithIpNoLock( const std::string &ip );
+
+    //
+    // Data
+    //
+
+    std::mutex      m_mutex; // Protectes the LocalServerList.
+    using LocalServerList = std::vector< ServerEntry >;
+    LocalServerList m_ServerList;
 };

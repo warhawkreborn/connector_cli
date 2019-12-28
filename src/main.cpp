@@ -185,21 +185,21 @@ int main( int argc_, const char **argv_ )
     PacketServer packetServer( udpServer );
 
     // The SearchServer broadcasts a request for servers on the local network.
-    // Any responses it receives are then sent on to the remote server that
-    // publishes the list of available public servers.
-    SearchServer searchServer( &packetServer );
+    // Any responses it receives are then marked as local servers and sent on
+    // to the remote server that publishes the list of available public servers.
+    SearchServer searchServer( serverList, &packetServer );
 
-    // The ForwardServer watches for requests from the local network and
+    // The ForwardServer watches for server query requests from the local network and
     // responds with a list of remote servers.
-    ForwardServer forwardServer( &packetServer, searchServer );
+    ForwardServer forwardServer( serverList, &packetServer );
 
     // The RequestServer periodically queries the remote WarHawk Server List Server
     // and puts the resuling list of servers into the forwardServer and searchServer.
-    RequestServer requestServer( forwardServer, packetServer, searchServer );
+    RequestServer requestServer( serverList, packetServer );
 
 #ifndef TEST_SHUTDOWN
     // Run the HTTP server in the main thread.
-    HttpServer httpServer( port, root, forwardServer, searchServer );
+    HttpServer httpServer( port, root, serverList, forwardServer, searchServer );
     httpServer.run( );
 #endif
 

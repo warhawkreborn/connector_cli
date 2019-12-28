@@ -16,6 +16,7 @@ class HttpServer
 
     HttpServer( const int port,
                 const std::string rootDirectory_,
+                ServerList &,
                 ForwardServer &,
                 SearchServer & );
     ~HttpServer( );
@@ -39,6 +40,7 @@ class HttpServer
 
     int            m_Port = 8080;
     std::string    m_RootDirectory;
+    ServerList    &m_ServerList;
     ForwardServer &m_ForwardServer;
     SearchServer  &m_SearchServer;
 };

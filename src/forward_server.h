@@ -20,15 +20,10 @@ class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( PacketServer *, SearchServer & );
+    ForwardServer( ServerList &, PacketServer * );
     ~ForwardServer( );
  
-    void SetEntries( std::vector< ServerEntry > );
-
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
-
-    // Iterate through each server entry in the list of servers.
-    void ForEachServer( std::function< void ( const ServerEntry & ) > );
 
   protected:
 
@@ -43,8 +38,6 @@ class ForwardServer : public MessageHandler
     // Data
     //
 
-    std::mutex                  m_mutex;
-    std::vector< ServerEntry >  m_entries;
+    ServerList                 &m_ServerList;
     PacketServer               *m_PacketServer = nullptr;
-    SearchServer               &m_SearchServer;
 };
