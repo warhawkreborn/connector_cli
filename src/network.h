@@ -50,7 +50,7 @@ class Network
     // DECLARATIONS
     //////////////////////////////
 
-    typedef std::vector< IpAddress > IpAddresses_t;
+    using IpAddresses_t = std::vector< IpAddress >;
 
     //////////////////////////////
     // METHODS
@@ -63,7 +63,7 @@ class Network
 
     bool OnAddressList( const IpAddresses_t &, const sockaddr_storage &address ) const; // True if this is one of my addresses.
 
-    bool ResolveAddress( const char *inputAddr, std::string &resultString );
+    bool OnLocalNetwork( const std::string &ip ); // True if this ip is on one of the local networks.
 
     //////////////////////////////
     // DATA
@@ -81,6 +81,12 @@ class Network
 
   private:
 
+    //
+    // Declarations
+    //
+
+    using IpAddrArray = std::array< unsigned char, sizeof( struct in6_addr ) >;
+
     //////////////////////////////
     // METHODS
     //////////////////////////////
@@ -90,6 +96,13 @@ class Network
     void AddAddress( IpAddresses_t &, const char *address, const int prefixLen );
 
     int GetPrefixLen( const std::string &netmask ); // Return the prefix length of the nextmask;
+
+    bool OnSameNetwork( const IpAddress &ipWithPrefix, const std::string &ip2 );
+
+    void ConvertToInteger( const std::string &ip, IpAddrArray &out );
+
+    bool Ipv4Addr( const std::string &ip );
+    bool Ipv6Addr( const std::string &ip );
 
     // Return interface information from OS.
     std::string GetFirstInterface( );

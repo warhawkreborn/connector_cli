@@ -1,25 +1,27 @@
 #include "addr_info.h"
 #include "forward_server.h"
+#include "network.h"
 #include "search_server.h"
 
 
-ForwardServer::ForwardServer( ServerList &serverList_, PacketServer *server_ )
+ForwardServer::ForwardServer( ServerList &serverList_, PacketServer &server_, Network &network_ )
   : m_ServerList( serverList_ )
   , m_PacketServer( server_ )
+  , m_Network( network_ )
 {
-  m_PacketServer->Register( this );
+  m_PacketServer.Register( this );
 }
 
 
 ForwardServer::~ForwardServer( )
 {
-  m_PacketServer->Unregister( this );
+  m_PacketServer.Unregister( this );
 }
 
 
 void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
 {
-  if ( data_.size( ) > 300)
+  if ( data_.size( ) > 300 )
   {
     // This is not a request, but a response, so we exit early.
     return;
@@ -41,12 +43,21 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
     std::cout << "ForwardServer: Sending server list" << std::endl;
 #endif
 
-    m_ServerList.ForEachServer( [ this, client_ ] ( const ServerEntry &entry_ )
+    std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
+    bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+
+    // This server only handles packets from the local network.
+    if ( !fromLocalNetwork )
     {
-      std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
+      return;
+    }
+
+    m_ServerList.ForEachServer( [ this, &client_, fromLocalNetwork ] ( const ServerEntry &entry_ )
+    {
+      // If it is from the local network then forward only remote servers to sender on local network.
       if ( !entry_.m_LocalServer )
       {
-        m_PacketServer->send( client_, entry_.m_frame );
+        m_PacketServer.send( client_, entry_.m_frame );
       }
 
       const bool continueOn = true;

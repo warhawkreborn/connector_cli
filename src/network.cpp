@@ -6,6 +6,7 @@
 #include <iphlpapi.h>
 #endif // WIN32
 
+#include <array>
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
@@ -344,7 +345,7 @@ int Network::GetPrefixLen( const std::string &netmask_ )
 {
   int prefixLen = 0;
 
-  if ( netmask_.find( '.' ) != std::string::npos )
+  if ( Ipv4Addr( netmask_) )
   {
     std::string netmask = netmask_;
     while ( netmask.length( ) > 0 )
@@ -375,7 +376,7 @@ int Network::GetPrefixLen( const std::string &netmask_ )
       }
     }
   }
-  else if ( netmask_.find( ':' ) != std::string::npos )
+  else if ( Ipv6Addr( netmask_ ) )
   {
     // Count IPv6 bits.
     for ( unsigned char c : netmask_ )
@@ -413,3 +414,100 @@ int Network::GetPrefixLen( const std::string &netmask_ )
 
   return prefixLen;
 }
+
+
+bool Network::OnLocalNetwork( const std::string &ip_ )
+{
+  for ( const auto &entry : m_MyIpAddresses )
+  {
+    if ( OnSameNetwork( entry, ip_ ) )
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+bool Network::OnSameNetwork( const IpAddress &ipWithPrefix_, const std::string &ip_ )
+{
+  IpAddrArray addrWithPrefix;
+  IpAddrArray ip;
+  std::string maskIp;
+  IpAddrArray mask;
+
+  if ( Ipv4Addr( ipWithPrefix_.GetAddress( ) ) && Ipv4Addr( ip_ ) )
+  {
+    maskIp = "255.255.255.255";
+  }
+  else if ( Ipv6Addr( ipWithPrefix_.GetAddress( ) ) && Ipv6Addr( ip_ ) )
+  {
+    maskIp = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
+  }
+  else
+  {
+    return false; // Not on the same network because they are not the same type of address.
+  }
+
+  ConvertToInteger( ipWithPrefix_.GetAddress( ), addrWithPrefix );
+  ConvertToInteger( ip_,                         ip             );
+  ConvertToInteger( maskIp,                      mask           );
+
+  int maskLen = ipWithPrefix_.GetPrefixLength( );
+  int maskBytes = maskLen / 8 + ( maskLen % 8 == 0 ? 0 : 1 );
+
+  for ( int i = 0; i < maskBytes; ++i, maskLen -= 8 )
+  {
+    unsigned char left  = addrWithPrefix[ i ];
+    unsigned char right = ip[ i ];
+    unsigned char mask = maskLen >= 8 ? 255 : ( 255 << maskLen ) ;
+    bool sameNetwork = ( left & mask ) == right;
+
+    if ( !sameNetwork )
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+void Network::ConvertToInteger( const std::string &ip_, IpAddrArray &outBuf_ )
+{
+  memset( &outBuf_, 0, sizeof( outBuf_ ) );
+
+  int domain = Ipv4Addr( ip_ ) ? AF_INET : Ipv6Addr( ip_ ) ? AF_INET6 : -1;
+
+  if ( domain == -1 )
+  {
+    std::stringstream ss;
+    ss << "FATAL ERROR: IP address '" << ip_ << "' not IPv4 or IPv6!";
+    throw std::runtime_error( ss.str() );
+  }
+
+  int err = inet_pton( domain, ip_.c_str( ), &outBuf_ );
+
+  if ( err <= 0 )
+  {
+    std::stringstream ss;
+    ss << "FATAL ERROR: Can't convert IP '" << ip_ << "' to integer!" << std::endl;
+    throw std::runtime_error( ss.str() );
+  }
+}
+
+
+bool Network::Ipv4Addr( const std::string &ip_ )
+{
+  bool ipv4 = ip_.find( '.' ) != std::string::npos;
+  return ipv4;
+}
+
+
+bool Network::Ipv6Addr( const std::string &ip_ )
+{
+  bool ipv6 = ip_.find( ':' ) != std::string::npos;
+  return ipv6;
+}
+ 

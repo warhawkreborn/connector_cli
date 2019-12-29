@@ -191,7 +191,7 @@ int main( int argc_, const char **argv_ )
 
     // The ForwardServer watches for server query requests from the local network and
     // responds with a list of remote servers.
-    ForwardServer forwardServer( serverList, &packetServer );
+    ForwardServer forwardServer( serverList, packetServer, network );
 
     // The RequestServer periodically queries the remote WarHawk Server List Server
     // and puts the resuling list of servers into the forwardServer and searchServer.

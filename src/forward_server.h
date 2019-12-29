@@ -14,13 +14,14 @@
 #include "udp_server.h"
 
 class SearchServer;
+class Network;
 
 
 class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( ServerList &, PacketServer * );
+    ForwardServer( ServerList &, PacketServer &, Network & );
     ~ForwardServer( );
  
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
@@ -38,6 +39,7 @@ class ForwardServer : public MessageHandler
     // Data
     //
 
-    ServerList                 &m_ServerList;
-    PacketServer               *m_PacketServer = nullptr;
+    ServerList   &m_ServerList;
+    PacketServer &m_PacketServer;
+    Network      &m_Network;
 };
