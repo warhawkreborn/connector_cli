@@ -2,7 +2,7 @@
 // This program acts as an intermediary which does several things
 // 1. Gets a list of current remote warhawk servers from https://warhawk.thalhammer.it/api/ URL.
 // 2. Broadcasts that list of servers to a warhawk client when it requests the list of servers.
-// 3. Watches for warhawk local warhawk servers on the network and sends those so the remote server.
+// 3. Watches for local warhawk servers on the network and sends those to the remote server.
 // 4. Provides a web server to show the list of servers and other information.
 //
 

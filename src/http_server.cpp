@@ -177,11 +177,14 @@ std::string HttpServer::OnGetMainPage( )
 
   m_ServerList.ForEachServer( [ &html ]( const ServerEntry &entry_ )
   {
-    html << "  <tr>" << std::endl;
-    html << "    <td style='color: #00ff00;'>" << entry_.m_name << "</td>"    << std::endl;
-    html << "    <td style='color: #00ff00;'>" << entry_.m_ping << " ms</td>" << std::endl;
-    html << "    <td style='color: #00ff00;'>" << entry_.m_ip   << "</td>"    << std::endl;
-    html << "  </tr>" << std::endl;
+    if ( !entry_.m_LocalServer )
+    {
+      html << "  <tr>" << std::endl;
+      html << "    <td style='color: #00ff00;'>" << entry_.m_name << "</td>"    << std::endl;
+      html << "    <td style='color: #00ff00;'>" << entry_.m_ping << " ms</td>" << std::endl;
+      html << "    <td style='color: #00ff00;'>" << entry_.m_ip   << "</td>"    << std::endl;
+      html << "  </tr>" << std::endl;
+    }
 
     const bool continueOn = true;
     return continueOn;
@@ -203,22 +206,22 @@ std::string HttpServer::OnGetMainPage( )
   html << "    <th style='color: #00ff00;'>Info</th>" << std::endl;
   html << "  </tr>" << std::endl;
 
-  m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &data_ )
+  m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
   {
-    if ( data_.m_LocalServer )
+    if ( entry_.m_LocalServer )
     {
       html << "  <tr>" << std::endl;
-      html << "    <td style='color: #00ff00;'><center>" << data_.m_PacketData.m_data.GetName( ) << "</center></td>" << std::endl;
-      html << "    <td style='color: #00ff00;'><center>" << data_.m_PublicIpResponse.m_ip        << "</center></td>" << std::endl;
-      html << "    <td style='color: #00ff00;'><center>" << data_.m_PacketData.m_address         << "</center></td>" << std::endl;
+      html << "    <td style='color: #00ff00;'><center>" << entry_.m_PacketData.m_data.GetName( ) << "</center></td>" << std::endl;
+      html << "    <td style='color: #00ff00;'><center>" << entry_.m_PublicIpResponse.m_ip        << "</center></td>" << std::endl;
+      html << "    <td style='color: #00ff00;'><center>" << entry_.m_PacketData.m_address         << "</center></td>" << std::endl;
       html << "    <td style='color: #00ff00;'>";
-        html << "Mode: "            << data_.m_PacketData.m_data.GetGameMode(       ) << "<br/>";
-        html << "Map: "             << data_.m_PacketData.m_data.GetMapName(        ) << "<br/>";
-        html << "Current Players: " << data_.m_PacketData.m_data.GetCurrentPlayers( ) << "<br/>";
-        html << "Maximum Players: " << data_.m_PacketData.m_data.GetMaxPlayers(     ) << "<br/>";
-        html << "Time Elapsed: "    << data_.m_PacketData.m_data.GetTimeElapsed(    ) << "<br/>";
-        html << "Time Limit:   "    << data_.m_PacketData.m_data.GetTimeLimit(      ) << "<br/>";
-        html << "Rounds Played: "   << data_.m_PacketData.m_data.GetRoundsPlayed(   ) << "<br/>";
+        html << "Mode: "            << entry_.m_PacketData.m_data.GetGameMode(       ) << "<br/>";
+        html << "Map: "             << entry_.m_PacketData.m_data.GetMapName(        ) << "<br/>";
+        html << "Current Players: " << entry_.m_PacketData.m_data.GetCurrentPlayers( ) << "<br/>";
+        html << "Maximum Players: " << entry_.m_PacketData.m_data.GetMaxPlayers(     ) << "<br/>";
+        html << "Time Elapsed: "    << entry_.m_PacketData.m_data.GetTimeElapsed(    ) << "<br/>";
+        html << "Time Limit:   "    << entry_.m_PacketData.m_data.GetTimeLimit(      ) << "<br/>";
+        html << "Rounds Played: "   << entry_.m_PacketData.m_data.GetRoundsPlayed(   ) << "<br/>";
         html << "</td>" << std::endl;
       html << "  </tr>" << std::endl;
     }
