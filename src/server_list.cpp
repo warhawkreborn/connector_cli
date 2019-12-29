@@ -11,7 +11,7 @@ ServerList::~ServerList( )
 }
 
 
-void ServerList::AddRemoteServerEntries( std::vector< ServerEntry > &list_ )
+void ServerList::AddRemoteServerEntries( const std::vector< ServerEntry > &list_ )
 {
   std::unique_lock< std::mutex > guard( m_mutex );
 
@@ -38,42 +38,31 @@ void ServerList::AddRemoteServerEntries( std::vector< ServerEntry > &list_ )
 }
 
 
-void ServerList::AddLocalServerEntry( const std::string &ip_, const ServerEntry &entry_ )
+void ServerList::AddLocalServerEntries( const std::vector< ServerEntry > &list_ )
 {
   std::unique_lock< std::mutex > guard( m_mutex );
 
-  bool found = false;
-
-  if ( ContainsLocalServerWithIpNoLock( entry_.m_PublicIpResponse.m_ip ) )
+  // First, delete any local entries.
+  ForEachServerNoLock( [ ] ( ServerEntry &entry_ )
   {
-    found = true;
-  }
-
-  if ( !found )
-  {
-    m_ServerList.push_back( entry_ );
-  }
-}
-
-
-void ServerList::UpdateLocalServerEntry( const std::string &ip_, const ServerEntry &entry_ )
-{
-  std::unique_lock< std::mutex > guard( m_mutex );
-
-  ForEachServerNoLock( [ & ] ( ServerEntry &searchEntry_ )
-  {
-    bool continueOn = true;
-
-    if ( ip_ == searchEntry_.m_PublicIpResponse.m_ip )
+    if ( entry_.m_LocalServer )
     {
-      searchEntry_.m_LocalServer      = entry_.m_LocalServer;
-      searchEntry_.m_PacketData       = entry_.m_PacketData;
-      searchEntry_.m_PublicIpResponse = entry_.m_PublicIpResponse;
-      continueOn = false;
+      entry_.m_DeleteEntry = true;
     }
 
+    const bool continueOn = true;
     return continueOn;
   } );
+
+  for ( auto &entry : list_ )
+  {
+    ServerEntry newEntry = entry;
+    newEntry.m_ip   = entry.m_PublicIpResponse.m_ip;
+    newEntry.m_name = entry.m_PacketData.m_data.GetName( );
+
+    // Now add list of servers.
+    m_ServerList.push_back( newEntry );
+  }
 }
  
 

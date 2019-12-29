@@ -51,10 +51,8 @@ class ServerList
     ServerList( );
     ~ServerList( );
 
-    void AddRemoteServerEntries( std::vector< ServerEntry > & );
-
-    void AddLocalServerEntry(    const std::string &ip, const ServerEntry & );
-    void UpdateLocalServerEntry( const std::string &ip, const ServerEntry & );
+    void AddRemoteServerEntries( const std::vector< ServerEntry > & );
+    void AddLocalServerEntries(  const std::vector< ServerEntry > & );
 
     void ForEachServer( std::function< bool ( ServerEntry & ) > );
 

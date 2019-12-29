@@ -136,7 +136,7 @@ void SearchServer::DoStateProcessing( )
 #endif
   try
   {
-    publicIpResponse = warhawk::API::CheckForwarding();
+    publicIpResponse = warhawk::API::CheckForwarding( );
   }
   catch ( const std::exception &e_ )
   {
@@ -144,6 +144,15 @@ void SearchServer::DoStateProcessing( )
   }
 
   std::unique_lock< std::mutex > lck( m_mutex );
+
+  // If we can't get "online" status then abort.
+  if ( publicIpResponse.m_state != "online" )
+  {
+    std::cout << "SearchServer: Server not online, check your port forwarding!" << std::endl;
+    m_PacketList.clear( );
+  }
+
+  std::vector< ServerEntry > localServerList; // Build a new list of local servers.
 
   for ( PacketList::iterator itr = m_PacketList.begin();
         itr != m_PacketList.end( );
@@ -161,40 +170,24 @@ void SearchServer::DoStateProcessing( )
               << "GameMode = '"         << packetData.m_data.GetGameMode( ) << "'" << std::endl;
 #endif
 
-    if ( !m_ServerList.ContainsLocalServerWithIp( publicIpResponse.m_ip ) )
-    {
-      // If it is not on the list then check the status.
-      if ( publicIpResponse.m_state != "online" )
-      {
-        std::cout << "SearchServer: Server not online, check your port forwarding!" << std::endl;
-        continue;
-      }
+    // Add the host to the remote server.
+    auto addHostResponse = warhawk::API::AddHost( packetData.m_data.GetName( ), "", false );
 
-      // Add the host to the remote server.
-      auto addHostResponse = warhawk::API::AddHost( packetData.m_data.GetName( ), "", false );
+    // Add the host to our list of Local Servers.
+    ServerEntry lsdata;
+    lsdata.m_PacketData        = packetData;
+    lsdata.m_PublicIpResponse  = publicIpResponse;
+    lsdata.m_LocalServer       = true;
 
-      // Add the host to our list of Local Servers.
-      ServerEntry lsdata;
-      lsdata.m_PacketData        = packetData;
-      lsdata.m_PublicIpResponse  = publicIpResponse;
-      lsdata.m_LocalServer       = true;
-
-      m_ServerList.AddLocalServerEntry( publicIpResponse.m_ip, lsdata );
-    }
-    else
-    {
-      ServerEntry lsdata;
-      lsdata.m_PacketData       = packetData;
-      lsdata.m_PublicIpResponse = publicIpResponse;
-      lsdata.m_LocalServer      = true;
-
-      // Update the information from the packet into the local server list.
-      m_ServerList.UpdateLocalServerEntry( publicIpResponse.m_ip, lsdata );
-    }
+    localServerList.push_back( lsdata );
   }
+
+  // Update the information from the packet into the local server list.
+  m_ServerList.AddLocalServerEntries( localServerList );
 
   m_CurrentState = STATE::STATE_WAITING;
 }
+
 
 bool SearchServer::LocalServerContainsIp( const std::string &ip_ )
 {
