@@ -242,7 +242,7 @@ void Network::_Init( )
 bool Network::OnAddressList( const IpAddresses_t &addrList_,
                              const sockaddr_storage &address_ ) const
 {
-  std::string incomingAddr = AddrInfo::SockAddrToAddress( (const sockaddr *) &address_ ); 
+  std::string incomingAddr = AddrInfo::SockAddrToAddress( &address_ ); 
   for ( IpAddresses_t::const_iterator itr = addrList_.begin( );
         itr != addrList_.end( ); ++itr )
   {

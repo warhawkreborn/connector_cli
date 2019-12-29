@@ -1,3 +1,4 @@
+#include "addr_info.h"
 #include "forward_server.h"
 #include "search_server.h"
 
@@ -42,6 +43,7 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
 
     m_ServerList.ForEachServer( [ this, client_ ] ( const ServerEntry &entry_ )
     {
+      std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
       if ( !entry_.m_LocalServer )
       {
         m_PacketServer->send( client_, entry_.m_frame );

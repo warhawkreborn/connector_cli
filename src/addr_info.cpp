@@ -88,6 +88,12 @@ void *AddrInfo::GetInAddr( const struct sockaddr *sa_ )
 }
 
 
+std::string AddrInfo::SockAddrToAddress( const sockaddr_storage *sa_ )
+{
+  return SockAddrToAddress( (sockaddr *) sa_ );
+}
+
+
 std::string AddrInfo::SockAddrToAddress( const struct sockaddr *sa_ )
 {
   struct addrinfo p;

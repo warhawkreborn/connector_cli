@@ -68,7 +68,7 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
     // Anything else is probably the discovery packet.
     if ( data_.size( ) == 372 )
     {
-      std::string addr = AddrInfo::SockAddrToAddress( (sockaddr *) &client_ );
+      std::string addr = AddrInfo::SockAddrToAddress( &client_ );
       PacketData item { addr, data_ };
 
       std::unique_lock< std::mutex > lck( m_mutex );

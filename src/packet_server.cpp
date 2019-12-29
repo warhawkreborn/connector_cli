@@ -41,6 +41,7 @@ void PacketServer::run()
       {
         MessageHandler *messageHandler = itr.second;
 
+        std::string fromIp = AddrInfo::SockAddrToAddress( &client ); 
         messageHandler->OnReceivePacket( client, data );
       }
     }

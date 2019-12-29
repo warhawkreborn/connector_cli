@@ -55,7 +55,8 @@ class AddrInfo
     std::string GetAddr( ) const;        // Get the Address in std::string format.
     bool SetAddr( const std::string & ); // Set the Address from std::string format.
 
-    static std::string SockAddrToAddress( const struct sockaddr * ); // Convert sockaddr to std::string format.
+    static std::string SockAddrToAddress( const sockaddr_storage * ); // Convert sockaddr_storage to std::string format.
+    static std::string SockAddrToAddress( const struct sockaddr  * ); // Convert sockaddr         to std::string format.
 
     static uint16_t SockAddrToPort(             const struct sockaddr * ); // Get Port from sockaddr.
     static void PortToSockAddr( const uint16_t,       struct sockaddr * ); // Set Port from sockaddr.
