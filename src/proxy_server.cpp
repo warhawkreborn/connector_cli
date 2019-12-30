@@ -66,7 +66,7 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
   }
   else
   {
-    std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
+    std::cout << "ProxyServer: Unknown frame type, ignoring" << std::endl;
   }
 #endif
 }
