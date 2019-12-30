@@ -87,6 +87,7 @@ set( SOURCE_FILES
      main.cpp
      network.cpp
      packet_server.cpp
+     proxy_server.cpp
      request_server.cpp
      search_server.cpp
      server_list.cpp
@@ -107,6 +108,7 @@ set( INCLUDE_FILES
      message_handler.h
      network.h
      packet_server.h
+     proxy_server.h
      picojson.h
      request_server.h
      search_server.h
