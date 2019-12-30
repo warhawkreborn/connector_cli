@@ -35,7 +35,7 @@ void PacketServer::run()
 
   while ( !m_Done && m_server.receive( client, data ) )
   {
-    if ( data.size( ) > 0 )
+    if ( valid_packet( data ) )
     {
       for ( auto itr : m_MessageHandlers )
       {
