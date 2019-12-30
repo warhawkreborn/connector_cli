@@ -154,6 +154,7 @@ std::string HttpServer::OnGetMainPage( )
 
   html << "<html>" << std::endl;
   html << "<head>" << std::endl;
+  html << "  <meta http-equiv='refresh' content='30'>"  << std::endl;
   html << "  <title>" << VersionString( ) << "</title>" << std::endl;
   html << "</head>" << std::endl;
   html << "<body bgcolor='#000000'>" << std::endl;
