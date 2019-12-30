@@ -46,4 +46,6 @@ class ProxyServer : public MessageHandler
     PacketServer &m_PacketServer;
     Network      &m_Network;
     bool          m_ProxyMode = false;
+    std::string   m_ServerListServer; // warhawk.thalhamer.it.
+    std::vector < std::string > m_ClientIpList;
 };

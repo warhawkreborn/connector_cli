@@ -31,44 +31,71 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
     return;
   }
 
-#ifdef FUTURE
-  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
+  std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
+  bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+
+  // If we receive a packet from a remote server then turn ProxyMode ON.
+  if ( !fromLocalNetwork && m_ServerListServer == "" )
   {
-#ifdef LOGDATA
-    std::cout << "ProxyServer: Sending server list" << std::endl;
-#endif
+    m_ProxyMode = true;
+    // Record the www.thalhammer.it site so we can distinguish between it
+    // and the game client addresses.
+    m_ServerListServer = fromIp;
+  }
 
-    std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
-    bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+  if ( !m_ProxyMode )
+  {
+    return;
+  }
 
-    // If we receive a packet from a remote server then turn ProxyMode ON.
-    if ( !fromLocalNetwork )
+  int debug = 0;
+
+  if ( fromLocalNetwork )
+  {
+    if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
     {
-      m_ProxyMode = true;
+      return; // This query packet which we are not intersted in.
     }
 
-    if ( !m_ProxyMode )
-    {
-      return;
-    }
-
-    m_ServerList.ForEachServer( [ this, &client_, fromLocalNetwork ] ( const ServerEntry &entry_ )
-    {
-      // If it is from the local network then forward only remote servers to sender on local network.
-      if ( !entry_.m_LocalServer )
-      {
-        m_PacketServer.send( client_, entry_.m_frame );
-      }
-
-      const bool continueOn = true;
-      return continueOn;
-    } );
+    // Broadcast it to the entire local LAN.
+    AddrInfo sendAddr;
+    sendAddr.SetAddr( m_ServerListServer );
+    sendAddr.PortToSockAddr( m_PacketServer.GetServer().GetPort(), (sockaddr *) sendAddr.GetAiAddr() );
+    const bool broadcast = false;
+    m_PacketServer.send( *sendAddr.GetAiAddr(), data_, broadcast );
   }
   else
   {
-    std::cout << "ProxyServer: Unknown frame type, ignoring" << std::endl;
+    std::string foundLocalServer = "";
+
+    // Forward remote client to local LAN server.
+    m_ServerList.ForEachServer( [ & ] ( ServerEntry &entry_ )
+    {
+      bool continueOn = true;
+
+      if ( entry_.m_LocalServer )
+      {
+        foundLocalServer = entry_.m_PacketData.m_address;
+        continueOn = false;
+      }
+
+      return continueOn;
+    } );
+
+    if ( foundLocalServer == "" )
+    {
+      // Broadcast it to the entire local LAN.
+      AddrInfo broadcastAddr;
+      broadcastAddr.SetAddr( "255.255.255.255" );
+      broadcastAddr.PortToSockAddr( m_PacketServer.GetServer( ).GetPort( ), (sockaddr *) broadcastAddr.GetAiAddr() );
+      const bool broadcast = true;
+      m_PacketServer.send( *broadcastAddr.GetAiAddr( ), data_, broadcast );
+    }
+    else
+    {
+      debug = 6;
+    }
   }
-#endif
 }
 
 
