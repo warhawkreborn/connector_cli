@@ -10,7 +10,7 @@
 #include <thread>
 
 #include "message_handler.h"
-#include "udp_server.h"
+#include "udp_network_socket.h"
 #include "server_list.h"
 
 
@@ -21,7 +21,7 @@ class PacketServer
 {
   public:
 
-    PacketServer( warhawk::net::udp_server &udpServer_ );
+    PacketServer( warhawk::net::UdpNetworkSocket &udpServer_ );
     virtual ~PacketServer( );
 
     // Run the Server process.
@@ -37,7 +37,7 @@ class PacketServer
     bool valid_packet( const std::vector< uint8_t > &data_ );
 
     // Return the associated UdpServer.
-    warhawk::net::udp_server &GetServer( );
+    warhawk::net::UdpNetworkSocket &GetServer();
 
     // Register a message handler.
     void Register(   MessageHandler * );
@@ -59,7 +59,7 @@ class PacketServer
     // Data
     //
 
-    warhawk::net::udp_server &m_server;
+    warhawk::net::UdpNetworkSocket &m_UdpNetworkSocket;
  
     std::mutex      m_mutex; // Protect m_MessageHandlers.
     using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;

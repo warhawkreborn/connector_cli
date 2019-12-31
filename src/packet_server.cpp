@@ -2,8 +2,8 @@
 #include "packet_server.h"
 
 
-PacketServer::PacketServer( warhawk::net::udp_server &udpServer_ )
-  : m_server( udpServer_ )
+PacketServer::PacketServer( warhawk::net::UdpNetworkSocket &udpNetworkSocket_ )
+  : m_UdpNetworkSocket( udpNetworkSocket_ )
   , m_mutex( )
   , m_MessageHandlers( )
   , m_Thread( [ & ] ( ) { run( ); } )
@@ -17,10 +17,10 @@ PacketServer::~PacketServer()
   // Broadcast zero-length packet to make sure this server shuts down
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
-  clientAddr.PortToSockAddr( m_server.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  clientAddr.PortToSockAddr( m_UdpNetworkSocket.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
   std::vector< uint8_t > packet;
   const bool broadcast = true;
-  m_server.send( *clientAddr.GetAiAddr(), packet, broadcast );
+  m_UdpNetworkSocket.send( *clientAddr.GetAiAddr(), packet, broadcast );
 
   m_Thread.join();
 }
@@ -33,7 +33,7 @@ void PacketServer::run()
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
 
-  while ( !m_Done && m_server.receive( client, data ) )
+  while ( !m_Done && m_UdpNetworkSocket.receive( client, data ) )
   {
     if ( valid_packet( data ) )
     {
@@ -52,13 +52,13 @@ void PacketServer::run()
 
 void PacketServer::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
-  m_server.send( clientaddr_, data_, broadcast_ );
+  m_UdpNetworkSocket.send( clientaddr_, data_, broadcast_ );
 }
 
 
 bool PacketServer::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
-  return m_server.receive( clientaddr_, data_ );
+  return m_UdpNetworkSocket.receive( clientaddr_, data_ );
 }
 
 
@@ -81,9 +81,9 @@ bool PacketServer::valid_packet( const std::vector< uint8_t > &data_ )
 }
 
 
-warhawk::net::udp_server &PacketServer::GetServer()
+warhawk::net::UdpNetworkSocket &PacketServer::GetServer()
 {
-  return m_server;
+  return m_UdpNetworkSocket;
 }
 
 

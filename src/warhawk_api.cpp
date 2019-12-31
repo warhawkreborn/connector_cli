@@ -1,7 +1,7 @@
-#include "udp_server.h"
 #include "picojson.h"
 #include "packet_server.h"
 #include "server_list.h"
+#include "udp_network_socket.h"
 #include "warhawk.h"
 #include "warhawk_api.h"
 #include "webclient.h"
@@ -36,7 +36,7 @@ std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
   {
     try
     {
-      auto ip = warhawk::net::udp_server::StringToIp( e.get( "hostname" ).get< std::string >( ) );
+      auto ip = warhawk::net::UdpNetworkSocket::StringToIp( e.get( "hostname" ).get< std::string >() );
 
       if ( e.get( "state" ).get< std::string >( ) != "online" )
       {
@@ -49,7 +49,7 @@ std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
       entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >( ) );
       // NOTE: Converting hostname to array and back might seems redundant, but its not,
       // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
-      entry.m_ip = warhawk::net::udp_server::IpToString( ip );
+      entry.m_ip = warhawk::net::UdpNetworkSocket::IpToString( ip );
 
       // Set PublicIpResponse to help get around duplicate entries.
       entry.m_PublicIpResponse.m_ip = entry.m_ip;

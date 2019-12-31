@@ -11,7 +11,7 @@
 #include "message_handler.h"
 #include "packet_server.h"
 #include "server_list.h"
-#include "udp_server.h"
+#include "udp_network_socket.h"
 
 class SearchServer;
 class Network;

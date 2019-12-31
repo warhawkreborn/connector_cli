@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #endif
 
-#include "udp_server.h"
+#include "udp_network_socket.h"
 #include "network.h"
 
 
@@ -29,7 +29,7 @@ namespace warhawk
 namespace net
 {
 
-udp_server::udp_server( Network &network_, uint16_t port_ )
+UdpNetworkSocket::UdpNetworkSocket( Network &network_, uint16_t port_ )
   : m_fd( 0 )
   , m_port( port_ )
   , m_Network( network_ )
@@ -59,12 +59,12 @@ udp_server::udp_server( Network &network_, uint16_t port_ )
 }
 
 
-udp_server::~udp_server( )
+UdpNetworkSocket::~UdpNetworkSocket()
 {
 }
 
 
-void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, const bool broadcast_ )
+void UdpNetworkSocket::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, const bool broadcast_ )
 {
   int optval = broadcast_ ? 1 : 0;
   int err = setsockopt( m_fd, SOL_SOCKET, SO_BROADCAST, (const char *) &optval, sizeof( optval ) );
@@ -100,7 +100,7 @@ void udp_server::send( const sockaddr_storage &clientaddr_, const std::vector< u
 }
 
 
-bool udp_server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
+bool UdpNetworkSocket::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
   data_.resize( 16 * 1024 ); // TODO: Detect MTU
   socklen_t clientlen = sizeof( clientaddr_ );
@@ -125,7 +125,7 @@ bool udp_server::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > 
 }
 
 
-std::array< uint8_t, 4 > udp_server::StringToIp( const std::string &host_ )
+std::array< uint8_t, 4 > UdpNetworkSocket::StringToIp( const std::string &host_ )
 {
   auto host_entry = gethostbyname( host_.c_str() );
 
@@ -140,13 +140,13 @@ std::array< uint8_t, 4 > udp_server::StringToIp( const std::string &host_ )
 }
 
 
-uint16_t udp_server::GetPort( ) const
+uint16_t UdpNetworkSocket::GetPort() const
 {
   return m_port;
 }
 
 
-std::string udp_server::IpToString( const std::array< uint8_t, 4 > &ip_ )
+std::string UdpNetworkSocket::IpToString( const std::array< uint8_t, 4 > &ip_ )
 {
   return std::to_string( ip_[ 0 ] ) + "." + std::to_string( ip_[ 1 ] ) + "." +
          std::to_string( ip_[ 2 ] ) + "." + std::to_string( ip_[ 3 ] );

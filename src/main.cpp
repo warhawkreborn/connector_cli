@@ -193,11 +193,11 @@ int main( int argc_, const char **argv_ )
     ServerList serverList;
 
     // Set up to listen for UDP packets on standard WarHawk port.
-    warhawk::net::udp_server udpServer( network, WARHAWK_UDP_PORT );
+    warhawk::net::UdpNetworkSocket udpNetworkSocket( network, WARHAWK_UDP_PORT );
 
     // The Packet server watches for packets and distributes them to the
     // clients that register with it.
-    PacketServer packetServer( udpServer );
+    PacketServer packetServer( udpNetworkSocket );
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then marked as local servers and sent on
