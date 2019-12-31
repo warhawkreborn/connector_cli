@@ -510,4 +510,49 @@ bool Network::Ipv6Addr( const std::string &ip_ )
   bool ipv6 = ip_.find( ':' ) != std::string::npos;
   return ipv6;
 }
- 
+
+
+std::vector< std::string > ResolveIpAddress( const std::string &hostname_ )
+{
+  std::vector< std::string > addressList;
+
+  addrinfo *result = NULL;
+  addrinfo hints;
+  memset( &hints, 0, sizeof(hints) );
+
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  hints.ai_family = AF_INET;
+
+  hints.ai_flags =
+#ifdef AI_ADDRCONFIG
+    AI_ADDRCONFIG |
+#endif
+    0;
+
+  int e = getaddrinfo( hostname_.c_str( ), "0", &hints, &result );
+
+  if ( e != 0 )
+  {
+    if ( result != NULL )
+    {
+      freeaddrinfo( result );
+    }
+
+    return addressList; // Error.
+  }
+
+  for ( addrinfo *itr = result; itr != NULL; itr = itr->ai_next )
+  {
+    AddrInfo addrInfo( *itr );
+    addressList.push_back( addrInfo.GetAddr( ) );
+  }
+
+  if ( result != NULL )
+  {
+    freeaddrinfo( result );
+  }
+
+  return addressList;
+}
