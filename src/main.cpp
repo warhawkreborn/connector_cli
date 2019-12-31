@@ -217,7 +217,7 @@ int main( int argc_, const char **argv_ )
     // switches in to "ProxyMode".
     // It then relays packets back and forth between the local LAN PS3(s) and
     // the remote servers or clients.
-//#define PROXY_MODE
+#define PROXY_MODE
 #ifdef PROXY_MODE
     ProxyServer proxyServer( serverList, packetProcessor, network );
 #endif

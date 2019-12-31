@@ -1,8 +1,12 @@
+#include <string>
+#include <sstream>
+
 #include "addr_info.h"
 #include "network.h"
 #include "packet_processor.h"
 #include "proxy_server.h"
 #include "search_server.h"
+#include "warhawk.h"
 
 
 ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProcessor_, Network &network_ )
@@ -10,6 +14,18 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
+  std::vector< std::string > addressList;
+  addressList = m_Network.ResolveIpAddress( WARHAWK_SERVER_LIST_SERVER );
+
+  if ( addressList.size( ) < 1 )
+  {
+    std::stringstream ss;
+    ss << "Can't resolve IP address for WARHAWK_SERVER_LIST_SERVER: " << WARHAWK_SERVER_LIST_SERVER;
+    throw std::runtime_error( ss.str( ) );
+  }
+
+  m_ServerListServer = addressList[ 0 ];
+
   m_PacketProcessor.Register( this );
 }
 
@@ -35,13 +51,10 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
   std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
   bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
 
-  // If we receive a packet from a remote server then turn ProxyMode ON.
-  if ( !fromLocalNetwork && m_ServerListServer == "" )
+  // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
+  if ( fromIp == m_ServerListServer )
   {
     m_ProxyMode = true;
-    // Record the www.thalhammer.it site so we can distinguish between it
-    // and the game client addresses.
-    m_ServerListServer = fromIp;
   }
 
   if ( !m_ProxyMode )

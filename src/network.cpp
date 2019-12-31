@@ -512,7 +512,7 @@ bool Network::Ipv6Addr( const std::string &ip_ )
 }
 
 
-std::vector< std::string > ResolveIpAddress( const std::string &hostname_ )
+std::vector< std::string > Network::ResolveIpAddress( const std::string &hostname_ )
 {
   std::vector< std::string > addressList;
 
