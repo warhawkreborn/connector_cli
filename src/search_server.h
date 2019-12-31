@@ -15,7 +15,7 @@
 
 #include "discovery_packet.h"
 #include "message_handler.h"
-#include "packet_server.h"
+#include "packet_processor.h"
 #include "server_list.h"
 #include "udp_network_socket.h"
 #include "warhawk_api.h"
@@ -35,7 +35,7 @@ class SearchServer : public MessageHandler
     // Methods
     //
 
-    SearchServer( ServerList &, PacketServer * );
+    SearchServer( ServerList &, PacketProcessor & );
     ~SearchServer( );
 
     void run( );
@@ -71,8 +71,8 @@ class SearchServer : public MessageHandler
 
     ServerList   &m_ServerList;
 
-    std::mutex    m_mutex; // Protects the m_PacketList.
-    PacketServer *m_PacketServer = nullptr;
+    std::mutex       m_mutex; // Protects the m_PacketList.
+    PacketProcessor &m_PacketProcessor;
 
     enum class STATE
     {

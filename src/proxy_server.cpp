@@ -1,21 +1,22 @@
 #include "addr_info.h"
 #include "network.h"
+#include "packet_processor.h"
 #include "proxy_server.h"
 #include "search_server.h"
 
 
-ProxyServer::ProxyServer( ServerList &serverList_, PacketServer &server_, Network &network_ )
+ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProcessor_, Network &network_ )
   : m_ServerList( serverList_ )
-  , m_PacketServer( server_ )
+  , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
-  m_PacketServer.Register( this );
+  m_PacketProcessor.Register( this );
 }
 
 
 ProxyServer::~ProxyServer( )
 {
-  m_PacketServer.Unregister( this );
+  m_PacketProcessor.Unregister( this );
 }
 
 
@@ -60,9 +61,9 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
     // Broadcast it to the entire local LAN.
     AddrInfo sendAddr;
     sendAddr.SetAddr( m_ServerListServer );
-    sendAddr.PortToSockAddr( m_PacketServer.GetServer().GetPort(), (sockaddr *) sendAddr.GetAiAddr() );
+    sendAddr.PortToSockAddr( m_PacketProcessor.GetServer().GetPort(), (sockaddr *) sendAddr.GetAiAddr() );
     const bool broadcast = false;
-    m_PacketServer.send( *sendAddr.GetAiAddr(), data_, broadcast );
+    m_PacketProcessor.send( *sendAddr.GetAiAddr(), data_, broadcast );
   }
   else
   {
@@ -87,9 +88,9 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
       // Broadcast it to the entire local LAN.
       AddrInfo broadcastAddr;
       broadcastAddr.SetAddr( "255.255.255.255" );
-      broadcastAddr.PortToSockAddr( m_PacketServer.GetServer( ).GetPort( ), (sockaddr *) broadcastAddr.GetAiAddr() );
+      broadcastAddr.PortToSockAddr( m_PacketProcessor.GetServer( ).GetPort( ), (sockaddr *) broadcastAddr.GetAiAddr() );
       const bool broadcast = true;
-      m_PacketServer.send( *broadcastAddr.GetAiAddr( ), data_, broadcast );
+      m_PacketProcessor.send( *broadcastAddr.GetAiAddr( ), data_, broadcast );
     }
     else
     {

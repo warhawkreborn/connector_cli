@@ -4,18 +4,18 @@
 #include "search_server.h"
 
 
-ForwardServer::ForwardServer( ServerList &serverList_, PacketServer &server_, Network &network_ )
+ForwardServer::ForwardServer( ServerList &serverList_, PacketProcessor &packetProcessor_, Network &network_ )
   : m_ServerList( serverList_ )
-  , m_PacketServer( server_ )
+  , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
-  m_PacketServer.Register( this );
+  m_PacketProcessor.Register( this );
 }
 
 
 ForwardServer::~ForwardServer( )
 {
-  m_PacketServer.Unregister( this );
+  m_PacketProcessor.Unregister( this );
 }
 
 
@@ -49,7 +49,7 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
     // If it is from the local network then forward only remote servers to sender on local network.
     if ( !entry_.m_LocalServer )
     {
-      m_PacketServer.send( client_, entry_.m_frame );
+      m_PacketProcessor.send( client_, entry_.m_frame );
     }
 
     const bool continueOn = true;

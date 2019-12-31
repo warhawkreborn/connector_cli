@@ -13,7 +13,7 @@ class RequestServer
 {
   public:
 
-    RequestServer( ServerList &, PacketServer & );
+    RequestServer( ServerList &, PacketProcessor & );
     ~RequestServer( );
 
     void run( );
@@ -22,8 +22,8 @@ class RequestServer
 
   private:
 
-    ServerList    &m_ServerList;
-    PacketServer  &m_PacketServer;
+    ServerList       &m_ServerList;
+    PacketProcessor  &m_PacketProcessor;
 
     bool           m_Done = false;
 

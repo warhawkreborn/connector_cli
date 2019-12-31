@@ -1,5 +1,5 @@
 #include "picojson.h"
-#include "packet_server.h"
+#include "packet_processor.h"
 #include "server_list.h"
 #include "udp_network_socket.h"
 #include "warhawk.h"
@@ -10,7 +10,7 @@
 namespace warhawk
 {
 
-std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
+std::vector< ServerEntry > API::DownloadServerList( PacketProcessor *packetProcessor_ )
 {
   auto req = warhawk::common::request::default_get( WARHAWK_API_BASE + "server/" );
   warhawk::common::webclient client;
@@ -46,7 +46,7 @@ std::vector< ServerEntry > API::DownloadServerList( PacketServer *server_ )
       ServerEntry entry;
       entry.m_name = e.get( "name" ).get< std::string >( );
       entry.m_ping = static_cast< int >( e.get( "ping" ).get< int64_t >( ) );
-      entry.m_frame = server_->hex2bin( e.get( "response" ).get< std::string >( ) );
+      entry.m_frame = packetProcessor_->hex2bin( e.get( "response" ).get< std::string >( ) );
       // NOTE: Converting hostname to array and back might seems redundant, but its not,
       // as hostname can be a domain, and ip is guaranteed to be a ipv4 ip.
       entry.m_ip = warhawk::net::UdpNetworkSocket::IpToString( ip );

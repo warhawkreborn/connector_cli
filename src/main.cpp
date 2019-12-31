@@ -195,22 +195,22 @@ int main( int argc_, const char **argv_ )
     // Set up to listen for UDP packets on standard WarHawk port.
     warhawk::net::UdpNetworkSocket udpNetworkSocket( network, WARHAWK_UDP_PORT );
 
-    // The Packet server watches for packets and distributes them to the
+    // The PacketProcessor watches for packets and distributes them to the
     // clients that register with it.
-    PacketServer packetServer( udpNetworkSocket );
+    PacketProcessor packetProcessor( udpNetworkSocket );
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then marked as local servers and sent on
     // to the remote server that publishes the list of available public servers.
-    SearchServer searchServer( serverList, &packetServer );
+    SearchServer searchServer( serverList, packetProcessor );
 
     // The ForwardServer watches for server query requests from the local
     // network and responds with a list of remote servers.
-    ForwardServer forwardServer( serverList, packetServer, network );
+    ForwardServer forwardServer( serverList, packetProcessor, network );
 
     // The RequestServer periodically queries the remote WarHawk Server List
     // Server and puts the resuling list of servers into Server List.
-    RequestServer requestServer( serverList, packetServer );
+    RequestServer requestServer( serverList, packetProcessor );
 
     // The ProxyServer watches for packets to the WARHAWK UDP port and if it
     // sees any packets come from remote systems (servers or clients) then it
@@ -219,7 +219,7 @@ int main( int argc_, const char **argv_ )
     // the remote servers or clients.
 //#define PROXY_MODE
 #ifdef PROXY_MODE
-    ProxyServer proxyServer( serverList, packetServer, network );
+    ProxyServer proxyServer( serverList, packetProcessor, network );
 #endif
 
 #ifndef TEST_SHUTDOWN

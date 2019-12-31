@@ -4,16 +4,16 @@
 #include <vector>
 
 #include "forward_server.h"
-#include "packet_server.h"
+#include "packet_processor.h"
 #include "request_server.h"
 #include "search_server.h"
 #include "server_list.h"
 #include "warhawk_api.h"
 
 
-RequestServer::RequestServer( ServerList &serverList_, PacketServer &packetServer_ )
+RequestServer::RequestServer( ServerList &serverList_, PacketProcessor &packetProcessor_ )
   : m_ServerList( serverList_ )
-  , m_PacketServer(  packetServer_  )
+  , m_PacketProcessor( packetProcessor_  )
   , m_Thread( [&] ( ) { run( ); } )
 {
 }
@@ -41,7 +41,7 @@ void RequestServer::run( )
     std::vector< ServerEntry > list;
     try
     {
-      list = warhawk::API::DownloadServerList( &m_PacketServer );
+      list = warhawk::API::DownloadServerList( &m_PacketProcessor );
     }
     catch ( const std::exception &e_ )
     {
