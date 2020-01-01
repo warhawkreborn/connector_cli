@@ -149,7 +149,6 @@ void SearchServer::DoStateProcessing( )
   if ( publicIpResponse.m_state != "online" )
   {
     std::cout << "SearchServer: Server not online, check your port forwarding!" << std::endl;
-    m_PacketList.clear( );
   }
 
   std::vector< ServerEntry > localServerList; // Build a new list of local servers.
