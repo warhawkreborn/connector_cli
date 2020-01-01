@@ -31,7 +31,7 @@ void RequestServer::run( )
   std::cout << "Starting Request Server..."<< std::endl;
 
   // This loop periodically queries the server that holds a list of available
-  // public servers and updates that list into the SearchServer and ForwardServer.
+  // public servers and updates that list into the ServerList.
   while ( !m_Done )
   {
 #ifdef LOGDATA
