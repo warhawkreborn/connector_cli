@@ -223,7 +223,7 @@ void Network::_Init( )
 
 #endif // WIN32
 
-#if 1
+#if 0
   // Test - Convert back and make sure we got what we thought we got.
   for ( IpAddresses_t::iterator itr = m_MyIpAddresses.begin();
         itr != m_MyIpAddresses.end(); ++itr )
@@ -556,3 +556,18 @@ std::vector< std::string > Network::ResolveIpAddress( const std::string &hostnam
 
   return addressList;
 }
+
+
+void Network::ForEachAddress( std::function< bool ( const IpAddress & ) > func_ )
+{
+  for ( const auto &ipAddr : m_MyIpAddresses )
+  {
+    bool continueOn = func_( ipAddr );
+
+    if ( !continueOn )
+    {
+      break;
+    }
+  }
+}
+ 

@@ -34,6 +34,7 @@
 
 #endif
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -66,6 +67,9 @@ class Network
     bool OnLocalNetwork( const std::string &ip ); // True if this ip is on one of the local networks.
 
     static std::vector< std::string > ResolveIpAddress( const std::string &hostname );
+
+    void ForEachAddress( std::function< bool ( const IpAddress & ) > );
+
     //////////////////////////////
     // DATA
     //////////////////////////////

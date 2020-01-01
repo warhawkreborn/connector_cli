@@ -35,21 +35,25 @@
 
 #include "forward_server.h"
 #include "http_server.h"
+#include "network.h"
 #include "search_server.h"
+
 
 extern std::string VersionString( );
 
 
 HttpServer::HttpServer( const int port_,
                         const std::string rootDirectory_,
-                        ServerList &serverList_,
+                        ServerList    &serverList_,
                         ForwardServer &forwardServer_,
-                        SearchServer  &searchServer_ )
+                        SearchServer  &searchServer_,
+                        Network       &network_ )
   : m_Port( port_ )
   , m_ServerList( serverList_ )
   , m_RootDirectory( rootDirectory_ )
   , m_ForwardServer( forwardServer_ )
   , m_SearchServer(  searchServer_  )
+  , m_Network( network_ )
 {
 }
 
@@ -90,6 +94,12 @@ void HttpServer::run( )
           {
             std::string html = OnGetMainPage( );
 
+            res_->end( html );
+          } )
+          // Server IP Address.
+          .get( "/api/addresses", [ this ] ( auto *res_, auto *req_ )
+          {
+            std::string html = OnGetMyAddresses( );
             res_->end( html );
           } )
           // Serve files.
@@ -148,6 +158,31 @@ void HttpServer::OnListen( )
 }
 
 
+std::string HttpServer::OnGetMyAddresses( )
+{
+  std::stringstream html;
+
+  html << "<html>" << std::endl;
+  html << "<head>" << std::endl;
+  html << "  <title>" << VersionString( ) << "</title>" << std::endl;
+  html << "</head>" << std::endl;
+
+  html << "<h1>WarHawk Reborn Network Addresses</h1>" << std::endl;
+
+  m_Network.ForEachAddress( [ this, &html ] ( const IpAddress &ip_ )
+  {
+    html << "Address: " << ip_.GetAddress( ) << "/" << ip_.GetPrefixLength( ) << "<br/>" << std::endl;
+    const bool continueOn = true;
+    return continueOn;
+  } );
+
+  html << "</body>" << std::endl;
+  html << "</html>" << std::endl;
+
+  return html.str( );
+}
+
+
 std::string HttpServer::OnGetMainPage( )
 {
   std::stringstream html;
@@ -163,10 +198,10 @@ std::string HttpServer::OnGetMainPage( )
 
   html << "<img src='/images/warhawk.png'>" << std::endl;
 
+  html << "<a href='/api/addresses'>Addresses</a>" << std::endl;
+
   html << "<p>" << std::endl;
-
   html << "<h1 style='color: #00ff00;'>Remote Servers</h1>" << std::endl;
-
   html << "</p>" << std::endl;
 
   html << "<table>" << std::endl;
