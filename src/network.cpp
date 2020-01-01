@@ -174,7 +174,14 @@ void Network::_Init( )
 
       if ( abuf[ 0 ] && nbuf[ 0 ] )
       {
-        AddAddress( m_MyIpAddresses, abuf, prefixLen );
+        std::string address = abuf;
+        // Delete '%' character and anything following if found.
+        size_t idx = address.find( "%" );
+        if ( idx != std::string::npos )
+        {
+          address = address.substr( 0, idx );
+        }
+        AddAddress( m_MyIpAddresses, address.c_str( ), prefixLen );
       }
     }
   }
