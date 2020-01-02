@@ -86,6 +86,7 @@ set( SOURCE_FILES
      ip_address.cpp
      main.cpp
      network.cpp
+     packet.cpp
      packet_processor.cpp
      proxy_server.cpp
      request_server.cpp
@@ -107,6 +108,7 @@ set( INCLUDE_FILES
      ip_address.h
      message_handler.h
      network.h
+     packet.h
      packet_processor.h
      proxy_server.h
      picojson.h

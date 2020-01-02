@@ -3,10 +3,13 @@
 //
 // A MessageHandler allows registered subscribers to handle processing of particular
 // message.
+#pragma once
+
+//
+// The MessageHandler handles incoming packets.
 //
 
-#include <vector>
-
+#include "packet.h"
 #include "udp_network_socket.h"
 
 
@@ -18,7 +21,7 @@ class MessageHandler
     {
     }
 
-    virtual void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) = 0;
+    virtual void OnReceivePacket( sockaddr_storage client, const Packet & ) = 0;
 
   protected:
 

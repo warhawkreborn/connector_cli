@@ -10,16 +10,19 @@
 #include <vector>
 
 
+#include "packet.h"
+
+
 namespace warhawk
 {
 
-class DiscoveryPacket
+class DiscoveryPacket : public Packet
 {
   public:
 
     DiscoveryPacket( );
 
-    DiscoveryPacket( std::vector< uint8_t > data );
+    DiscoveryPacket( Packet );
 
     std::string GetName( ) const;
 
@@ -63,7 +66,6 @@ class DiscoveryPacket
 
   private:
 
-    std::vector< uint8_t > m_data;
 };
 
 } // End namespace warhawk

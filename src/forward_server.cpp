@@ -19,14 +19,14 @@ ForwardServer::~ForwardServer( )
 }
 
 
-void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
+void ForwardServer::OnReceivePacket( sockaddr_storage client_, const Packet & packet_ )
 {
 
 #ifdef LOGDATA
   std::cout << "ForwardServer: Received packet." << std::endl;
 #endif
 
-  if ( !valid_packet( data_ ) )
+  if ( !valid_packet( packet_ ) )
   {
     return;
   }
@@ -58,15 +58,15 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint
 }
 
 
-bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
+bool ForwardServer::valid_packet( const Packet &packet_ )
 {
-  if ( data_.size() > 300 )
+  if ( packet_.GetData( ).size( ) > 300 )
   {
     // This is not a request, but a response, so we exit early.
     return false;
   }
 
-  if ( ! ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 ) )
+  if ( ! ( packet_.GetData( )[ 0 ] == 0xc3 && packet_.GetData( )[ 1 ] == 0x81 ) )
   {
     return false;
   }

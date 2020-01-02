@@ -1,4 +1,5 @@
 #include "addr_info.h"
+#include "packet.h"
 #include "packet_processor.h"
 
 
@@ -35,14 +36,17 @@ void PacketProcessor::run( )
 
   while ( !m_Done && m_UdpNetworkSocket.receive( client, data ) )
   {
-    if ( valid_packet( data ) )
+    Packet packet( data );
+
+    if ( valid_packet( packet ) )
     {
+      std::string fromIp = AddrInfo::SockAddrToAddress( &client ); 
+
       for ( auto itr : m_MessageHandlers )
       {
         MessageHandler *messageHandler = itr.second;
 
-        std::string fromIp = AddrInfo::SockAddrToAddress( &client ); 
-        messageHandler->OnReceivePacket( client, data );
+        messageHandler->OnReceivePacket( client, packet );
       }
     }
   }
@@ -62,17 +66,17 @@ bool PacketProcessor::receive( sockaddr_storage &clientaddr_, std::vector< uint8
 }
 
 
-bool PacketProcessor::valid_packet( const std::vector< uint8_t > &data_ )
+bool PacketProcessor::valid_packet( const Packet &packet_ )
 {
-  if ( data_.size() < 4 )
+  if ( packet_.GetData( ).size( ) < 4 )
   {
     return false;
   }
 
-  uint16_t len = data_[ 3 ];
-  len = ( len << 8 ) | data_[ 2 ];
+  uint16_t len = packet_.GetData( )[ 3 ];
+  len = ( len << 8 ) | packet_.GetData( )[ 2 ];
 
-  if ( data_.size() - 4 != len )
+  if ( packet_.GetData( ).size( ) - 4 != len )
   {
     return false;
   }

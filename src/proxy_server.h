@@ -17,6 +17,7 @@
 
 
 class Network;
+class Packet;
 class PacketProcessor;
 
 
@@ -27,7 +28,7 @@ class ProxyServer : public MessageHandler
     ProxyServer( ServerList &, PacketProcessor &, Network & );
     ~ProxyServer( );
  
-    void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
+    void OnReceivePacket( sockaddr_storage client, const Packet & ) override;
 
   protected:
 
@@ -37,10 +38,10 @@ class ProxyServer : public MessageHandler
     // Methods
     //
 
-    bool valid_packet( const std::vector< uint8_t > &data_ );
+    bool valid_packet( const Packet & );
 
-    void OnHandleServerInfoRequest( const std::string &fromIp, std::vector< uint8_t > data );
-    void OnHandleServerInfoResponse( std::vector< uint8_t > data );
+    void OnHandleServerInfoRequest( const std::string &fromIp, const Packet & );
+    void OnHandleServerInfoResponse( const Packet & );
 
     //
     // Data

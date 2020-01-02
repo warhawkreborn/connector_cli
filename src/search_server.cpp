@@ -56,7 +56,7 @@ void SearchServer::run( )
 }
 
 
-void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector< uint8_t > data_ )
+void SearchServer::OnReceivePacket( struct sockaddr_storage client_, const Packet &packet_ )
 {
   if ( m_CurrentState == STATE::STATE_COLLECTING )
   {
@@ -66,10 +66,11 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, std::vector
 
     // The packet received from the PS3 is 372 bytes in length.
     // Anything else is probably the discovery packet.
-    if ( data_.size( ) == 372 )
+    if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_RESPONSE )
     {
       std::string addr = AddrInfo::SockAddrToAddress( &client_ );
-      PacketData item { addr, data_ };
+      warhawk::DiscoveryPacket packet( packet_ );
+      PacketData item { addr, packet };
 
       std::unique_lock< std::mutex > lck( m_mutex );
       m_PacketList.push_back( item );

@@ -38,13 +38,13 @@ ProxyServer::~ProxyServer( )
 }
 
 
-void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
+void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packet_ )
 {
 #ifdef LOGDATA
   std::cout << "ProxyServer: Received packet." << std::endl;
 #endif
 
-  if ( !valid_packet( data_ ) )
+  if ( !valid_packet( packet_ ) )
   {
     std::cout << "ProxyServer: Received invalid frame, skipping" << std::endl;
     return;
@@ -74,29 +74,29 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
 
     m_ReplyingToQuery = false;
 
-    if ( data_.size( ) == 372 )
+    if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_RESPONSE )
     {
-      OnHandleServerInfoResponse( data_ );
+      OnHandleServerInfoResponse( packet_ );
     }
   }
   else
   {
-    OnHandleServerInfoRequest( fromIp, data_ );
+    OnHandleServerInfoRequest( fromIp, packet_ );
   }
 }
 
 
-bool ProxyServer::valid_packet( const std::vector< uint8_t > &data_ )
+bool ProxyServer::valid_packet( const Packet &packet_ )
 {
-  if ( data_.size( ) < 4 )
+  if ( packet_.GetData( ).size( ) < 4 )
   {
     return false;
   }
 
-  uint16_t len = data_[ 3 ];
-  len = ( len << 8 ) | data_[ 2 ];
+  uint16_t len = packet_.GetData( )[ 3 ];
+  len = ( len << 8 ) | packet_.GetData( )[ 2 ];
 
-  if ( data_.size( ) - 4 != len )
+  if ( packet_.GetData( ).size( ) - 4 != len )
   {
     return false;
   }
@@ -105,7 +105,7 @@ bool ProxyServer::valid_packet( const std::vector< uint8_t > &data_ )
 }
 
 
-void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, std::vector< uint8_t > data_ )
+void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, const Packet &packet_ )
 {
   int debug = 0;
 
@@ -113,17 +113,17 @@ void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, std::ve
 
   // Forward remote client to local LAN server.
   m_ServerList.ForEachServer( [ & ] ( ServerEntry &entry_ )
-    {
-      bool continueOn = true;
+  {
+    bool continueOn = true;
 
-      if ( entry_.m_LocalServer )
-      {
+    if ( entry_.m_LocalServer )
+    {
         localServerIp = entry_.m_PacketData.m_address;
         continueOn = false;
     }
 
-      return continueOn;
-} );
+    return continueOn;
+  } );
 
   if ( localServerIp != "" )
   {
@@ -132,7 +132,7 @@ void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, std::ve
     localServerAddr.SetAddr( localServerIp );
     localServerAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) localServerAddr.GetAiAddr() );
     const bool broadcast = false;
-    m_PacketProcessor.send( *localServerAddr.GetAiAddr( ), data_, broadcast );
+    m_PacketProcessor.send( *localServerAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
 
     // std::cout << "ProxyServer::OnHandleInfoRequest - Sending packet to local server at " << localServerIp << std::endl;
 
@@ -148,7 +148,7 @@ void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, std::ve
 }
 
 
-void ProxyServer::OnHandleServerInfoResponse( std::vector< uint8_t > data_ )
+void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
 {
 #if 0
   if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
@@ -184,11 +184,14 @@ void ProxyServer::OnHandleServerInfoResponse( std::vector< uint8_t > data_ )
     return;
   }
 
+  Packet newPacket( packet_.GetData( ) );
+
   // Fill in our public server address instead of the local server address.
-  auto frame = reinterpret_cast< warhawk::net::server_info_response * >( &data_ + 4 );
+  uint8_t *dataPtr = static_cast< uint8_t * >( &(newPacket.GetData( )[ 0 ]) );
+  auto frame = reinterpret_cast< warhawk::net::server_info_response * >( dataPtr + 4 );
 
   memcpy( frame->m_ip1, &publicServerIp, sizeof( frame->m_ip1 ) );
   memcpy( frame->m_ip2, &publicServerIp, sizeof( frame->m_ip2 ) );
 
-  m_PacketProcessor.send( *sendAddr.GetAiAddr(), data_, broadcast );
+  m_PacketProcessor.send( *sendAddr.GetAiAddr(), packet_.GetData( ), broadcast );
 }

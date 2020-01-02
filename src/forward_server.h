@@ -13,8 +13,10 @@
 #include "server_list.h"
 #include "udp_network_socket.h"
 
-class SearchServer;
+
+class Packet;
 class Network;
+class SearchServer;
 
 
 class ForwardServer : public MessageHandler
@@ -24,7 +26,7 @@ class ForwardServer : public MessageHandler
     ForwardServer( ServerList &, PacketProcessor &, Network & );
     ~ForwardServer( );
  
-    void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
+    void OnReceivePacket( sockaddr_storage client, const Packet & ) override;
 
   protected:
 
@@ -33,7 +35,7 @@ class ForwardServer : public MessageHandler
     // Methods
     //
 
-    bool valid_packet( const std::vector< uint8_t > &data_ );
+    bool valid_packet( const Packet & );
 
     //
     // Data
