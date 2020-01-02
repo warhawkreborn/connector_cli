@@ -68,7 +68,6 @@ bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
 
   if ( ! ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 ) )
   {
-    std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
     return false;
   }
 
