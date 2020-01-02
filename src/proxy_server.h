@@ -46,7 +46,9 @@ class ProxyServer : public MessageHandler
     ServerList      &m_ServerList;
     PacketProcessor &m_PacketProcessor;
     Network         &m_Network;
-    bool             m_ProxyMode = false;
+    bool             m_ProxyMode       = false;
+    bool             m_ReplyingToQuery = false;
     std::string      m_ServerListServer; // warhawk.thalhamer.it.
+    uint16_t         m_LastServerListServerPort; // Port we last received packet from ServerListServer on.
     std::vector < std::string > m_ClientIpList;
 };
