@@ -39,6 +39,9 @@ class ProxyServer : public MessageHandler
 
     bool valid_packet( const std::vector< uint8_t > &data_ );
 
+    void OnHandleServerInfoRequest( const std::string &fromIp, std::vector< uint8_t > data );
+    void OnHandleServerInfoResponse( std::vector< uint8_t > data );
+
     //
     // Data
     //

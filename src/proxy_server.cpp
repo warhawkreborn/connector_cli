@@ -65,8 +65,6 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
     return;
   }
 
-  int debug = 0;
-
   if ( fromLocalNetwork )
   {
     if ( !m_ReplyingToQuery )
@@ -76,81 +74,14 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
 
     m_ReplyingToQuery = false;
 
-#if 0
-    if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
+    if ( data_.size( ) == 372 )
     {
-      return; // This query packet which we are not intersted in.
+      OnHandleServerInfoResponse( data_ );
     }
-#endif
-    // Send it to the WarHawkServerListServer.
-    AddrInfo sendAddr;
-    sendAddr.SetAddr( m_ServerListServer );
-    sendAddr.PortToSockAddr( m_LastServerListServerPort, (sockaddr *) sendAddr.GetAiAddr( ) );
-    const bool broadcast = false;
-
-    bool foundPublicServerIp = false;
-    std::array< uint8_t, 4 > publicServerIp;
-    
-    m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
-    {
-      bool continueOn = true;
- 
-      if ( entry_.m_LocalServer )
-      {
-        foundPublicServerIp = true;
-        publicServerIp = warhawk::net::UdpNetworkSocket::StringToIp( entry_.m_ip );
-        continueOn = false;
-      }
-
-      return continueOn;
-    } );
-
-    if ( !foundPublicServerIp )
-    {
-      return;
-    }
-
-    // Fill in our public server address instead of the local server address.
-    auto frame = reinterpret_cast< warhawk::net::server_info_response * >( &data_ + 4 );
-
-    memcpy( frame->m_ip1, &publicServerIp, sizeof( frame->m_ip1 ) );
-    memcpy( frame->m_ip2, &publicServerIp, sizeof( frame->m_ip2 ) );
-
-    m_PacketProcessor.send( *sendAddr.GetAiAddr(), data_, broadcast );
   }
   else
   {
-    std::string localServerIp = "";
-
-    // Forward remote client to local LAN server.
-    m_ServerList.ForEachServer( [ & ] ( ServerEntry &entry_ )
-    {
-      bool continueOn = true;
-
-      if ( entry_.m_LocalServer )
-      {
-        localServerIp = entry_.m_PacketData.m_address;
-        continueOn = false;
-      }
-
-      return continueOn;
-    } );
-
-    if ( localServerIp != "" )
-    {
-      // Send it to the local server.
-      AddrInfo localServerAddr;
-      localServerAddr.SetAddr( localServerIp );
-      localServerAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) localServerAddr.GetAiAddr() );
-      const bool broadcast = false;
-      m_PacketProcessor.send( *localServerAddr.GetAiAddr( ), data_, broadcast );
-
-      m_ReplyingToQuery = true;
-    }
-    else
-    {
-      debug = 6;
-    }
+    OnHandleServerInfoRequest( fromIp, data_ );
   }
 }
 
@@ -171,4 +102,93 @@ bool ProxyServer::valid_packet( const std::vector< uint8_t > &data_ )
   }
 
   return true;
+}
+
+
+void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, std::vector< uint8_t > data_ )
+{
+  int debug = 0;
+
+  std::string localServerIp = "";
+
+  // Forward remote client to local LAN server.
+  m_ServerList.ForEachServer( [ & ] ( ServerEntry &entry_ )
+    {
+      bool continueOn = true;
+
+      if ( entry_.m_LocalServer )
+      {
+        localServerIp = entry_.m_PacketData.m_address;
+        continueOn = false;
+    }
+
+      return continueOn;
+} );
+
+  if ( localServerIp != "" )
+  {
+    // Send it to the local server.
+    AddrInfo localServerAddr;
+    localServerAddr.SetAddr( localServerIp );
+    localServerAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) localServerAddr.GetAiAddr() );
+    const bool broadcast = false;
+    m_PacketProcessor.send( *localServerAddr.GetAiAddr( ), data_, broadcast );
+
+    // std::cout << "ProxyServer::OnHandleInfoRequest - Sending packet to local server at " << localServerIp << std::endl;
+
+    if ( fromIp_ == m_ServerListServer )
+    {
+      m_ReplyingToQuery = true;
+    }
+  }
+  else
+  {
+    debug = 6;
+  }
+}
+
+
+void ProxyServer::OnHandleServerInfoResponse( std::vector< uint8_t > data_ )
+{
+#if 0
+  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
+  {
+    return; // This query packet which we are not intersted in.
+  }
+#endif
+  // Send it to the WarHawkServerListServer.
+  AddrInfo sendAddr;
+  sendAddr.SetAddr( m_ServerListServer );
+  sendAddr.PortToSockAddr( m_LastServerListServerPort, (sockaddr *) sendAddr.GetAiAddr( ) );
+  const bool broadcast = false;
+
+  bool foundPublicServerIp = false;
+  std::array< uint8_t, 4 > publicServerIp;
+
+  m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
+    {
+      bool continueOn = true;
+
+      if ( entry_.m_LocalServer )
+      {
+        foundPublicServerIp = true;
+        publicServerIp = warhawk::net::UdpNetworkSocket::StringToIp( entry_.m_ip );
+        continueOn = false;
+      }
+
+      return continueOn;
+    } );
+
+  if ( !foundPublicServerIp )
+  {
+    return;
+  }
+
+  // Fill in our public server address instead of the local server address.
+  auto frame = reinterpret_cast< warhawk::net::server_info_response * >( &data_ + 4 );
+
+  memcpy( frame->m_ip1, &publicServerIp, sizeof( frame->m_ip1 ) );
+  memcpy( frame->m_ip2, &publicServerIp, sizeof( frame->m_ip2 ) );
+
+  m_PacketProcessor.send( *sendAddr.GetAiAddr(), data_, broadcast );
 }
