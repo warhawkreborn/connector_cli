@@ -26,7 +26,7 @@ class ForwardServer : public MessageHandler
     ForwardServer( ServerList &, PacketProcessor &, Network & );
     ~ForwardServer( );
  
-    void OnReceivePacket( sockaddr_storage client, const Packet & ) override;
+    void OnReceivePacket( const Packet & ) override;
 
   protected:
 

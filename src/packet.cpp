@@ -65,3 +65,38 @@ void Packet::SetType( )
     debug = 1;
   }
 }
+
+const struct sockaddr_storage &Packet::GetClient( ) const
+{
+  return m_Client;
+}
+
+
+void Packet::SetClient( const struct sockaddr_storage &client_ )
+{
+  m_Client = client_;
+}
+
+
+std::string Packet::GetFromIp( ) const
+{
+  return m_FromIp;
+}
+
+
+void Packet::SetFromIp( const std::string &ip_ )
+{
+  m_FromIp = ip_;
+}
+
+
+bool Packet::GetFromLocalNetwork( ) const
+{
+  return m_FromLocalNetwork;
+}
+
+
+void Packet::SetFromLocalNetwork( const bool &value_ )
+{
+  m_FromLocalNetwork = value_;
+}

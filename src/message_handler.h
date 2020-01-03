@@ -21,7 +21,7 @@ class MessageHandler
     {
     }
 
-    virtual void OnReceivePacket( sockaddr_storage client, const Packet & ) = 0;
+    virtual void OnReceivePacket( const Packet & ) = 0;
 
   protected:
 

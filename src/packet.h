@@ -5,7 +5,10 @@
 //
 
 #include <memory>
+#include <string>
 #include <vector>
+
+#include "addr_info.h"
 
 
 class Packet
@@ -31,6 +34,16 @@ class Packet
     std::vector< uint8_t > &GetData( );
     const std::vector< uint8_t > &GetData( ) const;
 
+    const struct sockaddr_storage &GetClient( ) const;
+    void SetClient( const struct sockaddr_storage & );
+
+    std::string GetFromIp( ) const;
+    void SetFromIp( const std::string & );
+
+    bool GetFromLocalNetwork( ) const;
+    void SetFromLocalNetwork( const bool & );
+
+
   protected:
 
   private:
@@ -45,8 +58,11 @@ class Packet
     // Data
     //
 
-    TYPE                   m_Type = TYPE::TYPE_UNKNOWN;
-    std::vector< uint8_t > m_Data;
+    TYPE                    m_Type = TYPE::TYPE_UNKNOWN;
+    std::vector< uint8_t >  m_Data;
+    std::string             m_FromIp = "";
+    struct sockaddr_storage m_Client;
+    bool                    m_FromLocalNetwork = false;
 };
 
 

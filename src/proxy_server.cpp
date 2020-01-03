@@ -40,19 +40,16 @@ ProxyServer::~ProxyServer( )
 }
 
 
-void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packet_ )
+void ProxyServer::OnReceivePacket( const Packet &packet_ )
 {
 #ifdef LOGDATA
   std::cout << "ProxyServer: Received packet." << std::endl;
 #endif
 
-  std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
-  bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
-
   // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
-  if ( fromIp == m_ServerListServer )
+  if ( packet_.GetFromIp( ) == m_ServerListServer )
   {
-    m_LastServerListServerPort = AddrInfo::SockAddrToPort( (const sockaddr *) &client_ );
+    m_LastServerListServerPort = AddrInfo::SockAddrToPort( (const sockaddr *) &packet_.GetClient( ) );
     m_ProxyMode = true;
   }
 
@@ -61,7 +58,7 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packe
     return;
   }
 
-  if ( fromLocalNetwork )
+  if ( packet_.GetFromLocalNetwork( ) )
   {
     if ( !m_ReplyingToQuery )
     {
@@ -79,13 +76,13 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packe
   {
     if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_REQUEST )
     {
-      OnHandleServerInfoRequest( fromIp, packet_ );
+      OnHandleServerInfoRequest( packet_ );
     }
   }
 }
 
 
-void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, const Packet &packet_ )
+void ProxyServer::OnHandleServerInfoRequest( const Packet &packet_ )
 {
   int debug = 0;
 
@@ -116,7 +113,7 @@ void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, const P
 
     // std::cout << "ProxyServer::OnHandleInfoRequest - Sending packet to local server at " << localServerIp << std::endl;
 
-    if ( fromIp_ == m_ServerListServer )
+    if ( packet_.GetFromIp( ) == m_ServerListServer )
     {
       m_ReplyingToQuery = true;
     }

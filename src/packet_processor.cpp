@@ -1,10 +1,12 @@
 #include "addr_info.h"
+#include "network.h"
 #include "packet.h"
 #include "packet_processor.h"
 
 
-PacketProcessor::PacketProcessor( warhawk::net::UdpNetworkSocket &udpNetworkSocket_ )
+PacketProcessor::PacketProcessor( warhawk::net::UdpNetworkSocket &udpNetworkSocket_, Network &network_ )
   : m_UdpNetworkSocket( udpNetworkSocket_ )
+  , m_Network( network_ )
   , m_mutex( )
   , m_MessageHandlers( )
   , m_Thread( [ & ] ( ) { run( ); } )
@@ -40,7 +42,12 @@ void PacketProcessor::run( )
 
     if ( valid_packet( packet ) )
     {
-      std::string fromIp = AddrInfo::SockAddrToAddress( &client ); 
+      std::string fromIp = AddrInfo::SockAddrToAddress( &client );
+      bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+
+      packet.SetClient( client );
+      packet.SetFromIp( fromIp );
+      packet.SetFromLocalNetwork( fromLocalNetwork );
 
       for ( auto itr : m_MessageHandlers )
       {
@@ -52,7 +59,7 @@ void PacketProcessor::run( )
 
         if ( result != 0 )
         { 
-          messageHandler->OnReceivePacket( client, packet );
+          messageHandler->OnReceivePacket( packet );
         }
       }
     }

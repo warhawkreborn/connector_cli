@@ -40,7 +40,7 @@ class SearchServer : public MessageHandler
 
     void run( );
 
-    void OnReceivePacket( sockaddr_storage client, const Packet & ) override;
+    void OnReceivePacket( const Packet & ) override;
 
     bool LocalServerContainsIp( const std::string &ip ); // True if the list contains this IP.
 

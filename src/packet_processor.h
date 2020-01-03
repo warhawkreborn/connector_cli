@@ -15,13 +15,14 @@
 
 
 class MessageHandler;
+class Network;
 
 
 class PacketProcessor
 {
   public:
 
-    PacketProcessor( warhawk::net::UdpNetworkSocket &udpServer_ );
+    PacketProcessor( warhawk::net::UdpNetworkSocket &, Network & );
     virtual ~PacketProcessor( );
 
     // Run the Server process.
@@ -60,7 +61,8 @@ class PacketProcessor
     //
 
     warhawk::net::UdpNetworkSocket &m_UdpNetworkSocket;
- 
+    Network                        &m_Network;
+
     std::mutex      m_mutex; // Protect m_MessageHandlers.
     using MessageHandlers = std::map< MessageHandler *, int >;
     MessageHandlers m_MessageHandlers;

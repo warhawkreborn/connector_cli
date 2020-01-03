@@ -56,7 +56,7 @@ void SearchServer::run( )
 }
 
 
-void SearchServer::OnReceivePacket( struct sockaddr_storage client_, const Packet &packet_ )
+void SearchServer::OnReceivePacket( const Packet &packet_ )
 {
   if ( m_CurrentState == STATE::STATE_COLLECTING )
   {
@@ -68,7 +68,7 @@ void SearchServer::OnReceivePacket( struct sockaddr_storage client_, const Packe
     // Anything else is probably the discovery packet.
     if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_RESPONSE )
     {
-      std::string addr = AddrInfo::SockAddrToAddress( &client_ );
+      std::string addr = AddrInfo::SockAddrToAddress( &packet_.GetClient( ) );
       warhawk::DiscoveryPacket packet( packet_ );
       PacketData item { addr, packet };
 

@@ -19,7 +19,7 @@ ForwardServer::~ForwardServer( )
 }
 
 
-void ForwardServer::OnReceivePacket( sockaddr_storage client_, const Packet & packet_ )
+void ForwardServer::OnReceivePacket( const Packet & packet_ )
 {
 
 #ifdef LOGDATA
@@ -30,21 +30,18 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, const Packet & pa
     std::cout << "ForwardServer: Sending server list" << std::endl;
 #endif
 
-  std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
-  bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
-
   // This server only handles packets from the local network.
-  if ( !fromLocalNetwork )
+  if ( !packet_.GetFromLocalNetwork( ) )
   {
     return;
   }
 
-  m_ServerList.ForEachServer( [ this, &client_, fromLocalNetwork ] ( const ServerEntry &entry_ )
+  m_ServerList.ForEachServer( [ this, &packet_ ] ( const ServerEntry &entry_ )
   {
     // If it is from the local network then forward only remote servers to sender on local network.
     if ( !entry_.m_LocalServer )
     {
-      m_PacketProcessor.send( client_, entry_.m_frame );
+      m_PacketProcessor.send( packet_.GetClient( ), entry_.m_frame );
     }
 
     const bool continueOn = true;
