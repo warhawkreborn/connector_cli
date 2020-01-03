@@ -118,9 +118,9 @@ bool Network::StartWinsock( )
 //////////////////////////////////////////////////////////////////////
 void Network::_Init( )
 {
-  AddAddress( m_MyIpAddresses, "127.0.0.1", 8 );
+  AddAddress( m_MyIpAddresses, "LoopBack", "127.0.0.1", 8 );
 
-  AddAddress( m_MyIpAddresses, "::1", 128 );
+  AddAddress( m_MyIpAddresses, "LoopBack", "::1", 128 );
 
 #if defined( __linux__ ) || defined( __APPLE__ )
   struct ifaddrs *addrs = NULL;
@@ -221,7 +221,14 @@ void Network::_Init( )
         char buf[ 256 ];
         memset( &buf[0], 0, sizeof(buf) );
         getnameinfo( ptr->Address.lpSockaddr, ptr->Address.iSockaddrLength, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
-        AddAddress( m_MyIpAddresses, buf, ptr->OnLinkPrefixLength );
+        std::string ipAddress = buf;
+        size_t idx = ipAddress.find( "%" );
+        if ( idx != std::string::npos )
+        {
+          ipAddress = ipAddress.substr( 0, idx );
+        }
+        wcstombs ( buf, pAddresses->FriendlyName, sizeof( buf ) );
+        AddAddress( m_MyIpAddresses, buf, ipAddress.c_str( ), ptr->OnLinkPrefixLength );
       }
 
       pAddresses = pAddresses->Next;
@@ -254,8 +261,8 @@ bool Network::OnAddressList( const IpAddresses_t &addrList_,
   for ( IpAddresses_t::const_iterator itr = addrList_.begin( );
         itr != addrList_.end( ); ++itr )
   {
-    const IpAddress *ptr = &( *itr );
-    std::string address = ptr->GetAddress( );
+    const IpData *ptr = &( *itr );
+    std::string address = ptr->m_Address.GetAddress( );
     if ( incomingAddr == address )
     {
       return true; // Yes, this is one of my addresses.
@@ -335,10 +342,13 @@ std::string Network::GetNextInterface( )
 }
 
 
-void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_, int prefixLen_ )
+void Network::AddAddress( IpAddresses_t &addrList_, const std::string &interfaceName_, const char *addr_, int prefixLen_ )
 {
   IpAddress addr( addr_, prefixLen_ );
-  addrList_.push_back( addr );
+  IpData ipData;
+  ipData.m_InterfaceName = interfaceName_;
+  ipData.m_Address = addr;
+  addrList_.push_back( ipData );
 }
 
 
@@ -427,7 +437,7 @@ bool Network::OnLocalNetwork( const std::string &ip_ )
 {
   for ( const auto &entry : m_MyIpAddresses )
   {
-    if ( OnSameNetwork( entry, ip_ ) )
+    if ( OnSameNetwork( entry.m_Address, ip_ ) )
     {
       return true;
     }
@@ -565,7 +575,7 @@ std::vector< std::string > Network::ResolveIpAddress( const std::string &hostnam
 }
 
 
-void Network::ForEachAddress( std::function< bool ( const IpAddress & ) > func_ )
+void Network::ForEachAddress( std::function< bool ( const IpData & ) > func_ )
 {
   for ( const auto &ipAddr : m_MyIpAddresses )
   {

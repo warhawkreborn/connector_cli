@@ -20,6 +20,7 @@ class IpAddress
     // METHODS
     //////////////////////////////
 
+    IpAddress( );
     IpAddress( const std::string &ipAddres, const int &prefixLength );
     ~IpAddress( );
 
@@ -51,5 +52,5 @@ class IpAddress
     //////////////////////////////
 
     std::string m_Address;
-    int         m_PrefixLength;
+    int         m_PrefixLength = -1;
 };

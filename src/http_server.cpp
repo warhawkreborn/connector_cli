@@ -169,9 +169,9 @@ std::string HttpServer::OnGetMyAddresses( )
 
   html << "<h1>WarHawk Reborn Network Addresses</h1>" << std::endl;
 
-  m_Network.ForEachAddress( [ this, &html ] ( const IpAddress &ip_ )
+  m_Network.ForEachAddress( [ this, &html ] ( const IpData &data_ )
   {
-    html << "Address: " << ip_.GetAddress( ) << "/" << ip_.GetPrefixLength( ) << "<br/>" << std::endl;
+    html << "Interface: " << data_.m_InterfaceName << ", Address: " << data_.m_Address.GetAddress( ) << "/" << data_.m_Address.GetPrefixLength( ) << "<br/>" << std::endl;
     const bool continueOn = true;
     return continueOn;
   } );

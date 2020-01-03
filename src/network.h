@@ -43,6 +43,15 @@
 
 struct addrinfo;
 
+typedef struct IpData
+{
+  IpData::IpData( ) { }
+
+  std::string m_InterfaceName;
+  IpAddress   m_Address;
+} IpData;
+
+
 class Network
 {
   public:
@@ -51,7 +60,7 @@ class Network
     // DECLARATIONS
     //////////////////////////////
 
-    using IpAddresses_t = std::vector< IpAddress >;
+    using IpAddresses_t = std::vector< IpData >;
 
     //////////////////////////////
     // METHODS
@@ -68,7 +77,7 @@ class Network
 
     static std::vector< std::string > ResolveIpAddress( const std::string &hostname );
 
-    void ForEachAddress( std::function< bool ( const IpAddress & ) > );
+    void ForEachAddress( std::function< bool ( const IpData & ) > );
 
     //////////////////////////////
     // DATA
@@ -98,7 +107,7 @@ class Network
 
     void _Init( );
 
-    void AddAddress( IpAddresses_t &, const char *address, const int prefixLen );
+    void AddAddress( IpAddresses_t &, const std::string &interfaceName, const char *address, const int prefixLen );
 
     int GetPrefixLen( const std::string &netmask ); // Return the prefix length of the nextmask;
 
