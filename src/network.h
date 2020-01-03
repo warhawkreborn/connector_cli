@@ -45,7 +45,7 @@ struct addrinfo;
 
 typedef struct IpData
 {
-  IpData::IpData( ) { }
+  IpData( ) { }
 
   std::string m_InterfaceName;
   IpAddress   m_Address;

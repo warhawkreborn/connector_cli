@@ -181,7 +181,7 @@ void Network::_Init( )
         {
           address = address.substr( 0, idx );
         }
-        AddAddress( m_MyIpAddresses, address.c_str( ), prefixLen );
+        AddAddress( m_MyIpAddresses, tmp->ifa_name, address.c_str( ), prefixLen );
       }
     }
   }
