@@ -236,10 +236,11 @@ std::string HttpServer::OnGetMainPage( )
 
   html << "<table>" << std::endl;
   html << "  <tr>" << std::endl;
-  html << "    <th style='color: #00ff00;'>Name</th>" << std::endl;
-  html << "    <th style='color: #00ff00;'>Public IP Address</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Name</th>"               << std::endl;
+  html << "    <th style='color: #00ff00;'>Status</th>"             << std::endl;
+  html << "    <th style='color: #00ff00;'>Public IP Address</th>"  << std::endl;
   html << "    <th style='color: #00ff00;'>Private IP Address</th>" << std::endl;
-  html << "    <th style='color: #00ff00;'>Info</th>" << std::endl;
+  html << "    <th style='color: #00ff00;'>Info</th>"               << std::endl;
   html << "  </tr>" << std::endl;
 
   m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
@@ -248,6 +249,7 @@ std::string HttpServer::OnGetMainPage( )
     {
       html << "  <tr>" << std::endl;
       html << "    <td style='color: #00ff00;'><center>" << entry_.m_PacketData.m_data.GetName( ) << "</center></td>" << std::endl;
+      html << "    <td style='color: #00ff00;'><center>" << entry_.m_PublicIpResponse.m_state     << "</center></td>" << std::endl;
       html << "    <td style='color: #00ff00;'><center>" << entry_.m_PublicIpResponse.m_ip        << "</center></td>" << std::endl;
       html << "    <td style='color: #00ff00;'><center>" << entry_.m_PacketData.m_address         << "</center></td>" << std::endl;
       html << "    <td style='color: #00ff00;'>";
