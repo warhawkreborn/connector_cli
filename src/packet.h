@@ -26,7 +26,7 @@ class Packet
     };
 
     Packet( );
-    Packet( std::vector< uint8_t > data );
+    Packet( std::vector< uint8_t > data, bool fromLocalNetwork );
     virtual ~Packet( );
 
     TYPE GetType( ) const;
@@ -53,6 +53,8 @@ class Packet
     //
 
      void SetType( );
+
+     bool ValidPacket( );
 
     //
     // Data

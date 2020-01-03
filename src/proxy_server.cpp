@@ -32,7 +32,8 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   m_PacketProcessor.Register( this,
      ( (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST  |
        (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE |
-       (int) Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER ) );
+       (int) Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER|
+       (int) Packet::TYPE::TYPE_GAME_SERVER_TO_CLIENT ) );
 }
 
 
@@ -62,6 +63,12 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
 
   if ( packet_.GetFromLocalNetwork( ) )
   {
+    if ( packet_.GetType( ) == Packet::TYPE::TYPE_GAME_SERVER_TO_CLIENT )
+    {
+      OnHandleGameServerToClient( packet_ );
+      return;
+    }
+
     if ( !m_ReplyingToQuery )
     {
       return;
@@ -161,7 +168,7 @@ void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
     return;
   }
 
-  Packet newPacket( packet_.GetData( ) );
+  Packet newPacket( packet_.GetData( ), true );
 
   // Fill in our public server address instead of the local server address.
   uint8_t *dataPtr = static_cast< uint8_t * >( &(newPacket.GetData( )[ 0 ]) );
@@ -191,5 +198,56 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
     // Update it it on the list.
     ClientData &data = itr->second;
     data.m_PacketFromClient = packet_;
+  }
+
+  std::string localServerIp;
+
+  m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
+  {
+    bool continueOn = true;
+
+    if ( entry_.m_LocalServer )
+    {
+      localServerIp = entry_.m_PacketData.m_address; // LOCAL IP not PUBLIC.
+      continueOn = false;
+    }
+
+    return continueOn;
+  } );
+
+  if ( localServerIp == "" )
+  {
+    return;
+  }
+
+  // Send it to the local WarHawkServer.
+  AddrInfo sendAddr;
+  sendAddr.SetAddr( localServerIp );
+  sendAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) sendAddr.GetAiAddr( ) );
+  const bool broadcast = false;
+  m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
+
+  std::cout << "CLIENT_TO_SERVER: Length=" << packet_.GetData( ).size( ) << std::endl;
+}
+
+
+void ProxyServer::OnHandleGameServerToClient( const Packet &packet_ )
+{
+  for ( const auto &client : m_ClientIpList )
+  {
+    if ( true ) // This needs to somehow differentiate between clients, but just one for now.
+    {
+      const std::string &clientIp = client.first;
+      // Send it to the client.
+      AddrInfo sendAddr;
+      sendAddr.SetAddr( clientIp );
+      sendAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) sendAddr.GetAiAddr( ) );
+      const bool broadcast = false;
+      m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
+
+      std::cout << "SERVER_TO_CLIENT: Length=" << packet_.GetData( ).size( ) << std::endl;
+
+      break;
+    }
   }
 }

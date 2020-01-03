@@ -38,16 +38,16 @@ void PacketProcessor::run( )
 
   while ( !m_Done && m_UdpNetworkSocket.receive( client, data ) )
   {
-    Packet packet( data );
+    std::string fromIp = AddrInfo::SockAddrToAddress( &client );
+    bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
 
-    if ( valid_packet( packet ) )
+    Packet packet( data, fromLocalNetwork );
+
+    packet.SetClient( client );
+    packet.SetFromIp( fromIp );
+
+    if ( packet.GetData( ).size( ) > 0 )
     {
-      std::string fromIp = AddrInfo::SockAddrToAddress( &client );
-      bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
-
-      packet.SetClient( client );
-      packet.SetFromIp( fromIp );
-      packet.SetFromLocalNetwork( fromLocalNetwork );
 
       for ( auto itr : m_MessageHandlers )
       {
@@ -77,30 +77,6 @@ void PacketProcessor::send( const sockaddr_storage &clientaddr_, const std::vect
 bool PacketProcessor::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
   return m_UdpNetworkSocket.receive( clientaddr_, data_ );
-}
-
-
-bool PacketProcessor::valid_packet( const Packet &packet_ )
-{
-  if ( packet_.GetData( ).size( ) == 0 )
-  {
-    return false;
-  }
-
-  if ( packet_.GetData( ).size( ) < 4 )
-  {
-    return false;
-  }
-
-  uint16_t len = packet_.GetData( )[ 3 ];
-  len = ( len << 8 ) | packet_.GetData( )[ 2 ];
-
-  if ( packet_.GetData( ).size( ) - 4 != len )
-  {
-    return false;
-  }
-
-  return true;
 }
 
 

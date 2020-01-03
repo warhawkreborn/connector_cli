@@ -34,9 +34,6 @@ class PacketProcessor
     // Receive packets.
     bool receive(       sockaddr_storage &clientaddr, std::vector< uint8_t > &data );
 
-    // Check for valid packet.
-    bool valid_packet( const Packet & );
-
     // Return the associated UdpServer.
     warhawk::net::UdpNetworkSocket &GetServer();
 
