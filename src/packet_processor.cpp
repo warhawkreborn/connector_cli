@@ -15,7 +15,7 @@ PacketProcessor::~PacketProcessor( )
 {
   m_Done = true;
 
-  // Broadcast zero-length packet to make sure this server shuts down
+  // Broadcast zero-length packet to make sure this server shuts down.
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
   clientAddr.PortToSockAddr( m_UdpNetworkSocket.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
@@ -44,9 +44,13 @@ void PacketProcessor::run( )
 
       for ( auto itr : m_MessageHandlers )
       {
-        MessageHandler *messageHandler = itr.second;
-
-        messageHandler->OnReceivePacket( client, packet );
+        MessageHandler *messageHandler = itr.first;
+        int handlerMask                = itr.second;
+ 
+        if ( ( (int) packet.GetType( ) & handlerMask ) != 0 )
+        { 
+          messageHandler->OnReceivePacket( client, packet );
+        }
       }
     }
   }
@@ -91,10 +95,10 @@ warhawk::net::UdpNetworkSocket &PacketProcessor::GetServer()
 }
 
 
-void PacketProcessor::Register( MessageHandler *handler_ )
+void PacketProcessor::Register( MessageHandler *handler_, int messageMask_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
-  m_MessageHandlers[ handler_ ] = handler_;
+  m_MessageHandlers[ handler_ ] = messageMask_;
 }
 
 

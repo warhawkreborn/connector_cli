@@ -14,11 +14,12 @@ class Packet
 
     enum class TYPE
     {
-      TYPE_UNKNOWN,
-      TYPE_SERVER_INFO_REQUEST,
-      TYPE_SERVER_INFO_RESPONSE,
-      TYPE_GAME_CLIENT_TO_SERVER,
-      TYPE_GAME_SERVER_TO_CLIENT,
+      // Powers of two so they can also be 'or'ed together to form groups.
+      TYPE_UNKNOWN               = 0x0,
+      TYPE_SERVER_INFO_REQUEST   = 0x1,
+      TYPE_SERVER_INFO_RESPONSE  = 0x2,
+      TYPE_GAME_CLIENT_TO_SERVER = 0x4,
+      TYPE_GAME_SERVER_TO_CLIENT = 0x8,
     };
 
     Packet( );

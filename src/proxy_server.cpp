@@ -28,7 +28,9 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
 
   m_ServerListServer = addressList[ 0 ];
 
-  m_PacketProcessor.Register( this );
+  m_PacketProcessor.Register( this,
+     ( (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST |
+       (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE ) );
 }
 
 

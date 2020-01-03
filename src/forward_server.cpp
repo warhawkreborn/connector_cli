@@ -9,7 +9,7 @@ ForwardServer::ForwardServer( ServerList &serverList_, PacketProcessor &packetPr
   , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
-  m_PacketProcessor.Register( this );
+  m_PacketProcessor.Register( this, (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST );
 }
 
 
@@ -25,11 +25,6 @@ void ForwardServer::OnReceivePacket( sockaddr_storage client_, const Packet & pa
 #ifdef LOGDATA
   std::cout << "ForwardServer: Received packet." << std::endl;
 #endif
-
-  if ( packet_.GetType( ) != Packet::TYPE::TYPE_SERVER_INFO_REQUEST )
-  {
-    return;
-  }
 
 #ifdef LOGDATA
     std::cout << "ForwardServer: Sending server list" << std::endl;

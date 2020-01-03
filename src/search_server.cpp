@@ -14,7 +14,7 @@ SearchServer::SearchServer( ServerList &serverList_, PacketProcessor &packetProc
   , m_Thread( [&] ( ) { run( ); } )
 
 {
-  m_PacketProcessor.Register( this );
+  m_PacketProcessor.Register( this, (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE );
 }
 
 

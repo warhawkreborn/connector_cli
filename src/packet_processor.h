@@ -40,7 +40,7 @@ class PacketProcessor
     warhawk::net::UdpNetworkSocket &GetServer();
 
     // Register a message handler.
-    void Register(   MessageHandler * );
+    void Register(   MessageHandler *, int messageMask );
 
     // Unregister a message handler.
     void Unregister( MessageHandler * );
@@ -62,7 +62,7 @@ class PacketProcessor
     warhawk::net::UdpNetworkSocket &m_UdpNetworkSocket;
  
     std::mutex      m_mutex; // Protect m_MessageHandlers.
-    using MessageHandlers = std::map< MessageHandler *, MessageHandler * >;
+    using MessageHandlers = std::map< MessageHandler *, int >;
     MessageHandlers m_MessageHandlers;
 
     bool        m_Done = false;
