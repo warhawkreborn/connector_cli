@@ -46,8 +46,11 @@ void PacketProcessor::run( )
       {
         MessageHandler *messageHandler = itr.first;
         int handlerMask                = itr.second;
- 
-        if ( ( (int) packet.GetType( ) & handlerMask ) != 0 )
+
+        Packet::TYPE packetType = packet.GetType( );
+        int result = (int) packetType & handlerMask;
+
+        if ( result != 0 )
         { 
           messageHandler->OnReceivePacket( client, packet );
         }
@@ -72,6 +75,11 @@ bool PacketProcessor::receive( sockaddr_storage &clientaddr_, std::vector< uint8
 
 bool PacketProcessor::valid_packet( const Packet &packet_ )
 {
+  if ( packet_.GetData( ).size( ) == 0 )
+  {
+    return false;
+  }
+
   if ( packet_.GetData( ).size( ) < 4 )
   {
     return false;
