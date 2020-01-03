@@ -17,6 +17,8 @@ class Packet
       TYPE_UNKNOWN,
       TYPE_SERVER_INFO_REQUEST,
       TYPE_SERVER_INFO_RESPONSE,
+      TYPE_GAME_CLIENT_TO_SERVER,
+      TYPE_GAME_SERVER_TO_CLIENT,
     };
 
     Packet( );

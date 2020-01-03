@@ -73,11 +73,6 @@ bool PacketProcessor::valid_packet( const Packet &packet_ )
     return false;
   }
 
-  if ( !( packet_.GetData( )[ 0 ] == 0xc3 && packet_.GetData( )[ 1 ] == 0x81 ) )
-  {
-    return false;
-  }
-
   uint16_t len = packet_.GetData( )[ 3 ];
   len = ( len << 8 ) | packet_.GetData( )[ 2 ];
 
