@@ -41,6 +41,8 @@ class ProxyServer : public MessageHandler
     void OnHandleServerInfoRequest(  const Packet & );
     void OnHandleServerInfoResponse( const Packet & );
 
+    void OnHandleGameClientToServer( const Packet & );
+
     //
     // Data
     //
@@ -52,5 +54,13 @@ class ProxyServer : public MessageHandler
     bool             m_ReplyingToQuery = false;
     std::string      m_ServerListServer; // warhawk.thalhamer.it.
     uint16_t         m_LastServerListServerPort; // Port we last received packet from ServerListServer on.
-    std::vector < std::string > m_ClientIpList;
+
+    typedef struct
+    {
+      Packet m_PacketFromClient;
+      Packet m_PacketFromServer;
+    } ClientData;
+    
+    using ClientIpList = std::map< std::string, ClientData >;
+    ClientIpList     m_ClientIpList;
 };

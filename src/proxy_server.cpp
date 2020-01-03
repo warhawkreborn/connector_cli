@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 #include <sstream>
 
@@ -29,8 +30,9 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   m_ServerListServer = addressList[ 0 ];
 
   m_PacketProcessor.Register( this,
-     ( (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST |
-       (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE ) );
+     ( (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST  |
+       (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE |
+       (int) Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER ) );
 }
 
 
@@ -77,6 +79,10 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
     if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_REQUEST )
     {
       OnHandleServerInfoRequest( packet_ );
+    }
+    else if ( packet_.GetType( ) == Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER )
+    {
+      OnHandleGameClientToServer( packet_ );
     }
   }
 }
@@ -164,5 +170,26 @@ void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
   memcpy( frame->m_ip1, &publicServerIp, sizeof( frame->m_ip1 ) );
   memcpy( frame->m_ip2, &publicServerIp, sizeof( frame->m_ip2 ) );
 
-  m_PacketProcessor.send( *sendAddr.GetAiAddr(), packet_.GetData( ), broadcast );
+  m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
+}
+
+
+void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
+{
+  ClientIpList::iterator itr = m_ClientIpList.find( packet_.GetFromIp( ) );
+
+  if ( itr == m_ClientIpList.end( ) )
+  {
+    // It is not on the list, so put it there.
+    ClientData data;
+    data.m_PacketFromClient = packet_;
+    m_ClientIpList[ packet_.GetFromIp( ) ] = data;
+    itr = m_ClientIpList.find( packet_.GetFromIp( ) );
+  }
+  else
+  {
+    // Update it it on the list.
+    ClientData &data = itr->second;
+    data.m_PacketFromClient = packet_;
+  }
 }
