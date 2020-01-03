@@ -245,9 +245,7 @@ void ProxyServer::OnHandleGameServerToClient( const Packet &packet_ )
       const bool broadcast = false;
       m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
 
-      std::cout << "SERVER_TO_CLIENT: Length=" << packet_.GetData( ).size( ) << std::endl;
-
-      break;
+      std::cout << "SERVER_TO_CLIENT: IP=" << clientIp << "< Length=" << packet_.GetData( ).size( ) << std::endl;
     }
   }
 }
