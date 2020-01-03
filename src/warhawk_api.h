@@ -12,7 +12,7 @@
 
 #include "server_list.h"
 
-class PacketServer;
+class PacketProcessor;
 class Server;
 
 struct ServerEntry;
@@ -25,7 +25,7 @@ class API
 {
   public:
 
-    static std::vector< ServerEntry > DownloadServerList( PacketServer * );
+    static std::vector< ServerEntry > DownloadServerList( PacketProcessor * );
 
     struct ForwardingResponse
     {

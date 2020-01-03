@@ -1,9 +1,23 @@
 //
-// This program acts as an intermediary which does several things
+// This program acts as an intermediary for the Sony Playstation 3 WarHawk
+// multi-player game which does several things:
+//
+// It has two modes of operation:
+// 1. "Announcement Mode" where the port forwarding is done to the PS3 and
+//    this program just acts as a server announcement to the same local LAN
+//    as the PS3.
+//
+// 2. "Proxy Mode" where the port forwarding is done to the WarHawkReborn
+//    server.  This causes it to act as a "proxy" which passes through game
+//    packets between any remote systems and the PS3 on the same local LAN
+//    as the WarHawkReborn server.
+//
+// This program does multiple things:
 // 1. Gets a list of current remote warhawk servers from https://warhawk.thalhammer.it/api/ URL.
 // 2. Broadcasts that list of servers to a warhawk client when it requests the list of servers.
 // 3. Watches for local warhawk servers on the network and sends those to the remote server.
 // 4. Provides a web server to show the list of servers and other information.
+// 5. If it sees WARHAWK UDP packets from remote networks then it switches in to "Proxy Mode".
 //
 
 // System includes
@@ -46,6 +60,7 @@
 #include "forward_server.h"
 #include "http_server.h"
 #include "network.h"
+#include "proxy_server.h"
 #include "request_server.h"
 #include "search_server.h"
 #include "warhawk.h"
@@ -178,28 +193,38 @@ int main( int argc_, const char **argv_ )
     ServerList serverList;
 
     // Set up to listen for UDP packets on standard WarHawk port.
-    warhawk::net::udp_server udpServer( network, WARHAWK_UDP_PORT );
+    warhawk::net::UdpNetworkSocket udpNetworkSocket( network, WARHAWK_UDP_PORT );
 
-    // The Packet server watches for packets and distributes them to the
+    // The PacketProcessor watches for packets and distributes them to the
     // clients that register with it.
-    PacketServer packetServer( udpServer );
+    PacketProcessor packetProcessor( udpNetworkSocket );
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then marked as local servers and sent on
     // to the remote server that publishes the list of available public servers.
-    SearchServer searchServer( serverList, &packetServer );
+    SearchServer searchServer( serverList, packetProcessor );
 
-    // The ForwardServer watches for server query requests from the local network and
-    // responds with a list of remote servers.
-    ForwardServer forwardServer( serverList, packetServer, network );
+    // The ForwardServer watches for server query requests from the local
+    // network and responds with a list of remote servers.
+    ForwardServer forwardServer( serverList, packetProcessor, network );
 
-    // The RequestServer periodically queries the remote WarHawk Server List Server
-    // and puts the resuling list of servers into the forwardServer and searchServer.
-    RequestServer requestServer( serverList, packetServer );
+    // The RequestServer periodically queries the remote WarHawk Server List
+    // Server and puts the resuling list of servers into Server List.
+    RequestServer requestServer( serverList, packetProcessor );
+
+    // The ProxyServer watches for packets to the WARHAWK UDP port and if it
+    // sees any packets come from remote systems (servers or clients) then it
+    // switches in to "ProxyMode".
+    // It then relays packets back and forth between the local LAN PS3(s) and
+    // the remote servers or clients.
+//#define PROXY_MODE
+#ifdef PROXY_MODE
+    ProxyServer proxyServer( serverList, packetProcessor, network );
+#endif
 
 #ifndef TEST_SHUTDOWN
     // Run the HTTP server in the main thread.
-    HttpServer httpServer( port, root, serverList, forwardServer, searchServer );
+    HttpServer httpServer( port, root, serverList, forwardServer, searchServer, network );
     httpServer.run( );
 #endif
 

@@ -1,41 +1,41 @@
 #include "addr_info.h"
-#include "packet_server.h"
+#include "packet_processor.h"
 
 
-PacketServer::PacketServer( warhawk::net::udp_server &udpServer_ )
-  : m_server( udpServer_ )
+PacketProcessor::PacketProcessor( warhawk::net::UdpNetworkSocket &udpNetworkSocket_ )
+  : m_UdpNetworkSocket( udpNetworkSocket_ )
   , m_mutex( )
   , m_MessageHandlers( )
   , m_Thread( [ & ] ( ) { run( ); } )
 {
 }
 
-PacketServer::~PacketServer()
+PacketProcessor::~PacketProcessor( )
 {
   m_Done = true;
 
   // Broadcast zero-length packet to make sure this server shuts down
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
-  clientAddr.PortToSockAddr( m_server.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  clientAddr.PortToSockAddr( m_UdpNetworkSocket.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
   std::vector< uint8_t > packet;
   const bool broadcast = true;
-  m_server.send( *clientAddr.GetAiAddr(), packet, broadcast );
+  m_UdpNetworkSocket.send( *clientAddr.GetAiAddr(), packet, broadcast );
 
   m_Thread.join();
 }
 
 
-void PacketServer::run()
+void PacketProcessor::run( )
 {
   std::cout << "Starting Packet Server..." << std::endl;
 
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
 
-  while ( !m_Done && m_server.receive( client, data ) )
+  while ( !m_Done && m_UdpNetworkSocket.receive( client, data ) )
   {
-    if ( data.size( ) > 0 )
+    if ( valid_packet( data ) )
     {
       for ( auto itr : m_MessageHandlers )
       {
@@ -50,19 +50,19 @@ void PacketServer::run()
   std::cout << "Stopping Packet Server." << std::endl;
 }
 
-void PacketServer::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
+void PacketProcessor::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )
 {
-  m_server.send( clientaddr_, data_, broadcast_ );
+  m_UdpNetworkSocket.send( clientaddr_, data_, broadcast_ );
 }
 
 
-bool PacketServer::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
+bool PacketProcessor::receive( sockaddr_storage &clientaddr_, std::vector< uint8_t > &data_ )
 {
-  return m_server.receive( clientaddr_, data_ );
+  return m_UdpNetworkSocket.receive( clientaddr_, data_ );
 }
 
 
-bool PacketServer::valid_packet( const std::vector< uint8_t > &data_ )
+bool PacketProcessor::valid_packet( const std::vector< uint8_t > &data_ )
 {
   if ( data_.size() < 4 )
   {
@@ -81,20 +81,20 @@ bool PacketServer::valid_packet( const std::vector< uint8_t > &data_ )
 }
 
 
-warhawk::net::udp_server &PacketServer::GetServer()
+warhawk::net::UdpNetworkSocket &PacketProcessor::GetServer()
 {
-  return m_server;
+  return m_UdpNetworkSocket;
 }
 
 
-void PacketServer::Register( MessageHandler *handler_ )
+void PacketProcessor::Register( MessageHandler *handler_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   m_MessageHandlers[ handler_ ] = handler_;
 }
 
 
-void PacketServer::Unregister( MessageHandler *handler_ )
+void PacketProcessor::Unregister( MessageHandler *handler_ )
 {
   std::unique_lock< std::mutex > lck( m_mutex );
   MessageHandlers::iterator itr = m_MessageHandlers.find( handler_ );
@@ -105,7 +105,7 @@ void PacketServer::Unregister( MessageHandler *handler_ )
   }
 }
 
-std::vector< uint8_t > PacketServer::hex2bin( const std::string &str_ )
+std::vector< uint8_t > PacketProcessor::hex2bin( const std::string &str_ )
 {
   if ( str_.size() % 2 )
   {

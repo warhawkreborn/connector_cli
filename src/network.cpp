@@ -174,7 +174,14 @@ void Network::_Init( )
 
       if ( abuf[ 0 ] && nbuf[ 0 ] )
       {
-        AddAddress( m_MyIpAddresses, abuf, prefixLen );
+        std::string address = abuf;
+        // Delete '%' character and anything following if found.
+        size_t idx = address.find( "%" );
+        if ( idx != std::string::npos )
+        {
+          address = address.substr( 0, idx );
+        }
+        AddAddress( m_MyIpAddresses, address.c_str( ), prefixLen );
       }
     }
   }
@@ -223,7 +230,7 @@ void Network::_Init( )
 
 #endif // WIN32
 
-#if 1
+#if 0
   // Test - Convert back and make sure we got what we thought we got.
   for ( IpAddresses_t::iterator itr = m_MyIpAddresses.begin();
         itr != m_MyIpAddresses.end(); ++itr )
@@ -509,5 +516,65 @@ bool Network::Ipv6Addr( const std::string &ip_ )
 {
   bool ipv6 = ip_.find( ':' ) != std::string::npos;
   return ipv6;
+}
+
+
+std::vector< std::string > Network::ResolveIpAddress( const std::string &hostname_ )
+{
+  std::vector< std::string > addressList;
+
+  addrinfo *result = NULL;
+  addrinfo hints;
+  memset( &hints, 0, sizeof(hints) );
+
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  hints.ai_family = AF_INET;
+
+  hints.ai_flags =
+#ifdef AI_ADDRCONFIG
+    AI_ADDRCONFIG |
+#endif
+    0;
+
+  int e = getaddrinfo( hostname_.c_str( ), "0", &hints, &result );
+
+  if ( e != 0 )
+  {
+    if ( result != NULL )
+    {
+      freeaddrinfo( result );
+    }
+
+    return addressList; // Error.
+  }
+
+  for ( addrinfo *itr = result; itr != NULL; itr = itr->ai_next )
+  {
+    AddrInfo addrInfo( *itr );
+    addressList.push_back( addrInfo.GetAddr( ) );
+  }
+
+  if ( result != NULL )
+  {
+    freeaddrinfo( result );
+  }
+
+  return addressList;
+}
+
+
+void Network::ForEachAddress( std::function< bool ( const IpAddress & ) > func_ )
+{
+  for ( const auto &ipAddr : m_MyIpAddresses )
+  {
+    bool continueOn = func_( ipAddr );
+
+    if ( !continueOn )
+    {
+      break;
+    }
+  }
 }
  

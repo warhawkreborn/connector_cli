@@ -32,15 +32,15 @@ namespace warhawk
 namespace net
 {
 
-class udp_server
+class UdpNetworkSocket
 {
   public:
 
-    udp_server( Network &, uint16_t port ); // Bind a port to the socket.
-    ~udp_server( );
+    UdpNetworkSocket( Network &, uint16_t port ); // Bind a port to the socket.
+    ~UdpNetworkSocket();
 
-    udp_server( const udp_server & ) = delete;            // Don't allow copying of this class.
-    udp_server &operator=( const udp_server & ) = delete; // Don't allow copying of this class.
+    UdpNetworkSocket( const UdpNetworkSocket & ) = delete; // Don't allow copying of this class.
+    UdpNetworkSocket &operator=( const UdpNetworkSocket & ) = delete; // Don't allow copying of this class.
 
     // Send a packet from this port.
     void send(    const sockaddr_storage &clientaddr, const std::vector< uint8_t > &data, const bool broadcast = false );

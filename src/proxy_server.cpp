@@ -1,21 +1,38 @@
+#include <string>
+#include <sstream>
+
 #include "addr_info.h"
 #include "network.h"
+#include "packet_processor.h"
 #include "proxy_server.h"
 #include "search_server.h"
+#include "warhawk.h"
 
 
-ProxyServer::ProxyServer( ServerList &serverList_, PacketServer &server_, Network &network_ )
+ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProcessor_, Network &network_ )
   : m_ServerList( serverList_ )
-  , m_PacketServer( server_ )
+  , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
-  m_PacketServer.Register( this );
+  std::vector< std::string > addressList;
+  addressList = m_Network.ResolveIpAddress( WARHAWK_SERVER_LIST_SERVER );
+
+  if ( addressList.size( ) < 1 )
+  {
+    std::stringstream ss;
+    ss << "Can't resolve IP address for WARHAWK_SERVER_LIST_SERVER: " << WARHAWK_SERVER_LIST_SERVER;
+    throw std::runtime_error( ss.str( ) );
+  }
+
+  m_ServerListServer = addressList[ 0 ];
+
+  m_PacketProcessor.Register( this );
 }
 
 
 ProxyServer::~ProxyServer( )
 {
-  m_PacketServer.Unregister( this );
+  m_PacketProcessor.Unregister( this );
 }
 
 
@@ -31,44 +48,68 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_
     return;
   }
 
-#ifdef FUTURE
-  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
+  std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
+  bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+
+  // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
+  if ( fromIp == m_ServerListServer )
   {
-#ifdef LOGDATA
-    std::cout << "ProxyServer: Sending server list" << std::endl;
-#endif
+    m_ProxyMode = true;
+  }
 
-    std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
-    bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+  if ( !m_ProxyMode )
+  {
+    return;
+  }
 
-    // If we receive a packet from a remote server then turn ProxyMode ON.
-    if ( !fromLocalNetwork )
+  int debug = 0;
+
+  if ( fromLocalNetwork )
+  {
+    if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
     {
-      m_ProxyMode = true;
+      return; // This query packet which we are not intersted in.
     }
 
-    if ( !m_ProxyMode )
-    {
-      return;
-    }
-
-    m_ServerList.ForEachServer( [ this, &client_, fromLocalNetwork ] ( const ServerEntry &entry_ )
-    {
-      // If it is from the local network then forward only remote servers to sender on local network.
-      if ( !entry_.m_LocalServer )
-      {
-        m_PacketServer.send( client_, entry_.m_frame );
-      }
-
-      const bool continueOn = true;
-      return continueOn;
-    } );
+    // Broadcast it to the entire local LAN.
+    AddrInfo sendAddr;
+    sendAddr.SetAddr( m_ServerListServer );
+    sendAddr.PortToSockAddr( m_PacketProcessor.GetServer().GetPort(), (sockaddr *) sendAddr.GetAiAddr() );
+    const bool broadcast = false;
+    m_PacketProcessor.send( *sendAddr.GetAiAddr(), data_, broadcast );
   }
   else
   {
-    std::cout << "ProxyServer: Unknown frame type, ignoring" << std::endl;
+    std::string foundLocalServer = "";
+
+    // Forward remote client to local LAN server.
+    m_ServerList.ForEachServer( [ & ] ( ServerEntry &entry_ )
+    {
+      bool continueOn = true;
+
+      if ( entry_.m_LocalServer )
+      {
+        foundLocalServer = entry_.m_PacketData.m_address;
+        continueOn = false;
+      }
+
+      return continueOn;
+    } );
+
+    if ( foundLocalServer == "" )
+    {
+      // Broadcast it to the entire local LAN.
+      AddrInfo broadcastAddr;
+      broadcastAddr.SetAddr( "255.255.255.255" );
+      broadcastAddr.PortToSockAddr( m_PacketProcessor.GetServer( ).GetPort( ), (sockaddr *) broadcastAddr.GetAiAddr() );
+      const bool broadcast = true;
+      m_PacketProcessor.send( *broadcastAddr.GetAiAddr( ), data_, broadcast );
+    }
+    else
+    {
+      debug = 6;
+    }
   }
-#endif
 }
 
 

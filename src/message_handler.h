@@ -7,7 +7,8 @@
 
 #include <vector>
 
-#include "udp_server.h"
+#include "udp_network_socket.h"
+
 
 class MessageHandler
 {

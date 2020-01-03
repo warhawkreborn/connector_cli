@@ -12,18 +12,19 @@
 #include <iostream>
 
 #include "message_handler.h"
-#include "packet_server.h"
 #include "server_list.h"
-#include "udp_server.h"
+#include "udp_network_socket.h"
+
 
 class Network;
+class PacketProcessor;
 
 
 class ProxyServer : public MessageHandler
 {
   public:
 
-    ProxyServer( ServerList &, PacketServer &, Network & );
+    ProxyServer( ServerList &, PacketProcessor &, Network & );
     ~ProxyServer( );
  
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
@@ -42,8 +43,10 @@ class ProxyServer : public MessageHandler
     // Data
     //
 
-    ServerList   &m_ServerList;
-    PacketServer &m_PacketServer;
-    Network      &m_Network;
-    bool          m_ProxyMode = false;
+    ServerList      &m_ServerList;
+    PacketProcessor &m_PacketProcessor;
+    Network         &m_Network;
+    bool             m_ProxyMode = false;
+    std::string      m_ServerListServer; // warhawk.thalhamer.it.
+    std::vector < std::string > m_ClientIpList;
 };

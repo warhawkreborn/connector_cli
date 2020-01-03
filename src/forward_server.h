@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include "message_handler.h"
-#include "packet_server.h"
+#include "packet_processor.h"
 #include "server_list.h"
-#include "udp_server.h"
+#include "udp_network_socket.h"
 
 class SearchServer;
 class Network;
@@ -21,7 +21,7 @@ class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( ServerList &, PacketServer &, Network & );
+    ForwardServer( ServerList &, PacketProcessor &, Network & );
     ~ForwardServer( );
  
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
@@ -39,7 +39,7 @@ class ForwardServer : public MessageHandler
     // Data
     //
 
-    ServerList   &m_ServerList;
-    PacketServer &m_PacketServer;
-    Network      &m_Network;
+    ServerList      &m_ServerList;
+    PacketProcessor &m_PacketProcessor;
+    Network         &m_Network;
 };

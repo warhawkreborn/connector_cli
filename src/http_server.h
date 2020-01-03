@@ -7,6 +7,7 @@
 #include <string>
 
 class ForwardServer;
+class Network;
 class SearchServer;
 
 
@@ -16,9 +17,10 @@ class HttpServer
 
     HttpServer( const int port,
                 const std::string rootDirectory_,
-                ServerList &,
+                ServerList    &,
                 ForwardServer &,
-                SearchServer & );
+                SearchServer  &,
+                Network       & );
     ~HttpServer( );
 
     void run( );
@@ -33,6 +35,7 @@ class HttpServer
 
     void OnListen( );
     std::string OnGetMainPage( );
+    std::string OnGetMyAddresses( );
 
     //
     // Data
@@ -43,4 +46,5 @@ class HttpServer
     ServerList    &m_ServerList;
     ForwardServer &m_ForwardServer;
     SearchServer  &m_SearchServer;
+    Network       &m_Network;
 };
