@@ -35,8 +35,6 @@ class ForwardServer : public MessageHandler
     // Methods
     //
 
-    bool valid_packet( const Packet & );
-
     //
     // Data
     //

@@ -44,12 +44,6 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packe
   std::cout << "ProxyServer: Received packet." << std::endl;
 #endif
 
-  if ( !valid_packet( packet_ ) )
-  {
-    std::cout << "ProxyServer: Received invalid frame, skipping" << std::endl;
-    return;
-  }
-
   std::string fromIp = AddrInfo::SockAddrToAddress( &client_ );
   bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
 
@@ -81,27 +75,11 @@ void ProxyServer::OnReceivePacket( sockaddr_storage client_, const Packet &packe
   }
   else
   {
-    OnHandleServerInfoRequest( fromIp, packet_ );
+    if ( packet_.GetType( ) == Packet::TYPE::TYPE_SERVER_INFO_REQUEST )
+    {
+      OnHandleServerInfoRequest( fromIp, packet_ );
+    }
   }
-}
-
-
-bool ProxyServer::valid_packet( const Packet &packet_ )
-{
-  if ( packet_.GetData( ).size( ) < 4 )
-  {
-    return false;
-  }
-
-  uint16_t len = packet_.GetData( )[ 3 ];
-  len = ( len << 8 ) | packet_.GetData( )[ 2 ];
-
-  if ( packet_.GetData( ).size( ) - 4 != len )
-  {
-    return false;
-  }
-
-  return true;
 }
 
 
@@ -150,12 +128,6 @@ void ProxyServer::OnHandleServerInfoRequest( const std::string &fromIp_, const P
 
 void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
 {
-#if 0
-  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 && data_.size( ) != 174 )
-  {
-    return; // This query packet which we are not intersted in.
-  }
-#endif
   // Send it to the WarHawkServerListServer.
   AddrInfo sendAddr;
   sendAddr.SetAddr( m_ServerListServer );

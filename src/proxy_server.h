@@ -38,8 +38,6 @@ class ProxyServer : public MessageHandler
     // Methods
     //
 
-    bool valid_packet( const Packet & );
-
     void OnHandleServerInfoRequest( const std::string &fromIp, const Packet & );
     void OnHandleServerInfoResponse( const Packet & );
 
