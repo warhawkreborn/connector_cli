@@ -20,10 +20,10 @@ PacketProcessor::~PacketProcessor( )
   // Broadcast zero-length packet to make sure this server shuts down.
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
-  clientAddr.PortToSockAddr( m_UdpNetworkSocket.GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  clientAddr.SetPort( m_UdpNetworkSocket.GetPort( ) );
   std::vector< uint8_t > packet;
   const bool broadcast = true;
-  m_UdpNetworkSocket.send( *clientAddr.GetAiAddr(), packet, broadcast );
+  m_UdpNetworkSocket.send( *clientAddr.GetAiAddr( ), packet, broadcast );
 
   m_Thread.join();
 }

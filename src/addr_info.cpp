@@ -215,3 +215,15 @@ bool AddrInfo::SetAddr( const std::string &address_ )
 
   return true; // OK.
 }
+
+
+uint16_t AddrInfo::GetPort( ) const
+{
+  return SockAddrToPort( (const sockaddr *) GetAiAddr( ) );
+}
+
+
+void AddrInfo::SetPort( uint16_t port_ )
+{
+  PortToSockAddr( port_, (sockaddr *) GetAiAddr( ) );
+}

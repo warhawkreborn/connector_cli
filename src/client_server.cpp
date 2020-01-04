@@ -58,7 +58,7 @@ void ClientServer::SendPacket( const Packet &packet_ )
   // Send it to the local WarHawkServer.
   AddrInfo sendAddr;
   sendAddr.SetAddr( localServerIp );
-  sendAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) sendAddr.GetAiAddr( ) );
+  sendAddr.SetPort( WARHAWK_UDP_PORT );
   const bool broadcast = false;
   m_ProxyToServerPacketProcessor->send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
 #if 0
@@ -72,7 +72,7 @@ void ClientServer::OnReceivePacket( const Packet &packet_ )
   // Send it to the client.
   AddrInfo sendAddr;
   sendAddr.SetAddr( m_PublicIpAddress );
-  sendAddr.PortToSockAddr( m_PublicPort, (sockaddr *) sendAddr.GetAiAddr( ) );
+  sendAddr.SetPort( m_PublicPort );
   const bool broadcast = false;
   m_ProxyToClientPacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
 #if 0

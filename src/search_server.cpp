@@ -95,7 +95,7 @@ void SearchServer::DoStateBroadcasting( )
 
   AddrInfo clientAddr;
   clientAddr.SetAddr( "255.255.255.255" );
-  clientAddr.PortToSockAddr( m_PacketProcessor.GetServer().GetPort(), (sockaddr *) clientAddr.GetAiAddr() );
+  clientAddr.SetPort( m_PacketProcessor.GetServer( ).GetPort( ) );
 
   const std::vector< uint8_t > discoveryPacketData = m_PacketProcessor.hex2bin( m_DiscoveryPacket );
 

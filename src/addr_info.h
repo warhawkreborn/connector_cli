@@ -55,15 +55,26 @@ class AddrInfo
     std::string GetAddr( ) const;        // Get the Address in std::string format.
     bool SetAddr( const std::string & ); // Set the Address from std::string format.
 
+    uint16_t GetPort( ) const;
+    void SetPort( uint16_t );
+
     static std::string SockAddrToAddress( const sockaddr_storage * ); // Convert sockaddr_storage to std::string format.
     static std::string SockAddrToAddress( const struct sockaddr  * ); // Convert sockaddr         to std::string format.
 
-    static uint16_t SockAddrToPort(             const struct sockaddr * ); // Get Port from sockaddr.
-    static void PortToSockAddr( const uint16_t,       struct sockaddr * ); // Set Port from sockaddr.
+    static uint16_t SockAddrToPort(       const struct sockaddr *  ); // Get Port from sockaddr.
 
   protected:
 
   private:
+
+    //
+    // Methods
+    //
+
+    // Get pointer to sockaddr_in or sockaddr_in6 depending on address family of sockaddr. 
+    static void *GetInAddr( const struct sockaddr * );
+
+    static void PortToSockAddr( const uint16_t,       struct sockaddr * ); // Set Port from sockaddr.
 
     //
     // Data
@@ -76,11 +87,4 @@ class AddrInfo
     socklen_t        m_ai_addrlen;
     std::string      m_ai_canonname;
     sockaddr_storage m_ai_addr;
-
-    //
-    // Methods
-    //
-
-    // Get pointer to sockaddr_in or sockaddr_in6 depending on address family of sockaddr. 
-    static void *GetInAddr( const struct sockaddr * );
 };

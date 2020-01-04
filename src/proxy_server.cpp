@@ -114,7 +114,7 @@ void ProxyServer::OnHandleServerInfoRequest( const Packet &packet_ )
     // Send it to the local server.
     AddrInfo localServerAddr;
     localServerAddr.SetAddr( localServerIp );
-    localServerAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) localServerAddr.GetAiAddr() );
+    localServerAddr.SetPort( WARHAWK_UDP_PORT );
     const bool broadcast = false;
     m_PacketProcessor.send( *localServerAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
 
@@ -133,7 +133,7 @@ void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
   // Send it to the WarHawkServerListServer.
   AddrInfo sendAddr;
   sendAddr.SetAddr( m_ServerListServer );
-  sendAddr.PortToSockAddr( m_LastServerListServerPort, (sockaddr *) sendAddr.GetAiAddr( ) );
+  sendAddr.SetPort( m_LastServerListServerPort );
   const bool broadcast = false;
 
   bool foundPublicServerIp = false;
