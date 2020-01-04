@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 #include <thread>
 
 #include "message_handler.h"
@@ -22,7 +23,7 @@ class PacketProcessor
 {
   public:
 
-    PacketProcessor( warhawk::net::UdpNetworkSocket &, Network & );
+    PacketProcessor( const std::string &name, warhawk::net::UdpNetworkSocket &, Network & );
     virtual ~PacketProcessor( );
 
     // Run the Server process.
@@ -57,6 +58,7 @@ class PacketProcessor
     // Data
     //
 
+    std::string                     m_Name;
     warhawk::net::UdpNetworkSocket &m_UdpNetworkSocket;
     Network                        &m_Network;
 

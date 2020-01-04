@@ -4,8 +4,9 @@
 #include "packet_processor.h"
 
 
-PacketProcessor::PacketProcessor( warhawk::net::UdpNetworkSocket &udpNetworkSocket_, Network &network_ )
-  : m_UdpNetworkSocket( udpNetworkSocket_ )
+PacketProcessor::PacketProcessor( const std::string &name_, warhawk::net::UdpNetworkSocket &udpNetworkSocket_, Network &network_ )
+  : m_Name( name_ )
+  , m_UdpNetworkSocket( udpNetworkSocket_ )
   , m_Network( network_ )
   , m_mutex( )
   , m_MessageHandlers( )
@@ -31,7 +32,7 @@ PacketProcessor::~PacketProcessor( )
 
 void PacketProcessor::run( )
 {
-  std::cout << "Starting Packet Server..." << std::endl;
+  std::cout << "Starting Packet Processor '" << m_Name << "'..." << std::endl;
 
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
@@ -65,7 +66,7 @@ void PacketProcessor::run( )
     }
   }
 
-  std::cout << "Stopping Packet Server." << std::endl;
+  std::cout << "Stopping Packet Processor' " << m_Name << "'." << std::endl;
 }
 
 void PacketProcessor::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )

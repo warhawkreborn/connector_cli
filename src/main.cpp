@@ -197,7 +197,7 @@ int main( int argc_, const char **argv_ )
 
     // The PacketProcessor watches for packets and distributes them to the
     // clients that register with it.
-    PacketProcessor packetProcessor( udpNetworkSocket, network );
+    PacketProcessor packetProcessor( "WarHawk Reborn", udpNetworkSocket, network );
 
     // The SearchServer broadcasts a request for servers on the local network.
     // Any responses it receives are then marked as local servers and sent on

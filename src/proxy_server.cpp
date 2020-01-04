@@ -185,7 +185,9 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 
     // Set up to manage connection between client and WarHawk Server.
     // This will also receive packets from the WarHawk Server and forward them to the client.
-    ClientServerPtr newClientServer = std::make_unique< ClientServer >( packet_.GetFromIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
+    std::stringstream name;
+    name << "Player <" << packet_.GetFromIp( ) << ":" << port << ">";
+    ClientServerPtr newClientServer = std::make_unique< ClientServer >( name.str( ), packet_.GetFromIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
 
     if ( m_ClientList.size( ) < WARHAWK_MAX_PLAYERS )
     {
@@ -196,8 +198,7 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
         return clientServer_->GetPublicIp( ) == packet_.GetFromIp( );
       } );
 
-      std::cout << "Client joined game from IP=" << packet_.GetFromIp( ) <<
-        ", Port=" << port << std::endl;
+      std::cout << name.str( ) << " joined game." << std::endl;
     }
     else
     {

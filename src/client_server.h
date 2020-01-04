@@ -24,7 +24,8 @@ class ClientServer : public MessageHandler
 {
   public:
 
-    ClientServer( const std::string &publicIpAddress,
+    ClientServer( const std::string &name,
+                  const std::string &publicIpAddress,
                   const int &publicPort,
                   ServerList &,
                   Network &,
@@ -49,6 +50,7 @@ class ClientServer : public MessageHandler
     // Data
     //
 
+    std::string      m_Name;
     std::string      m_PublicIpAddress;
     const int        m_PublicPort;
     ServerList      &m_ServerList;

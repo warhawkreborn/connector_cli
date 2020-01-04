@@ -3,7 +3,8 @@
 #include "packet_processor.h"
 #include "warhawk.h"
 
-ClientServer::ClientServer( const std::string &publicIpAddress_,
+ClientServer::ClientServer( const std::string &name_,
+                            const std::string &publicIpAddress_,
                             const int &publicPort_,
                             ServerList &serverList_,
                             Network &network_,
@@ -14,7 +15,7 @@ ClientServer::ClientServer( const std::string &publicIpAddress_,
   , m_Network( network_ )
   , m_ProxyToClientPacketProcessor( proxyToClientPacketProcessor_ )
   , m_ProxyToServerSocket( std::make_unique< warhawk::net::UdpNetworkSocket >( m_Network, 0 ) ) // Port 0 = choose a random port.
-  , m_ProxyToServerPacketProcessor( std::make_unique< PacketProcessor >( *m_ProxyToServerSocket, network_ ) )
+  , m_ProxyToServerPacketProcessor( std::make_unique< PacketProcessor >( name_, *m_ProxyToServerSocket, network_ ) )
 {
   m_ProxyToServerPacketProcessor->Register( this, (int) Packet::TYPE::TYPE_GAME_SERVER_TO_CLIENT );
 }
