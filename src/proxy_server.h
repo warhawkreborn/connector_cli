@@ -10,15 +10,17 @@
 
 #include <functional>
 #include <iostream>
+#include <memory>
 
+#include "client_server.h"
 #include "message_handler.h"
 #include "server_list.h"
-#include "udp_network_socket.h"
 
 
 class Network;
 class Packet;
 class PacketProcessor;
+class UdpNetworkSocket;
 
 
 class ProxyServer : public MessageHandler
@@ -42,7 +44,6 @@ class ProxyServer : public MessageHandler
     void OnHandleServerInfoResponse( const Packet & );
 
     void OnHandleGameClientToServer( const Packet & );
-    void OnHandleGameServerToClient( const Packet & );
 
     //
     // Data
@@ -55,13 +56,7 @@ class ProxyServer : public MessageHandler
     bool             m_ReplyingToQuery = false;
     std::string      m_ServerListServer; // warhawk.thalhamer.it.
     uint16_t         m_LastServerListServerPort; // Port we last received packet from ServerListServer on.
-
-    typedef struct
-    {
-      Packet m_PacketFromClient;
-      Packet m_PacketFromServer;
-    } ClientData;
     
-    using ClientIpList = std::map< std::string, ClientData >;
-    ClientIpList     m_ClientIpList;
+    using ClientList = std::vector< ClientServerPtr >;
+    ClientList       m_ClientList;
 };

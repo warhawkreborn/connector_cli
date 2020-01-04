@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -32,8 +33,7 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   m_PacketProcessor.Register( this,
      ( (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST  |
        (int) Packet::TYPE::TYPE_SERVER_INFO_RESPONSE |
-       (int) Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER|
-       (int) Packet::TYPE::TYPE_GAME_SERVER_TO_CLIENT ) );
+       (int) Packet::TYPE::TYPE_GAME_CLIENT_TO_SERVER ) );
 }
 
 
@@ -63,12 +63,6 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
 
   if ( packet_.GetFromLocalNetwork( ) )
   {
-    if ( packet_.GetType( ) == Packet::TYPE::TYPE_GAME_SERVER_TO_CLIENT )
-    {
-      OnHandleGameServerToClient( packet_ );
-      return;
-    }
-
     if ( !m_ReplyingToQuery )
     {
       return;
@@ -131,10 +125,6 @@ void ProxyServer::OnHandleServerInfoRequest( const Packet &packet_ )
       m_ReplyingToQuery = true;
     }
   }
-  else
-  {
-    debug = 6;
-  }
 }
 
 
@@ -183,69 +173,44 @@ void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
 
 void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 {
-  ClientIpList::iterator itr = m_ClientIpList.find( packet_.GetFromIp( ) );
-
-  if ( itr == m_ClientIpList.end( ) )
+  ClientList::iterator itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
   {
-    // It is not on the list, so put it there.
-    ClientData data;
-    data.m_PacketFromClient = packet_;
-    m_ClientIpList[ packet_.GetFromIp( ) ] = data;
-    itr = m_ClientIpList.find( packet_.GetFromIp( ) );
-  }
-  else
-  {
-    // Update it it on the list.
-    ClientData &data = itr->second;
-    data.m_PacketFromClient = packet_;
-  }
-
-  std::string localServerIp;
-
-  m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
-  {
-    bool continueOn = true;
-
-    if ( entry_.m_LocalServer )
-    {
-      localServerIp = entry_.m_PacketData.m_address; // LOCAL IP not PUBLIC.
-      continueOn = false;
-    }
-
-    return continueOn;
+    return clientServer_->GetPublicIp( ) == packet_.GetFromIp( );
   } );
 
-  if ( localServerIp == "" )
+  if ( itr == m_ClientList.end( ) )
   {
-    return;
+    // It is not on the list, so put it there.
+    uint16_t port = AddrInfo::SockAddrToPort( (const sockaddr *) &packet_.GetClient( ) );
+
+    // Set up to manage connection between client and WarHawk Server.
+    // This will also receive packets from the WarHawk Server and forward them to the client.
+    ClientServerPtr newClientServer = std::make_unique< ClientServer >( packet_.GetFromIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
+
+    if ( m_ClientList.size( ) < WARHAWK_MAX_PLAYERS )
+    {
+      m_ClientList.push_back( std::move( newClientServer ) );
+
+      itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
+      {
+        return clientServer_->GetPublicIp( ) == packet_.GetFromIp( );
+      } );
+
+      std::cout << "Client joined game from IP=" << packet_.GetFromIp( ) <<
+        ", Port=" << port << std::endl;
+    }
+    else
+    {
+      std::cout << "MAX PLAYERS: Client join rejected from IP=" << packet_.GetFromIp( ) <<
+        ", Port=" << port << std::endl;
+      return;
+    }
   }
 
-  // Send it to the local WarHawkServer.
-  AddrInfo sendAddr;
-  sendAddr.SetAddr( localServerIp );
-  sendAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) sendAddr.GetAiAddr( ) );
-  const bool broadcast = false;
-  m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
-
-  std::cout << "CLIENT_TO_SERVER: Length=" << packet_.GetData( ).size( ) << std::endl;
-}
-
-
-void ProxyServer::OnHandleGameServerToClient( const Packet &packet_ )
-{
-  for ( const auto &client : m_ClientIpList )
+  if ( itr != m_ClientList.end( ) )
   {
-    if ( true ) // This needs to somehow differentiate between clients, but just one for now.
-    {
-      const std::string &clientIp = client.first;
-      // Send it to the client.
-      AddrInfo sendAddr;
-      sendAddr.SetAddr( clientIp );
-      sendAddr.PortToSockAddr( WARHAWK_UDP_PORT, (sockaddr *) sendAddr.GetAiAddr( ) );
-      const bool broadcast = false;
-      m_PacketProcessor.send( *sendAddr.GetAiAddr( ), packet_.GetData( ), broadcast );
+    ClientServerPtr &clientServer = *itr;
 
-      std::cout << "SERVER_TO_CLIENT: IP=" << clientIp << "< Length=" << packet_.GetData( ).size( ) << std::endl;
-    }
+    clientServer->SendPacket( packet_ ); // Send Packet to WarHawk Server.
   }
 }

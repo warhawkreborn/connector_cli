@@ -17,6 +17,8 @@ const std::string WARHAWK_SERVER_LIST_SERVER = "warhawk.thalhammer.it";
 // Server that distributes the list of active WarHawk servers.
 const std::string WARHAWK_API_BASE = "https://" + WARHAWK_SERVER_LIST_SERVER + "/api/";
 
+const int         WARHAWK_MAX_PLAYERS = 24;
+
 
 namespace warhawk
 {
