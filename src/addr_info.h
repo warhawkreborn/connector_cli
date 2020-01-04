@@ -61,7 +61,8 @@ class AddrInfo
     static std::string SockAddrToAddress( const sockaddr_storage * ); // Convert sockaddr_storage to std::string format.
     static std::string SockAddrToAddress( const struct sockaddr  * ); // Convert sockaddr         to std::string format.
 
-    static uint16_t SockAddrToPort(       const struct sockaddr *  ); // Get Port from sockaddr.
+    static uint16_t SockAddrToPort( const sockaddr_storage * ); // Get Port from sockaddr_storage.
+    static uint16_t SockAddrToPort( const struct sockaddr  * ); // Get Port from sockaddr.
 
   protected:
 

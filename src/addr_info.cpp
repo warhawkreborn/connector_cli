@@ -108,6 +108,12 @@ std::string AddrInfo::SockAddrToAddress( const struct sockaddr *sa_ )
 }
 
 
+uint16_t AddrInfo::SockAddrToPort( const sockaddr_storage *sa_ )
+{
+  return SockAddrToPort( (const sockaddr *) sa_ );
+}
+
+
 uint16_t AddrInfo::SockAddrToPort( const struct sockaddr *sa_ )
 {
   uint16_t port = 0;

@@ -52,7 +52,7 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
   // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
   if ( packet_.GetFromIp( ) == m_ServerListServer )
   {
-    m_LastServerListServerPort = AddrInfo::SockAddrToPort( (const sockaddr *) &packet_.GetClient( ) );
+    m_LastServerListServerPort = AddrInfo::SockAddrToPort( &packet_.GetClient( ) );
     m_ProxyMode = true;
   }
 
@@ -181,7 +181,7 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
   if ( itr == m_ClientList.end( ) )
   {
     // It is not on the list, so put it there.
-    uint16_t port = AddrInfo::SockAddrToPort( (const sockaddr *) &packet_.GetClient( ) );
+    uint16_t port = AddrInfo::SockAddrToPort( &packet_.GetClient( ) );
 
     // Set up to manage connection between client and WarHawk Server.
     // This will also receive packets from the WarHawk Server and forward them to the client.
