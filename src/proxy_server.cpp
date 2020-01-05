@@ -49,11 +49,19 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
   std::cout << "ProxyServer: Received packet." << std::endl;
 #endif
 
+  // Check to see if there are any disonnections
+  ManageClientList( );
+
   // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
   if ( packet_.GetFromIp( ) == m_ServerListServer )
   {
     m_LastServerListServerPort = AddrInfo::SockAddrToPort( &packet_.GetClient( ) );
-    m_ProxyMode = true;
+
+    if ( !m_ProxyMode )
+    {
+      m_ProxyMode = true;
+      std::cout << "ProxyMode detected: Turning ProxyMode = ON" << std::endl;
+    }
   }
 
   if ( !m_ProxyMode )
@@ -206,6 +214,8 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
         ", Port=" << port << std::endl;
       return;
     }
+
+    std::cout << "Total Current Clients: " << m_ClientList.size( ) << std::endl;
   }
 
   if ( itr != m_ClientList.end( ) )
@@ -213,5 +223,33 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
     ClientServerPtr &clientServer = *itr;
 
     clientServer->SendPacket( packet_ ); // Send Packet to WarHawk Server.
+  }
+}
+
+
+void ProxyServer::ManageClientList( )
+{
+  using namespace std::chrono_literals;
+  using seconds = std::chrono::seconds;
+
+  std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now( );;
+
+  for ( ClientList::iterator itr = m_ClientList.begin( );
+        itr != m_ClientList.end( );
+        )
+  {
+    ClientServerPtr &player = *itr;
+    auto notPlayingFor = std::chrono::duration_cast< seconds >( now - player->GetLastPacketTime( ) );
+
+    if ( notPlayingFor > 10s )
+    {
+      std::cout << player->GetName( ) << " inactive for > 10 seconds: Deleting." << std::endl;
+      itr = m_ClientList.erase( itr );
+      std::cout << "Total Current Clients: " << m_ClientList.size( ) << std::endl;
+    }
+    else
+    {
+      ++itr;
+    }
   }
 }

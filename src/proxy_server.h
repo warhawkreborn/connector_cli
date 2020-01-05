@@ -45,6 +45,8 @@ class ProxyServer : public MessageHandler
 
     void OnHandleGameClientToServer( const Packet & );
 
+    void ManageClientList( );
+
     //
     // Data
     //
