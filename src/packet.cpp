@@ -99,7 +99,7 @@ uint16_t Packet::GetPort( ) const
 }
 
 
-void Packet::SetPortA( const uint16_t &port_ )
+void Packet::SetPort( const uint16_t &port_ )
 {
   m_Port = port_;
 }
