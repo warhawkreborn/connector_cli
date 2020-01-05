@@ -67,7 +67,7 @@ UdpNetworkSocket::UdpNetworkSocket( Network &network_, uint16_t port_ )
 #ifdef WIN32
       int err = WSAGetLastError( );
 #else
-      int err == errno;
+      int err = errno;
 #endif
       std::stringstream ss;
       ss << "Error on 'getsockname': " << err;

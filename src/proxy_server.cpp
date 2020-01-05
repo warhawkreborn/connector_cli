@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <string.h>
 #include <sstream>
 
 #include "addr_info.h"
