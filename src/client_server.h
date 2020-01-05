@@ -32,9 +32,13 @@ class ClientServer : public MessageHandler
                   PacketProcessor &proxyToClientPacketProcessor );
     ~ClientServer( );
 
+    std::string GetName( );
+
     std::string GetPublicIp( );
 
     void SendPacket( const Packet & ); // Send Packet to WarHawk Server
+
+    std::chrono::steady_clock::time_point GetLastPacketTime( );
 
   protected:
 
@@ -57,7 +61,8 @@ class ClientServer : public MessageHandler
     Network         &m_Network;
     PacketProcessor                                  &m_ProxyToClientPacketProcessor;
     std::unique_ptr< warhawk::net::UdpNetworkSocket > m_ProxyToServerSocket;
-    std::unique_ptr< PacketProcessor >                m_ProxyToServerPacketProcessor;    
+    std::unique_ptr< PacketProcessor >                m_ProxyToServerPacketProcessor;
+    std::chrono::steady_clock::time_point m_LastPacketTime;
 };
 
 

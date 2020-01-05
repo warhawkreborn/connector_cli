@@ -9,7 +9,8 @@ ClientServer::ClientServer( const std::string &name_,
                             ServerList &serverList_,
                             Network &network_,
                             PacketProcessor &proxyToClientPacketProcessor_ )
-  : m_PublicIpAddress( publicIpAddress_ )
+  : m_Name( name_ )
+  , m_PublicIpAddress( publicIpAddress_ )
   , m_PublicPort( publicPort_ )
   , m_ServerList( serverList_ )
   , m_Network( network_ )
@@ -27,6 +28,12 @@ ClientServer::~ClientServer( )
 }
 
 
+std::string ClientServer::GetName( )
+{
+  return m_Name;
+}
+
+
 std::string ClientServer::GetPublicIp( )
 {
   return m_PublicIpAddress;
@@ -36,6 +43,8 @@ std::string ClientServer::GetPublicIp( )
 // Send packet to WarHawk Server
 void ClientServer::SendPacket( const Packet &packet_ )
 {
+  m_LastPacketTime = std::chrono::steady_clock::now( );
+
   std::string localServerIp;
 
   m_ServerList.ForEachServer( [ &, this ] ( ServerEntry &entry_ )
@@ -70,6 +79,10 @@ void ClientServer::SendPacket( const Packet &packet_ )
 
 void ClientServer::OnReceivePacket( const Packet &packet_ )
 {
+  m_LastPacketTime = std::chrono::steady_clock::now( );
+
+  uint16_t proxyPort = AddrInfo::SockAddrToPort( &packet_.GetClient( ) );
+
   // Send it to the client.
   AddrInfo sendAddr;
   sendAddr.SetAddr( m_PublicIpAddress );
@@ -79,4 +92,10 @@ void ClientServer::OnReceivePacket( const Packet &packet_ )
 #if 0
   std::cout << "SERVER_TO_CLIENT: IP=" << m_PublicIpAddress << ", Port=" << m_PublicPort << ", Length=" << packet_.GetData( ).size( ) << std::endl;
 #endif
+}
+
+
+std::chrono::steady_clock::time_point ClientServer::GetLastPacketTime( )
+{
+  return m_LastPacketTime;
 }
