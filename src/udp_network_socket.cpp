@@ -56,10 +56,32 @@ UdpNetworkSocket::UdpNetworkSocket( Network &network_, uint16_t port_ )
   {
     throw std::runtime_error( "ERROR on binding" );
   }
+
+  // If we asked for any port, find out which one we actually got.
+  if ( m_port == 0 )
+  {
+    struct sockaddr_in sin;
+    socklen_t len = sizeof( sin );
+    if ( getsockname( m_fd, (struct sockaddr *) &sin, &len ) == -1 )
+    {
+#ifdef WIN32
+      int err = WSAGetLastError( );
+#else
+      int err == errno;
+#endif
+      std::stringstream ss;
+      ss << "Error on 'getsockname': " << err;
+      throw std::runtime_error( ss.str( ) );
+    }
+    else
+    {
+      m_port = ntohs( sin.sin_port );
+    }
+  }
 }
 
 
-UdpNetworkSocket::~UdpNetworkSocket()
+UdpNetworkSocket::~UdpNetworkSocket( )
 {
 }
 
@@ -109,6 +131,11 @@ bool UdpNetworkSocket::receive( sockaddr_storage &clientaddr_, std::vector< uint
 
   if ( n < 0 )
   {
+ #ifdef WIN32
+    int err = WSAGetLastError( );
+#else
+    int err = errno;
+#endif
     return false;
   }
 
@@ -140,16 +167,16 @@ std::array< uint8_t, 4 > UdpNetworkSocket::StringToIp( const std::string &host_ 
 }
 
 
-uint16_t UdpNetworkSocket::GetPort() const
-{
-  return m_port;
-}
-
-
 std::string UdpNetworkSocket::IpToString( const std::array< uint8_t, 4 > &ip_ )
 {
   return std::to_string( ip_[ 0 ] ) + "." + std::to_string( ip_[ 1 ] ) + "." +
          std::to_string( ip_[ 2 ] ) + "." + std::to_string( ip_[ 3 ] );
+}
+
+
+uint16_t UdpNetworkSocket::GetPort( ) const
+{
+  return m_port;
 }
 
 } // namespace net
