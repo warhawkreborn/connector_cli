@@ -136,7 +136,18 @@ bool UdpNetworkSocket::receive( sockaddr_storage &clientaddr_, std::vector< uint
 #else
     int err = errno;
 #endif
-    return false;
+
+    // Was this a connection reset?  Then ignore.
+    if ( err == 10054 )
+    {
+#ifdef WIN32
+      n = 0;
+#endif
+    }
+    else
+    {
+      return false;
+    }
   }
 
   // Did this come from me?
