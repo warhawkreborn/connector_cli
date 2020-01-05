@@ -40,6 +40,12 @@ std::string ClientServer::GetPublicIp( )
 }
 
 
+uint16_t ClientServer::GetPublicPort( )
+{
+  return m_PublicPort;
+}
+
+
 // Send packet to WarHawk Server
 void ClientServer::SendPacket( const Packet &packet_ )
 {

@@ -53,7 +53,7 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
   ManageClientList( );
 
   // If we receive a packet from a WARHAWK_SERVER_LIST_SERVER then turn ProxyMode ON.
-  if ( packet_.GetFromIp( ) == m_ServerListServer )
+  if ( packet_.GetIp( ) == m_ServerListServer )
   {
     m_LastServerListServerPort = AddrInfo::SockAddrToPort( &packet_.GetClient( ) );
 
@@ -128,7 +128,7 @@ void ProxyServer::OnHandleServerInfoRequest( const Packet &packet_ )
 
     // std::cout << "ProxyServer::OnHandleInfoRequest - Sending packet to local server at " << localServerIp << std::endl;
 
-    if ( packet_.GetFromIp( ) == m_ServerListServer )
+    if ( packet_.GetIp( ) == m_ServerListServer )
     {
       m_ReplyingToQuery = true;
     }
@@ -183,7 +183,8 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 {
   ClientList::iterator itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
   {
-    return clientServer_->GetPublicIp( ) == packet_.GetFromIp( );
+    return clientServer_->GetPublicIp( ) == packet_.GetIp( ) &&
+           clientServer_->GetPublicPort( ) == packet_.GetPort( );
   } );
 
   if ( itr == m_ClientList.end( ) )
@@ -194,8 +195,8 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
     // Set up to manage connection between client and WarHawk Server.
     // This will also receive packets from the WarHawk Server and forward them to the client.
     std::stringstream name;
-    name << "Player <" << packet_.GetFromIp( ) << ":" << port << ">";
-    ClientServerPtr newClientServer = std::make_unique< ClientServer >( name.str( ), packet_.GetFromIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
+    name << "Player <" << packet_.GetIp( ) << ":" << port << ">";
+    ClientServerPtr newClientServer = std::make_unique< ClientServer >( name.str( ), packet_.GetIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
 
     if ( m_ClientList.size( ) < WARHAWK_MAX_PLAYERS )
     {
@@ -203,14 +204,15 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 
       itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
       {
-        return clientServer_->GetPublicIp( ) == packet_.GetFromIp( );
+        return clientServer_->GetPublicIp( ) == packet_.GetIp( ) &&
+               clientServer_->GetPublicPort( ) == packet_.GetPort( );
       } );
 
       std::cout << name.str( ) << " joined game." << std::endl;
     }
     else
     {
-      std::cout << "MAX PLAYERS: Client join rejected from IP=" << packet_.GetFromIp( ) <<
+      std::cout << "MAX PLAYERS: Client join rejected from IP=" << packet_.GetIp( ) <<
         ", Port=" << port << std::endl;
       return;
     }

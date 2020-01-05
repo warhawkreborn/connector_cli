@@ -37,8 +37,11 @@ class Packet
     const struct sockaddr_storage &GetClient( ) const;
     void SetClient( const struct sockaddr_storage & );
 
-    std::string GetFromIp( ) const;
-    void SetFromIp( const std::string & );
+    std::string GetIp( ) const;
+    void SetIp( const std::string & );
+
+    uint16_t GetPort( ) const;
+    void SetPort( const uint16_t & );
 
     bool GetFromLocalNetwork( ) const;
     void SetFromLocalNetwork( const bool & );
@@ -62,7 +65,8 @@ class Packet
 
     TYPE                    m_Type = TYPE::TYPE_UNKNOWN;
     std::vector< uint8_t >  m_Data;
-    std::string             m_FromIp = "";
+    std::string             m_Ip = "";
+    uint16_t                m_Port = 0;
     struct sockaddr_storage m_Client;
     bool                    m_FromLocalNetwork = false;
 };

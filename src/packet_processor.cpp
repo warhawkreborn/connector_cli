@@ -41,11 +41,13 @@ void PacketProcessor::run( )
   {
     std::string fromIp = AddrInfo::SockAddrToAddress( &client );
     bool fromLocalNetwork = m_Network.OnLocalNetwork( fromIp );
+    uint16_t port = AddrInfo::SockAddrToPort( &client );
 
     Packet packet( data, fromLocalNetwork );
 
     packet.SetClient( client );
-    packet.SetFromIp( fromIp );
+    packet.SetIp( fromIp );
+    packet.SetPort( port );
 
     if ( packet.GetData( ).size( ) > 0 )
     {

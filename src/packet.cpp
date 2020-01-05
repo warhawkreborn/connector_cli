@@ -81,15 +81,27 @@ void Packet::SetClient( const struct sockaddr_storage &client_ )
 }
 
 
-std::string Packet::GetFromIp( ) const
+std::string Packet::GetIp( ) const
 {
-  return m_FromIp;
+  return m_Ip;
 }
 
 
-void Packet::SetFromIp( const std::string &ip_ )
+void Packet::SetIp( const std::string &ip_ )
 {
-  m_FromIp = ip_;
+  m_Ip = ip_;
+}
+
+
+uint16_t Packet::GetPort( ) const
+{
+  return m_Port;
+}
+
+
+void Packet::SetPortA( const uint16_t &port_ )
+{
+  m_Port = port_;
 }
 
 

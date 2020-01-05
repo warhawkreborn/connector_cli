@@ -36,6 +36,8 @@ class ClientServer : public MessageHandler
 
     std::string GetPublicIp( );
 
+    uint16_t GetPublicPort( );
+
     void SendPacket( const Packet & ); // Send Packet to WarHawk Server
 
     std::chrono::steady_clock::time_point GetLastPacketTime( );
