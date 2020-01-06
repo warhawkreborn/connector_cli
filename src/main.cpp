@@ -70,6 +70,9 @@
 #define STRINGIFY_( x ) #x
 #define STRINGIFY( x ) STRINGIFY_( x )
 
+#ifndef GIT_HASH
+#define GIT_HASH "UnkownGitRevision"
+#endif
 
 // Generate string version.
 std::string VersionString( )
