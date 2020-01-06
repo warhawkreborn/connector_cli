@@ -46,11 +46,11 @@ void Packet::SetType( )
   {
     return;
   }
-  else if ( size == 188 && !m_FromLocalNetwork && validPacket && GetData( )[ 0 ] == 0xc3 && GetData( )[ 1 ] == 0x81 )
+  else if ( size == 188 && validPacket && GetData( )[ 0 ] == 0xc3 && GetData( )[ 1 ] == 0x81 )
   {
     m_Type = TYPE::TYPE_SERVER_INFO_REQUEST;
   }
-  else if ( size == 372 && m_FromLocalNetwork && validPacket && GetData( )[ 0 ] == 0xc3 && GetData( )[ 1 ] == 0x81 )
+  else if ( size == 372 && validPacket && GetData( )[ 0 ] == 0xc3 && GetData( )[ 1 ] == 0x81 )
   {
     m_Type = TYPE::TYPE_SERVER_INFO_RESPONSE;
   }
