@@ -1,7 +1,7 @@
 #pragma once
 
 //
-// The client server is created by the proxy server when it detects packets from a new 
+// The ClientPlayer is created by the proxy server when it detects packets from a new 
 // client.  It then passes the packets back and forth between the client and the local
 // server thereby performing the client function of the proxy server.
 //
@@ -20,17 +20,17 @@ class ServerList;
 class Packet;
 
 
-class ClientServer : public MessageHandler
+class ClientPlayer : public MessageHandler
 {
   public:
 
-    ClientServer( const std::string &name,
+    ClientPlayer( const std::string &name,
                   const std::string &publicIpAddress,
                   const int &publicPort,
                   ServerList &,
                   Network &,
                   PacketProcessor &proxyToClientPacketProcessor );
-    ~ClientServer( );
+    ~ClientPlayer( );
 
     std::string GetName( );
 
@@ -68,4 +68,4 @@ class ClientServer : public MessageHandler
 };
 
 
-using ClientServerPtr = std::unique_ptr< ClientServer >;
+using ClientPlayerPtr = std::unique_ptr< ClientPlayer >;

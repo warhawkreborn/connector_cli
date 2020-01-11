@@ -184,10 +184,10 @@ void ProxyServer::OnHandleServerInfoResponse( const Packet &packet_ )
 
 void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 {
-  ClientList::iterator itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
+  ClientList::iterator itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientPlayerPtr &clientPlayer_ )
   {
-    return clientServer_->GetPublicIp( ) == packet_.GetIp( ) &&
-           clientServer_->GetPublicPort( ) == packet_.GetPort( );
+    return clientPlayer_->GetPublicIp( ) == packet_.GetIp( ) &&
+           clientPlayer_->GetPublicPort( ) == packet_.GetPort( );
   } );
 
   if ( itr == m_ClientList.end( ) )
@@ -199,13 +199,13 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
     // This will also receive packets from the WarHawk Server and forward them to the client.
     std::stringstream name;
     name << "Player <" << packet_.GetIp( ) << ":" << port << ">";
-    ClientServerPtr newClientServer = std::make_unique< ClientServer >( name.str( ), packet_.GetIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
+    ClientPlayerPtr newClientServer = std::make_unique< ClientPlayer >( name.str( ), packet_.GetIp( ), port, m_ServerList, m_Network, m_PacketProcessor );
 
     if ( m_ClientList.size( ) < WARHAWK_MAX_PLAYERS )
     {
       m_ClientList.push_back( std::move( newClientServer ) );
 
-      itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientServerPtr &clientServer_ )
+      itr = std::find_if( m_ClientList.begin( ), m_ClientList.end( ), [ &packet_ ] ( ClientPlayerPtr &clientServer_ )
       {
         return clientServer_->GetPublicIp( ) == packet_.GetIp( ) &&
                clientServer_->GetPublicPort( ) == packet_.GetPort( );
@@ -225,9 +225,9 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
 
   if ( itr != m_ClientList.end( ) )
   {
-    ClientServerPtr &clientServer = *itr;
+    ClientPlayerPtr &clientPlayer = *itr;
 
-    clientServer->SendPacket( packet_ ); // Send Packet to WarHawk Server.
+    clientPlayer->SendPacket( packet_ ); // Send Packet to WarHawk Server.
   }
 }
 
@@ -243,7 +243,7 @@ void ProxyServer::ManageClientList( )
         itr != m_ClientList.end( );
         )
   {
-    ClientServerPtr &player = *itr;
+    ClientPlayerPtr &player = *itr;
     auto notPlayingFor = std::chrono::duration_cast< seconds >( now - player->GetLastPacketTime( ) );
 
     if ( notPlayingFor > 10s )

@@ -79,7 +79,7 @@ endif( )
 set( SOURCE_FILES
      actor.cpp
      addr_info.cpp
-     client_server.cpp
+     client_player.cpp
      cookie.cpp
      discovery_packet.cpp
      forward_server.cpp
@@ -102,7 +102,7 @@ set( INCLUDE_FILES
      actor.h
      addr_info.h
      blocking_queue.h
-     client_server.h
+     client_player.h
      cookie.h
      discovery_packet.h
      forward_server.h

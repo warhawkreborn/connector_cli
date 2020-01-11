@@ -1,9 +1,9 @@
-#include "client_server.h"
+#include "client_player.h"
 #include "network.h"
 #include "packet_processor.h"
 #include "warhawk.h"
 
-ClientServer::ClientServer( const std::string &name_,
+ClientPlayer::ClientPlayer( const std::string &name_,
                             const std::string &publicIpAddress_,
                             const int &publicPort_,
                             ServerList &serverList_,
@@ -22,32 +22,32 @@ ClientServer::ClientServer( const std::string &name_,
 }
 
 
-ClientServer::~ClientServer( )
+ClientPlayer::~ClientPlayer( )
 {
   m_ProxyToServerPacketProcessor->Unregister( this );
 }
 
 
-std::string ClientServer::GetName( )
+std::string ClientPlayer::GetName( )
 {
   return m_Name;
 }
 
 
-std::string ClientServer::GetPublicIp( )
+std::string ClientPlayer::GetPublicIp( )
 {
   return m_PublicIpAddress;
 }
 
 
-uint16_t ClientServer::GetPublicPort( )
+uint16_t ClientPlayer::GetPublicPort( )
 {
   return m_PublicPort;
 }
 
 
 // Send packet to WarHawk Server
-void ClientServer::SendPacket( const Packet &packet_ )
+void ClientPlayer::SendPacket( const Packet &packet_ )
 {
   m_LastPacketTime = std::chrono::steady_clock::now( );
 
@@ -83,7 +83,7 @@ void ClientServer::SendPacket( const Packet &packet_ )
 }
 
 
-void ClientServer::OnReceivePacket( const Packet &packet_ )
+void ClientPlayer::OnReceivePacket( const Packet &packet_ )
 {
   m_LastPacketTime = std::chrono::steady_clock::now( );
 
@@ -101,7 +101,7 @@ void ClientServer::OnReceivePacket( const Packet &packet_ )
 }
 
 
-std::chrono::steady_clock::time_point ClientServer::GetLastPacketTime( )
+std::chrono::steady_clock::time_point ClientPlayer::GetLastPacketTime( )
 {
   return m_LastPacketTime;
 }

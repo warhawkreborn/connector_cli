@@ -12,7 +12,7 @@
 #include <iostream>
 #include <memory>
 
-#include "client_server.h"
+#include "client_player.h"
 #include "message_handler.h"
 #include "server_list.h"
 
@@ -59,6 +59,6 @@ class ProxyServer : public MessageHandler
     std::string      m_ServerListServer; // warhawk.thalhamer.it.
     uint16_t         m_LastServerListServerPort; // Port we last received packet from ServerListServer on.
     
-    using ClientList = std::vector< ClientServerPtr >;
+    using ClientList = std::vector< ClientPlayerPtr >;
     ClientList       m_ClientList;
 };
