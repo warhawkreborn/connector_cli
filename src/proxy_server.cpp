@@ -25,7 +25,7 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   if ( addressList.size( ) < 1 )
   {
     std::stringstream ss;
-    ss << "Can't resolve IP address for WARHAWK_SERVER_LIST_SERVER: " << WARHAWK_SERVER_LIST_SERVER;
+    ss << "ProxyServer: Can't resolve IP address for WARHAWK_SERVER_LIST_SERVER: " << WARHAWK_SERVER_LIST_SERVER;
     throw std::runtime_error( ss.str( ) );
   }
 
@@ -63,7 +63,7 @@ void ProxyServer::OnReceivePacket( const Packet &packet_ )
     if ( !m_ProxyMode )
     {
       m_ProxyMode = true;
-      std::cout << "ProxyMode detected: Turning ProxyMode = ON" << std::endl;
+      std::cout << "Proxyserver - ProxyMode detected: Turning ProxyMode = ON" << std::endl;
     }
   }
 
@@ -215,12 +215,12 @@ void ProxyServer::OnHandleGameClientToServer( const Packet &packet_ )
     }
     else
     {
-      std::cout << "MAX PLAYERS: Client join rejected from IP=" << packet_.GetIp( ) <<
+      std::cout << "ProxyServer: MAX PLAYERS - Client join rejected from IP=" << packet_.GetIp( ) <<
         ", Port=" << port << std::endl;
       return;
     }
 
-    std::cout << "Total Current Clients: " << m_ClientList.size( ) << std::endl;
+    std::cout << "ProxyServer: Total Current Clients = " << m_ClientList.size( ) << std::endl;
   }
 
   if ( itr != m_ClientList.end( ) )
@@ -248,9 +248,9 @@ void ProxyServer::ManageClientList( )
 
     if ( notPlayingFor > 10s )
     {
-      std::cout << player->GetName( ) << " inactive for > 10 seconds: Deleting." << std::endl;
+      std::cout << "ProxyServer: " << player->GetName( ) << " inactive for > 10 seconds: Deleting." << std::endl;
       itr = m_ClientList.erase( itr );
-      std::cout << "Total Current Clients: " << m_ClientList.size( ) << std::endl;
+      std::cout << "ProxyServer: Total Current Clients = " << m_ClientList.size( ) << std::endl;
     }
     else
     {
