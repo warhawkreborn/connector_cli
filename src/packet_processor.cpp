@@ -32,7 +32,7 @@ PacketProcessor::~PacketProcessor( )
 
 void PacketProcessor::run( )
 {
-  std::cout << "Starting Packet Processor '" << m_Name << "'..." << std::endl;
+  std::cout << "Packet Processor: '" << m_Name << "' starting" << std::endl;
 
   struct sockaddr_storage client;
   std::vector< uint8_t > data;
@@ -68,7 +68,7 @@ void PacketProcessor::run( )
     }
   }
 
-  std::cout << "Stopping Packet Processor' " << m_Name << "'." << std::endl;
+  std::cout << "Packet Processor: '" << m_Name << "' stopping." << std::endl;
 }
 
 void PacketProcessor::send( const sockaddr_storage &clientaddr_, const std::vector< uint8_t > &data_, bool broadcast_ )

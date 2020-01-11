@@ -28,7 +28,7 @@ SearchServer::~SearchServer( )
 
 void SearchServer::run( )
 {
-  std::cout << "Starting Search Server..." << std::endl;
+  std::cout << "Search Server: Starting..." << std::endl;
 
   while ( !m_Done )
   {
@@ -52,7 +52,7 @@ void SearchServer::run( )
     }
   }
 
-  std::cout << "SearchServer thread ended." << std::endl;
+  std::cout << "SearchServer: Stopping." << std::endl;
 }
 
 

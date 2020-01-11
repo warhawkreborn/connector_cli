@@ -185,7 +185,7 @@ int main( int argc_, const char **argv_ )
 
   std::cout << VersionString( ) << std::endl;
 
-  std::cout << "Warhawk bridge booting..." << std::endl;
+  std::cout << "Warhawk Reborn: Starting..." << std::endl;
 
   try
   {
@@ -231,6 +231,8 @@ int main( int argc_, const char **argv_ )
     httpServer.run( );
 #endif
 
+    std::cout << "Warhawk Reborn: Stopping." << std::endl;
+
     // Servers and threads will destruct here as the variables go out of scope.
   }
   catch ( const std::exception e_ )
@@ -239,7 +241,7 @@ int main( int argc_, const char **argv_ )
     return -1;
   }
 
-  std::cout << "WarHawk Reborn server shutting down properly." << std::endl;
+  std::cout << "WarHawk Reborn server shut down properly." << std::endl;
 
   return 0;
 }

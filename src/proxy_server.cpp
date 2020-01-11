@@ -17,7 +17,7 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
   , m_PacketProcessor( packetProcessor_ )
   , m_Network( network_ )
 {
-  std::cout << "Starting ProxyServer..." << std::endl;
+  std::cout << "ProxyServer: Starting..." << std::endl;
 
   std::vector< std::string > addressList;
   addressList = m_Network.ResolveIpAddress( WARHAWK_SERVER_LIST_SERVER );
@@ -41,6 +41,8 @@ ProxyServer::ProxyServer( ServerList &serverList_, PacketProcessor &packetProces
 ProxyServer::~ProxyServer( )
 {
   m_PacketProcessor.Unregister( this );
+
+  std::cout << "ProxyServer: Stopping." << std::endl;
 }
 
 

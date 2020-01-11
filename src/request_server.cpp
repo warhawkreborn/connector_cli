@@ -28,7 +28,7 @@ RequestServer::~RequestServer( )
 
 void RequestServer::run( )
 {
-  std::cout << "Starting Request Server..."<< std::endl;
+  std::cout << "Request Server: Starting..."<< std::endl;
 
   // This loop periodically queries the server that holds a list of available
   // public servers and updates that list into the ServerList.
@@ -67,5 +67,5 @@ void RequestServer::run( )
     std::this_thread::sleep_for( std::chrono::seconds( 60 ) );
   }
 
-  std::cout << "RequestServer thread ended." << std::endl;
+  std::cout << "RequestServer: Stopping." << std::endl;
 }

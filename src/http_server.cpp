@@ -66,6 +66,8 @@ HttpServer::~HttpServer( )
 // Main program
 void HttpServer::run( )
 {
+  std::cout << "HTTP Server: Starting..." << std::endl;
+
   if ( m_RootDirectory == "" )
   {
     char *ptr = getcwd( nullptr, 0 );
@@ -149,6 +151,8 @@ void HttpServer::run( )
   {
     std::cout << "HTTP Server error: " << e_.what( ) << std::endl;
   }
+
+  std::cout << "HTTP Server: Stopping." << std::endl;
 }
 
 
