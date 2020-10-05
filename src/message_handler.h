@@ -1,9 +1,17 @@
-#ifndef MESSAGE_SERVER_H
-#define MESSAGE_SERVER_H
+#pragma once
 
-#include <vector>
+//
+// A MessageHandler allows registered subscribers to handle processing of particular
+// message.
+#pragma once
 
-#include "net.h"
+//
+// The MessageHandler handles incoming packets.
+//
+
+#include "packet.h"
+#include "udp_network_socket.h"
+
 
 class MessageHandler
 {
@@ -13,12 +21,9 @@ class MessageHandler
     {
     }
 
-    virtual void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) = 0;
+    virtual void OnReceivePacket( const Packet & ) = 0;
 
   protected:
 
   private:
 };
-
-
-#endif // MESSAGE_SERVER_H

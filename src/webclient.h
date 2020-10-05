@@ -1,5 +1,9 @@
-#ifndef WEBCLIENT_H
-#define WEBCLIENT_H
+#pragma once
+
+//
+// This class allows the caller to execute various web client requests and
+// return the response.
+//
 
 #pragma once
 
@@ -57,5 +61,3 @@ class webclient
 } // End common namespace
 
 } // End warhawk namespace
-
-#endif // WEBCLIENT_H

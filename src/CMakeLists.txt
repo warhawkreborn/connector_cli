@@ -34,8 +34,6 @@ if ( WARHAWK_BUILD )
 
 endif( )
 
-add_definitions( -DPICOJSON_USE_INT64 )
-
 if ( USE_SYSTEM_CURL )
 
   find_package( CURL REQUIRED )
@@ -44,13 +42,23 @@ endif( )
 
 find_package( Threads )
 
-if ( APPLE OR UNIX )
+if ( APPLE )
 
   set( PLATFORM_LIBS 
        curl
        dl
        z
      )
+
+elseif ( UNIX )
+
+  set( PLATFORM_LIBS 
+       curl
+       dl
+       z
+       stdc++fs
+     )
+
 
 else( )
 
@@ -69,30 +77,50 @@ else( )
 endif( )
 
 set( SOURCE_FILES
+     actor.cpp
      addr_info.cpp
+     client_player.cpp
+     cookie.cpp
      discovery_packet.cpp
      forward_server.cpp
+     http_server.cpp
+     ip_address.cpp
      main.cpp
-     net.cpp
      network.cpp
+     packet.cpp
+     packet_processor.cpp
+     proxy_server.cpp
+     request_server.cpp
      search_server.cpp
-     server.cpp
+     server_list.cpp
+     udp_network_socket.cpp
      warhawk_api.cpp
      webclient.cpp
    )
 
 set( INCLUDE_FILES
+     actor.h
      addr_info.h
+     blocking_queue.h
+     client_player.h
      cookie.h
      discovery_packet.h
      forward_server.h
+     http_server.h
+     ip_address.h
      message_handler.h
-     net.h
      network.h
+     packet.h
+     packet_processor.h
+     proxy_server.h
      picojson.h
+     request_server.h
      search_server.h
-     server.h
-     server_entry.h
+     server_list.h
+     udp_network_socket.h
+     uwebsockets_async_file_reader.h
+     uwebsockets_async_file_streamer.h
+     uwebsockets_middleware.h
      warhawk.h
      warhawk_api.h
      webclient.h
@@ -109,11 +137,21 @@ add_executable( ${WARHAWK_TARGET}
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_BINARY_DIR} )
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CURL_INCLUDE_DIR} )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libs/uWebSockets/uWebSockets-0.16.5/src )
+target_include_directories( ${WARHAWK_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libs/uSockets/uSockets-0.3.4/src )
 
 target_link_libraries( ${WARHAWK_TARGET}
                        ${PLATFORM_LIBS}
+                       uSockets
+                       uv_a
                        ${CMAKE_THREAD_LIBS_INIT}
                      )
+
+# Copy the html directory to where the binary is.
+add_custom_command( TARGET ${WARHAWK_TARGET} POST_BUILD 
+                    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/src/html
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/html ${CMAKE_BINARY_DIR}/src/html
+                  )
 
 if ( UNIX )
 
@@ -128,6 +166,7 @@ else( )
          )
 
 endif( )
+
 
 if ( UNIX )
 
@@ -151,5 +190,15 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/warhawkreborn/connector_unix")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-${GIT_HASH}" )
+
+if ( UNIX )
+
+  set( CPACK_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/html" "/usr/share/warhawkreborn/html" )
+
+else( )
+
+  set( CPACK_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/html" "html" )
+
+endif( )
 
 include(CPack)

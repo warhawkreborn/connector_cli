@@ -35,7 +35,7 @@ void AddrInfo::Set( const addrinfo &info_ )
   m_ai_family     = info_.ai_family;
   m_ai_socktype   = info_.ai_socktype;
   m_ai_protocol   = info_.ai_protocol;
-  m_ai_addrlen    = info_.ai_addrlen;
+  m_ai_addrlen    = (socklen_t) info_.ai_addrlen;
   m_ai_canonname  = info_.ai_canonname == NULL ? "" : info_.ai_canonname;
   memcpy( &m_ai_addr, info_.ai_addr, m_ai_addrlen );
 }
@@ -60,7 +60,7 @@ const sockaddr_storage *AddrInfo::GetAiAddr( ) const
 }
 
 
-size_t AddrInfo::GetAiAddrLen( ) const
+socklen_t AddrInfo::GetAiAddrLen( ) const
 {
   return m_ai_addrlen;
 }
@@ -88,18 +88,29 @@ void *AddrInfo::GetInAddr( const struct sockaddr *sa_ )
 }
 
 
+std::string AddrInfo::SockAddrToAddress( const sockaddr_storage *sa_ )
+{
+  return SockAddrToAddress( (sockaddr *) sa_ );
+}
+
+
 std::string AddrInfo::SockAddrToAddress( const struct sockaddr *sa_ )
 {
-  std::string stringAddress;
-
   struct addrinfo p;
   p.ai_addr = (struct sockaddr *) sa_;
   p.ai_family = sa_->sa_family;
 
   char s[INET6_ADDRSTRLEN];
   inet_ntop( p.ai_family, GetInAddr( (struct sockaddr *) p.ai_addr ), s, sizeof( s ) );
+  std::string stringAddress;
   stringAddress = s;
   return stringAddress;
+}
+
+
+uint16_t AddrInfo::SockAddrToPort( const sockaddr_storage *sa_ )
+{
+  return SockAddrToPort( (const sockaddr *) sa_ );
 }
 
 
@@ -147,7 +158,13 @@ std::string AddrInfo::GetAddr( ) const
 
   Get( ai );
 
-  int e = getnameinfo( ai.ai_addr, ai.ai_addrlen, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
+  int e = getnameinfo( ai.ai_addr,
+                       (socklen_t) ai.ai_addrlen,
+                       buf,
+                       sizeof( buf ),
+                       NULL,
+                       0,
+                       NI_NUMERICHOST );
 
   free( ai.ai_canonname );
   free( ai.ai_addr );
@@ -161,6 +178,7 @@ std::string AddrInfo::GetAddr( ) const
 
   return &buf[0];
 }
+
 
 bool AddrInfo::SetAddr( const std::string &address_ )
 {
@@ -202,4 +220,16 @@ bool AddrInfo::SetAddr( const std::string &address_ )
   }
 
   return true; // OK.
+}
+
+
+uint16_t AddrInfo::GetPort( ) const
+{
+  return SockAddrToPort( (const sockaddr *) GetAiAddr( ) );
+}
+
+
+void AddrInfo::SetPort( uint16_t port_ )
+{
+  PortToSockAddr( port_, (sockaddr *) GetAiAddr( ) );
 }

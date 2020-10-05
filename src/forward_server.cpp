@@ -1,74 +1,50 @@
+#include "addr_info.h"
 #include "forward_server.h"
+#include "network.h"
+#include "search_server.h"
 
-ForwardServer::ForwardServer( Server *server_ )
-  : m_mutex( )
-  , m_entries( )
-  , m_server( server_ )
+
+ForwardServer::ForwardServer( ServerList &serverList_, PacketProcessor &packetProcessor_, Network &network_ )
+  : m_ServerList( serverList_ )
+  , m_PacketProcessor( packetProcessor_ )
+  , m_Network( network_ )
 {
-  m_server->Register( this );
+  m_PacketProcessor.Register( this, (int) Packet::TYPE::TYPE_SERVER_INFO_REQUEST );
 }
 
 
 ForwardServer::~ForwardServer( )
 {
-  m_server->Unregister( this );
+  m_PacketProcessor.Unregister( this );
 }
 
 
-void ForwardServer::SetEntries( std::vector< ServerEntry > e_ )
+void ForwardServer::OnReceivePacket( const Packet & packet_ )
 {
-  std::unique_lock< std::mutex > lck( m_mutex );
-  m_entries = std::move( e_ );
-}
 
-
-void ForwardServer::OnReceivePacket( sockaddr_storage client_, std::vector< uint8_t > data_ )
-{
-  if ( data_.size( ) > 300)
-  {
-    // This is not a request, but a response, so we exit early.
-    return;
-  }
+#ifdef LOGDATA
   std::cout << "ForwardServer: Received packet." << std::endl;
+#endif
 
-  if ( !valid_packet( data_ ) )
+#ifdef LOGDATA
+    std::cout << "ForwardServer: Sending server list" << std::endl;
+#endif
+
+  // This server only handles packets from the local network.
+  if ( !packet_.GetFromLocalNetwork( ) )
   {
-    std::cout << "ForwardServer: Received invalid frame, skipping" << std::endl;
     return;
   }
 
-  if ( data_[ 0 ] == 0xc3 && data_[ 1 ] == 0x81 )
+  m_ServerList.ForEachServer( [ this, &packet_ ] ( const ServerEntry &entry_ )
   {
-    std::cout << "ForwardServer: Sending server list" << std::endl;
-
-    std::unique_lock< std::mutex > lck( m_mutex );
-
-    for ( auto &e : m_entries )
+    // If it is from the local network then forward only remote servers to sender on local network.
+    if ( !entry_.m_LocalServer )
     {
-      m_server->send( client_, e.m_frame );
+      m_PacketProcessor.send( packet_.GetClient( ), entry_.m_frame );
     }
-  }
-  else
-  {
-    std::cout << "ForwardServer: Unknown frame type, ignoring" << std::endl;
-  }
-}
 
-
-bool ForwardServer::valid_packet( const std::vector< uint8_t > &data_ )
-{
-  if ( data_.size( ) < 4 )
-  {
-    return false;
-  }
-
-  uint16_t len = data_[ 3 ];
-  len = ( len << 8 ) | data_[ 2 ];
-
-  if ( data_.size( ) - 4 != len )
-  {
-    return false;
-  }
-
-  return true;
+    const bool continueOn = true;
+    return continueOn;
+  } );
 }

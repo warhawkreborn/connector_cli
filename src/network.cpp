@@ -6,6 +6,7 @@
 #include <iphlpapi.h>
 #endif // WIN32
 
+#include <array>
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
@@ -117,9 +118,9 @@ bool Network::StartWinsock( )
 //////////////////////////////////////////////////////////////////////
 void Network::_Init( )
 {
-  AddAddress( m_MyIpAddresses, "127.0.0.1" );
+  AddAddress( m_MyIpAddresses, "LoopBack", "127.0.0.1", 8 );
 
-  AddAddress( m_MyIpAddresses, "::1" );
+  AddAddress( m_MyIpAddresses, "LoopBack", "::1", 128 );
 
 #if defined( __linux__ ) || defined( __APPLE__ )
   struct ifaddrs *addrs = NULL;
@@ -136,48 +137,51 @@ void Network::_Init( )
 
   for ( tmp = addrs; tmp; tmp = tmp->ifa_next )
   {
-    char buf[ 256 ];
-    memset( &buf[0], 0, sizeof(buf) );
+    char abuf[ 256 ];
+    char nbuf[ 256 ];
+    memset( &abuf[ 0 ], 0, sizeof(abuf) );
+    memset( &nbuf[ 0 ], 0, sizeof(nbuf) );
     sockaddr *sa = tmp->ifa_addr;
+    sockaddr *na = tmp->ifa_netmask;
     if ( sa != NULL )
     {
       switch ( sa->sa_family )
       {
         case AF_INET:
           inet_ntop( sa->sa_family, &((struct sockaddr_in *) sa)->sin_addr,
-            buf, sizeof(buf) );
+            abuf, sizeof(abuf) );
+          inet_ntop( sa->sa_family, &((struct sockaddr_in *) na)->sin_addr,
+            nbuf, sizeof(nbuf) );
           break;
 
         case AF_INET6:
           inet_ntop( sa->sa_family, &((struct sockaddr_in6 *) sa)->sin6_addr,
-            buf, sizeof(buf) );
+            abuf, sizeof(abuf) );
+          inet_ntop( sa->sa_family, &((struct sockaddr_in6 *) na)->sin6_addr,
+            nbuf, sizeof(nbuf) );
           break;
 
         default:
           break;
       }
 
-      if ( buf[0] )
+      int prefixLen = 0;
+
+      if ( nbuf[ 0 ] )
       {
-        addrinfo *ai = NULL;
+        prefixLen = GetPrefixLen( nbuf );
+      }
 
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
-        if ( e != 0 )
+      if ( abuf[ 0 ] && nbuf[ 0 ] )
+      {
+        std::string address = abuf;
+        // Delete '%' character and anything following if found.
+        size_t idx = address.find( "%" );
+        if ( idx != std::string::npos )
         {
-          if ( addrs != NULL )
-          {
-            freeifaddrs( addrs );
-          }
-          // FIXME - Add error checking.
-          return; // Error.
+          address = address.substr( 0, idx );
         }
-
-        if ( ai )
-        {
-          AddrInfo info( *ai );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
+        AddAddress( m_MyIpAddresses, tmp->ifa_name, address.c_str( ), prefixLen );
       }
     }
   }
@@ -197,7 +201,7 @@ void Network::_Init( )
 
   // Make an initial call to GetAdaptersAddresses to get the 
   // size needed into the outBufLen variable
-  if ( GetAdaptersAddresses( AF_UNSPEC, 0, NULL, pAddresses, &outBufLen ) == ERROR_BUFFER_OVERFLOW )
+  if ( GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, pAddresses, &outBufLen ) == ERROR_BUFFER_OVERFLOW )
   {
     free(pAddresses);
     pAddresses = (IP_ADAPTER_ADDRESSES*) malloc( outBufLen );
@@ -205,57 +209,26 @@ void Network::_Init( )
 
   // Make a second call to GetAdapters Addresses to get the
   // actual data we want
-  if ( ( dwRetVal = GetAdaptersAddresses( AF_UNSPEC, 0, NULL, pAddresses, &outBufLen ) ) == NO_ERROR )
+  if ( ( dwRetVal = GetAdaptersAddresses( AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, pAddresses, &outBufLen ) ) == NO_ERROR )
   {
     // If successful, output some information from the data we received
     while ( pAddresses )
     {
       for ( IP_ADAPTER_UNICAST_ADDRESS *ptr = pAddresses->FirstUnicastAddress;
-            ptr != NULL; ptr = ptr->Next )
+            ptr != NULL;
+            ptr = ptr->Next )
       {
         char buf[ 256 ];
         memset( &buf[0], 0, sizeof(buf) );
         getnameinfo( ptr->Address.lpSockaddr, ptr->Address.iSockaddrLength, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
-
-        addrinfo *ai = NULL;
-
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
-        if ( e != 0 )
+        std::string ipAddress = buf;
+        size_t idx = ipAddress.find( "%" );
+        if ( idx != std::string::npos )
         {
-          // FIXME - Add error checking.
-          return; // Error.
+          ipAddress = ipAddress.substr( 0, idx );
         }
-
-        if ( ai )
-        {
-          AddrInfo info( *ai );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
-      }
-
-      for ( IP_ADAPTER_ANYCAST_ADDRESS *ptr = pAddresses->FirstAnycastAddress;
-            ptr != NULL; ptr = ptr->Next )
-      {
-        char buf[ 256 ];
-        memset( &buf[0], 0, sizeof(buf) );
-        getnameinfo( ptr->Address.lpSockaddr, ptr->Address.iSockaddrLength, buf, sizeof(buf), NULL, 0, NI_NUMERICHOST );
-
-        addrinfo *ai = NULL;
-
-        int e = getaddrinfo( &buf[0], NULL, NULL, &ai );
-        if ( e != 0 )
-        {
-          // FIXME - Add error checking.
-          return; // Error.
-        }
-
-        if ( ai )
-        {
-          AddrInfo info( *ai );
-          AddAddress( m_MyIpAddresses, info );
-          freeaddrinfo( ai );
-        }
+        wcstombs ( buf, pAddresses->FriendlyName, sizeof( buf ) );
+        AddAddress( m_MyIpAddresses, buf, ipAddress.c_str( ), ptr->OnLinkPrefixLength );
       }
 
       pAddresses = pAddresses->Next;
@@ -264,13 +237,13 @@ void Network::_Init( )
 
 #endif // WIN32
 
-#if 1
+#if 0
   // Test - Convert back and make sure we got what we thought we got.
   for ( IpAddresses_t::iterator itr = m_MyIpAddresses.begin();
         itr != m_MyIpAddresses.end(); ++itr )
   {
-    AddrInfo *ptr = &(*itr);
-    std::cout << "My Address: " << ptr->GetAddr( ) << std::endl;;
+    IpAddress *ptr = &(*itr);
+    std::cout << "My Address: " << ptr->GetAddress( ) << "/" << ptr->GetPrefixLength( ) << std::endl;;
   }
 #endif
 }
@@ -284,12 +257,12 @@ void Network::_Init( )
 bool Network::OnAddressList( const IpAddresses_t &addrList_,
                              const sockaddr_storage &address_ ) const
 {
-  std::string incomingAddr = AddrInfo::SockAddrToAddress( (const sockaddr *) &address_ ); 
+  std::string incomingAddr = AddrInfo::SockAddrToAddress( &address_ ); 
   for ( IpAddresses_t::const_iterator itr = addrList_.begin( );
         itr != addrList_.end( ); ++itr )
   {
-    const AddrInfo *ptr = &( *itr );
-    std::string address = ptr->GetAddr( );
+    const IpData *ptr = &( *itr );
+    std::string address = ptr->m_Address.GetAddress( );
     if ( incomingAddr == address )
     {
       return true; // Yes, this is one of my addresses.
@@ -369,44 +342,249 @@ std::string Network::GetNextInterface( )
 }
 
 
-void Network::AddAddress( IpAddresses_t &addrList_, const char *addr_ )
+void Network::AddAddress( IpAddresses_t &addrList_, const std::string &interfaceName_, const char *addr_, int prefixLen_ )
 {
-  addrinfo *ai = NULL;
+  IpAddress addr( addr_, prefixLen_ );
+  IpData ipData;
+  ipData.m_InterfaceName = interfaceName_;
+  ipData.m_Address = addr;
+  addrList_.push_back( ipData );
+}
 
-  int e = getaddrinfo( addr_, NULL, NULL, &ai );
+
+const Network::IpAddresses_t &Network::GetMyIpAddresses( )
+{
+  return m_MyIpAddresses;
+}
+
+
+int Network::GetPrefixLen( const std::string &netmask_ )
+{
+  int prefixLen = 0;
+
+  if ( Ipv4Addr( netmask_) )
+  {
+    std::string netmask = netmask_;
+    while ( netmask.length( ) > 0 )
+    {
+      size_t pos = netmask.find( "." );
+      std::string num;
+      if ( pos != std::string::npos )
+      {
+        num = netmask.substr( 0, pos );
+        netmask = netmask.substr( pos + 1 );
+      }
+      else
+      {
+        num = netmask;
+        netmask = "";
+      }
+
+      int bits = atoi( num.c_str( ) );
+      // Count IPv4 bits.
+      while ( bits != 0 )
+      {
+        if ( bits & 1 )
+        {
+          prefixLen++;
+        }
+
+        bits >>= 1;
+      }
+    }
+  }
+  else if ( Ipv6Addr( netmask_ ) )
+  {
+    // Count IPv6 bits.
+    for ( unsigned char c : netmask_ )
+    {
+      int num = 0;
+
+      if ( c >= '0' && c <= '9' )
+      {
+        num = c - '0';
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+        num = c - 'a' + 10;
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+        num = c - 'A' + 10;
+      }
+      else
+      {
+        continue;
+      }
+
+      while ( num != 0 )
+      {
+        if ( num & 1 )
+        {
+          prefixLen++;
+        }
+
+        num >>= 1;
+      }
+    }
+  }
+
+  return prefixLen;
+}
+
+
+bool Network::OnLocalNetwork( const std::string &ip_ )
+{
+  for ( const auto &entry : m_MyIpAddresses )
+  {
+    if ( OnSameNetwork( entry.m_Address, ip_ ) )
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+bool Network::OnSameNetwork( const IpAddress &ipWithPrefix_, const std::string &ip_ )
+{
+  IpAddrArray addrWithPrefix;
+  IpAddrArray ip;
+  std::string maskIp;
+  IpAddrArray mask;
+
+  if ( Ipv4Addr( ipWithPrefix_.GetAddress( ) ) && Ipv4Addr( ip_ ) )
+  {
+    maskIp = "255.255.255.255";
+  }
+  else if ( Ipv6Addr( ipWithPrefix_.GetAddress( ) ) && Ipv6Addr( ip_ ) )
+  {
+    maskIp = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
+  }
+  else
+  {
+    return false; // Not on the same network because they are not the same type of address.
+  }
+
+  ConvertToInteger( ipWithPrefix_.GetAddress( ), addrWithPrefix );
+  ConvertToInteger( ip_,                         ip             );
+  ConvertToInteger( maskIp,                      mask           );
+
+  int maskLen = ipWithPrefix_.GetPrefixLength( );
+  int maskBytes = maskLen / 8 + ( maskLen % 8 == 0 ? 0 : 1 );
+
+  for ( int i = 0; i < maskBytes; ++i, maskLen -= 8 )
+  {
+    unsigned char left  = addrWithPrefix[ i ];
+    unsigned char right = ip[ i ];
+    unsigned char mask = maskLen >= 8 ? 255 : ( 255 << maskLen ) ;
+    bool sameNetwork = ( left & mask ) == right;
+
+    if ( !sameNetwork )
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+void Network::ConvertToInteger( const std::string &ip_, IpAddrArray &outBuf_ )
+{
+  memset( &outBuf_, 0, sizeof( outBuf_ ) );
+
+  int domain = Ipv4Addr( ip_ ) ? AF_INET : Ipv6Addr( ip_ ) ? AF_INET6 : -1;
+
+  if ( domain == -1 )
+  {
+    std::stringstream ss;
+    ss << "FATAL ERROR: IP address '" << ip_ << "' not IPv4 or IPv6!";
+    throw std::runtime_error( ss.str() );
+  }
+
+  int err = inet_pton( domain, ip_.c_str( ), &outBuf_ );
+
+  if ( err <= 0 )
+  {
+    std::stringstream ss;
+    ss << "FATAL ERROR: Can't convert IP '" << ip_ << "' to integer!" << std::endl;
+    throw std::runtime_error( ss.str() );
+  }
+}
+
+
+bool Network::Ipv4Addr( const std::string &ip_ )
+{
+  bool ipv4 = ip_.find( '.' ) != std::string::npos;
+  return ipv4;
+}
+
+
+bool Network::Ipv6Addr( const std::string &ip_ )
+{
+  bool ipv6 = ip_.find( ':' ) != std::string::npos;
+  return ipv6;
+}
+
+
+std::vector< std::string > Network::ResolveIpAddress( const std::string &hostname_ )
+{
+  std::vector< std::string > addressList;
+
+  addrinfo *result = NULL;
+  addrinfo hints;
+  memset( &hints, 0, sizeof(hints) );
+
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  hints.ai_family = AF_INET;
+
+  hints.ai_flags =
+#ifdef AI_ADDRCONFIG
+    AI_ADDRCONFIG |
+#endif
+    0;
+
+  int e = getaddrinfo( hostname_.c_str( ), "0", &hints, &result );
+
   if ( e != 0 )
   {
-    // FIXME - Add error checking.
-    return; // Error.
-  }
-
-  if ( ai )
-  {
-    AddrInfo info( *ai );
-
-    AddAddress( addrList_, info );
-
-    freeaddrinfo( ai );
-  }
-}
-
-
-void Network::AddAddress( IpAddresses_t &addrList_, const AddrInfo &info_ )
-{
-  bool found = false;
-  for ( IpAddresses_t::iterator itr = addrList_.begin( );
-        itr != addrList_.end( ); ++itr )
-  {
-    if ( itr->GetAiAddrLen( ) == info_.GetAiAddrLen( ) &&
-         memcmp( itr->GetAiAddr( ), info_.GetAiAddr( ), itr->GetAiAddrLen( ) ) == 0 )
+    if ( result != NULL )
     {
-      found = true;
-      break;
-    } 
+      freeaddrinfo( result );
+    }
+
+    return addressList; // Error.
   }
 
-  if ( !found )
+  for ( addrinfo *itr = result; itr != NULL; itr = itr->ai_next )
   {
-    addrList_.push_back( info_ );
+    AddrInfo addrInfo( *itr );
+    addressList.push_back( addrInfo.GetAddr( ) );
+  }
+
+  if ( result != NULL )
+  {
+    freeaddrinfo( result );
+  }
+
+  return addressList;
+}
+
+
+void Network::ForEachAddress( std::function< bool ( const IpData & ) > func_ )
+{
+  for ( const auto &ipAddr : m_MyIpAddresses )
+  {
+    bool continueOn = func_( ipAddr );
+
+    if ( !continueOn )
+    {
+      break;
+    }
   }
 }
+ 

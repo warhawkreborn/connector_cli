@@ -1,49 +1,58 @@
-#ifndef DISCOVERY_PACKET_H
-#define DISCOVERY_PACKET_H
+#pragma once
+
+//
+// The WarHawk DiscoveryPacket contains information about the current WarHawk server
+// including current map, number of players, and other information.
+//
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
 
+#include "packet.h"
+
+
 namespace warhawk
 {
 
-class DiscoveryPacket
+class DiscoveryPacket : public Packet
 {
   public:
 
-    DiscoveryPacket( std::vector< uint8_t > data );
+    DiscoveryPacket( );
 
-    std::string GetName( );
+    DiscoveryPacket( Packet );
 
-    std::string GetGameMode( );
+    std::string GetName( ) const;
 
-    std::string GetMap( );
+    std::string GetGameMode( ) const;
 
-    std::string GetMapName( );
+    std::string GetMap( ) const;
 
-    int GetMapSize( );
+    std::string GetMapName( ) const;
 
-    int GetMaxPlayers( );
+    int GetMapSize( ) const;
 
-    int GetCurrentPlayers( );
+    int GetMaxPlayers( ) const;
 
-    int GetMinPlayers( );
+    int GetCurrentPlayers( ) const;
 
-    int GetTimeElapsed( );
+    int GetMinPlayers( ) const;
 
-    int GetTimeLimit( );
+    int GetTimeElapsed( ) const;
 
-    int GetStartWaitTime( );
+    int GetTimeLimit( ) const;
 
-    int GetSpawnWaitTime( );
+    int GetStartWaitTime( ) const;
 
-    int GetRoundsPlayed( );
+    int GetSpawnWaitTime( ) const;
 
-    int GetPointLimit( );
+    int GetRoundsPlayed( ) const;
 
-    int GetCurrentPoints( );
+    int GetPointLimit( ) const;
+
+    int GetCurrentPoints( ) const;
 
     void setPort( int i );
 
@@ -57,9 +66,6 @@ class DiscoveryPacket
 
   private:
 
-    std::vector< uint8_t > m_data;
 };
 
 } // End namespace warhawk
-
-#endif // DISCOVERY_PACKET_H

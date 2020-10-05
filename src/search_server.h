@@ -1,33 +1,67 @@
-#ifndef SEARCH_SERVER_H
-#define SEARCH_SERVER_H
+#pragma once
+
+//
+// The SearchServer periodically broadcasts a request for local network
+// servers.
+// Once it broadcasts, it listens for one second for any responses.
+// Any responses it gets are then marked as local servers and then sent on to
+// the remote server list server to publish as available public servers.
+//
 
 #include <iostream>
+#include <functional>
 #include <list>
 #include <vector>
 
 #include "discovery_packet.h"
 #include "message_handler.h"
-#include "net.h"
-#include "server.h"
-#include "server_entry.h"
+#include "packet_processor.h"
+#include "server_list.h"
+#include "udp_network_socket.h"
+#include "warhawk_api.h"
 
 
 class SearchServer : public MessageHandler
 {
   public:
 
-    SearchServer( Server * );
+    //
+    // Declarations
+    //
+
+    using PacketList = std::list< PacketData >;
+
+    //
+    // Methods
+    //
+
+    SearchServer( ServerList &, PacketProcessor & );
     ~SearchServer( );
 
     void run( );
 
-    void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
+    void OnReceivePacket( const Packet & ) override;
 
-    void SetEntries( std::vector< ServerEntry > e_ );
+    bool LocalServerContainsIp( const std::string &ip ); // True if the list contains this IP.
 
   protected:
 
   private:
+
+    //
+    // Methods
+    //
+
+    void DoStateWaiting( );
+    void DoStateBroadcasting( );
+    void DoStateCollecting( );
+    void DoStateProcessing( );
+
+    void ForEachServerNoLock( std::function< void( const ServerEntry & ) > );
+
+    //
+    // Data
+    //
 
     const std::string m_DiscoveryPacket =
       "c381b800001900b6018094004654000005000000010000000000020307000000c0a814ac000000002d27000000000000010000005761726861"
@@ -35,9 +69,10 @@ class SearchServer : public MessageHandler
       "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002801800ffffffff000000"
       "00000000004503d7e0000000000000005a";
 
-    std::mutex                  m_mutex;
-    std::vector< ServerEntry >  m_entries;
-    Server                     *m_server;
+    ServerList   &m_ServerList;
+
+    std::mutex       m_mutex; // Protects the m_PacketList.
+    PacketProcessor &m_PacketProcessor;
 
     enum class STATE
     {
@@ -49,15 +84,11 @@ class SearchServer : public MessageHandler
 
     STATE m_CurrentState;
 
-    struct PacketData
-    {
-      std::string              m_address;
-      warhawk::DiscoveryPacket m_data;
-    };
 
-    using PacketList = std::list< PacketData >;
+    PacketList  m_PacketList;
 
-    PacketList m_PacketList;
+    bool        m_Done = false;
+
+    // Make sure this is always last so that the thread destructs (joins) first.
+    std::thread m_Thread;
 };
-
-#endif // SEARCH_SERVER_H

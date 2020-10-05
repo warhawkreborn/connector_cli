@@ -1,11 +1,21 @@
-#ifndef WARHAWK_API_H
-#define WARHAWK_API_H
+#pragma once
+
+//
+// This class defines the high-level API to:
+// Download WarHawk server list.
+// Check forwarding capability of local WarHawk server.
+// Publish (AddHost) a local WarHawk server to the list of available public
+// servers.
+//
 
 #include <vector>
 
-#include "server_entry.h"
+#include "server_list.h"
 
+class PacketProcessor;
 class Server;
+
+struct ServerEntry;
 
 
 namespace warhawk
@@ -15,7 +25,7 @@ class API
 {
   public:
 
-    static std::vector< ServerEntry > DownloadServerList( Server * );
+    static std::vector< ServerEntry > DownloadServerList( PacketProcessor * );
 
     struct ForwardingResponse
     {
@@ -32,5 +42,3 @@ class API
 };
 
 } // End namespace warhawk
-
-#endif // WARHAWK_API_H
