@@ -1,13 +1,21 @@
-#ifndef WARHAWK_H
-#define WARHAWK_H
-
 #pragma once
+
+//
+// Defines various information related to the WarHawk game.
+//
 
 #include <cstdint>
 #include <vector>
 
+// Network port that WarHawk sends and listens on.
 const int         WARHAWK_UDP_PORT = 10029;
-const std::string WARHAWK_API_BASE = "https://warhawk.thalhammer.it/api/";
+
+const int         WARHAWK_HTTP_PORT = 8080;
+
+const std::string WARHAWK_SERVER_LIST_SERVER = "warhawk.thalhammer.it";
+
+// Server that distributes the list of active WarHawk servers.
+const std::string WARHAWK_API_BASE = "https://" + WARHAWK_SERVER_LIST_SERVER + "/api/";
 
 
 namespace warhawk
@@ -16,6 +24,7 @@ namespace warhawk
 namespace net
 {
 
+// Decoded WarHawk server_info_response packet.
 struct server_info_response
 {
   uint8_t  m_unknown_1[ 108 ];
@@ -34,7 +43,7 @@ struct server_info_response
   uint8_t  m_time_eclapsed;
   uint8_t  m_unknown_7[ 4 ];
   uint8_t  m_mapsize[ 16 ];
-  uint16_t m_point_limit; // Note: Big endian
+  uint16_t m_point_limit;   // Note: Big endian
   uint16_t m_point_current; // Note: Big endian
   uint8_t  m_unknown_8[ 3 ];
   uint8_t  m_time_limit;
@@ -50,8 +59,12 @@ struct server_info_response
   uint8_t  m_unknown_11[ 56 ];
 };
 
+
+// Make sure that the packet size is correct (different compilers may pad structures differently).
 static_assert( sizeof( server_info_response ) == 368, "Size missmatch, check compiler" );
 
+// Build a network packet from the individual components.
+// TODO: Document t1, t2.
 template< typename T >
 inline std::vector< uint8_t > build_packet( uint8_t t1_, uint8_t t2_, const T& data_ )
 {
@@ -68,5 +81,3 @@ inline std::vector< uint8_t > build_packet( uint8_t t1_, uint8_t t2_, const T& d
 } // End namespace net
 
 } // End namespace warhawk
-
-#endif // WARHAWK_H

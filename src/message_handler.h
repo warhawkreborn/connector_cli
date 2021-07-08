@@ -1,9 +1,14 @@
-#ifndef MESSAGE_SERVER_H
-#define MESSAGE_SERVER_H
+#pragma once
+
+//
+// A MessageHandler allows registered subscribers to handle processing of particular
+// message.
+//
 
 #include <vector>
 
-#include "net.h"
+#include "udp_network_socket.h"
+
 
 class MessageHandler
 {
@@ -19,6 +24,3 @@ class MessageHandler
 
   private:
 };
-
-
-#endif // MESSAGE_SERVER_H

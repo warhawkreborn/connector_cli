@@ -78,6 +78,11 @@ Execute the following program.
 
 Go to your PS3, enter local games mode and search for games.
 
+## Web Server built in to warhawkreborn program
+
+http://localhost:8080/
+
+(Substitute 'localhost' with another name if you are accessing it remotely)
 
 ### Status
 

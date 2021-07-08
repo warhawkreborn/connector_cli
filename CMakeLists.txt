@@ -15,9 +15,9 @@ message( "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}" )
 if ( APPLE )
 
   # C++17
-  add_definitions( -std=c++17 )
+  set( CMAKE_CXX_STANDARD 17 )
 
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.10" )
+  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.15" )
   set( CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -lc++" )
 
   # Standard library.
@@ -37,12 +37,15 @@ elseif ( MSVC )
 else( )
 
   # C++17
-  add_definitions( -std=c++17 )
+  set( CMAKE_CXX_STANDARD 17 )
 
   set( USE_SYSTEM_CURL ON )
 
 endif( )
 
+add_definitions( -DPICOJSON_USE_INT64 )
+add_definitions( -DUWS_NO_ZLIB        )
+add_definitions( -DLIBUS_NO_SSL       )
 
 if ( NOT USE_SYSTEM_CURL )
 
@@ -50,5 +53,10 @@ if ( NOT USE_SYSTEM_CURL )
   add_subdirectory( libs/curl EXCLUDE_FROM_ALL )
 
 endif( )
+
+add_subdirectory( libs/libuv/libuv-1.34.0 EXCLUDE_FROM_ALL )
+add_subdirectory( libs/uSockets EXCLUDE_FROM_ALL )
+# uWebSockets is a header only library, so no need to build a static library.
+#add_subdirectory( libs/uWebSockets )
 
 add_subdirectory( src )

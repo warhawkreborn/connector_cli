@@ -1,23 +1,29 @@
-#ifndef FORWARD_SERVER_H
-#define FORWARD_SERVER_H
+#pragma once
 
+//
+// The ForwardServer watches for requests for servers from the local network and
+// responds to valid requests with a list of remote servers.
+//
+
+#include <functional>
 #include <iostream>
 
 #include "message_handler.h"
-#include "net.h"
-#include "server.h"
-#include "server_entry.h"
+#include "packet_processor.h"
+#include "server_list.h"
+#include "udp_network_socket.h"
+
+class SearchServer;
+class Network;
 
 
 class ForwardServer : public MessageHandler
 {
   public:
 
-    ForwardServer( Server * );
+    ForwardServer( ServerList &, PacketProcessor &, Network & );
     ~ForwardServer( );
  
-    void SetEntries( std::vector< ServerEntry > );
-
     void OnReceivePacket( sockaddr_storage client, std::vector< uint8_t > data ) override;
 
   protected:
@@ -33,9 +39,7 @@ class ForwardServer : public MessageHandler
     // Data
     //
 
-    std::mutex                  m_mutex;
-    std::vector< ServerEntry >  m_entries;
-    Server                     *m_server;
+    ServerList      &m_ServerList;
+    PacketProcessor &m_PacketProcessor;
+    Network         &m_Network;
 };
-
-#endif // FORWARD_SERVER_H
